@@ -1,6 +1,15 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include "PluginParameters.h"
+#include <algorithm>
+#include <functional>
+
+namespace Electrophilia::Plugin::Tremolo
+{
+
+}
+
 //==============================================================================
 PluginProcessor::PluginProcessor()
      : AudioProcessor (BusesProperties()
@@ -10,7 +19,8 @@ PluginProcessor::PluginProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+    treeState(*this, nullptr, "PARAMETER", createParameterLayout())
 {
 }
 
@@ -176,6 +186,31 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
     juce::ignoreUnused (data, sizeInBytes);
+}
+
+using namespace Electrophilia::Plugin::Tremolo;
+
+juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+
+    for (int i = 0; i < PARAM_COUNT; ++i)
+    {
+        auto paramData = ParametersByID[i];
+
+        params.push_back (std::make_unique<juce::AudioParameterFloat> (
+                juce::ParameterID {paramData.id, 0},
+                paramData.name,
+                juce::NormalisableRange<float>(paramData.min, paramData.max),
+                paramData.def,
+                paramData.name,
+                juce::AudioProcessorParameter::genericParameter,
+                [paramData](float value, int){ return juce::String(paramData.getStringFromValue(value)); }
+                )
+            );
+    }
+
+    return {params.begin(), params.end()};
 }
 
 //==============================================================================

@@ -35,7 +35,7 @@ BraceWrapping: # Allman except for lambdas
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: false
 BreakStringLiterals: false
-ColumnLimit: 0
+ColumnLimit:     120
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
@@ -75,7 +75,7 @@ UseCRLF: false
 Language: ObjC
 BasedOnStyle: Chromium
 BreakBeforeBraces: Allman
-ColumnLimit: 0
+ColumnLimit:     120
 IndentWidth: 4
 KeepEmptyLinesAtTheStartOfBlocks: false
 ObjCSpaceAfterProperty: true
