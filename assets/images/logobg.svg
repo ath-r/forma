@@ -2,14 +2,14 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="157.32755mm"
-   height="19.090343mm"
-   viewBox="0 0 157.32755 19.090343"
+   width="200mm"
+   height="30mm"
+   viewBox="0 0 200 30"
    version="1.1"
    id="svg5"
    xml:space="preserve"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
-   sodipodi:docname="logo.svg"
+   sodipodi:docname="logobg.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="1.3986842"
-     inkscape:cx="272.75635"
-     inkscape:cy="98.664157"
+     inkscape:cx="353.54656"
+     inkscape:cy="119.39793"
      inkscape:window-width="1920"
      inkscape:window-height="1128"
      inkscape:window-x="0"
@@ -38,7 +38,14 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="display:inline"
-     transform="translate(-48.709036,-132.78119)"><g
+     transform="translate(-27.372808,-127.32636)"><rect
+       style="display:inline;font-weight:bold;font-size:25.989px;line-height:1;font-family:'Cooper Hewitt';-inkscape-font-specification:'Cooper Hewitt weight=713';text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.25;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       id="rect15495"
+       width="172.0063"
+       height="34.882446"
+       x="23.541477"
+       y="148.04848"
+       transform="scale(1.1627481,0.86003151)" /><g
        aria-label="VERONIKA"
        transform="scale(1.1627481,0.86003151)"
        id="text356"
