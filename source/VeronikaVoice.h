@@ -37,6 +37,11 @@ namespace Electrophilia::Veronika
             octaves.setFrequency(mult * f);
         }
 
+        void setTime(double t)
+        {
+            octaves.setTime(t);
+        }
+
         bool isActive()
         {
             return gate > 0.0f;

@@ -2,6 +2,7 @@
 
 #include "control/Events.h"
 #include "dsp/Context.h"
+#include "dsp/PhaseCounter.h"
 #include "juce_audio_basics/juce_audio_basics.h"
 #include <array>
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -48,6 +49,8 @@ public:
     juce::AudioProcessorValueTreeState treeState;
 
 private:
+
+    Electrophilia::Dsp::PhaseCounter phaseCounter;
 
     Electrophilia::Control::VoiceManager voiceManager;
     std::array<Electrophilia::Veronika::VeronikaVoice, 16> voices;

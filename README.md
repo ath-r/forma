@@ -8,7 +8,7 @@ Implemented features:
 
 * Oscillators use SIMD to compute multiple stops in parallel, e.g. 16′, 8′, 4′, and 2′ stops are computed at the cost of a single oscillator.
 
-* Polysynth-style voice allocation, with a maximum of 16 voices.
+* Polysynth-style voice allocation, with a maximum of 16 voices. Oscillators are synced such that identical frequencies don't cancel each other out.
 
 Planned features (high to low priority):
 

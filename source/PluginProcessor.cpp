@@ -11,6 +11,7 @@
 #include "VeronikaVoice.h"
 #include "control/Midi.h"
 #include "dsp/Context.h"
+#include "dsp/PhaseCounter.h"
 #include "juce_audio_basics/juce_audio_basics.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_data_structures/juce_data_structures.h"
@@ -36,6 +37,8 @@ PluginProcessor::PluginProcessor()
                        ),
     treeState(*this, nullptr, "PARAMETER", createParameterLayout())
 {
+    contextOut.addMemberCallback(phaseCounter, &Electrophilia::Dsp::PhaseCounter::setContext);
+
     for (int i = 0; i < 16; i++)
     {
         voiceManager.noteOn_out(i).addMemberCallback(voices[i], &Electrophilia::Veronika::VeronikaVoice::handleNoteOn);
@@ -81,6 +84,8 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // This loop will iterate over all the midi events AND the audio frames after the last midi event
     // If there are no midi events, then it will just go through the audio frames in one go
 
+    if (!voiceManager.isAtLeastOneVoiceActive()) phaseCounter.reset();
+
     int midiEventCount = midiMessages.getNumEvents();
     auto iterator = midiMessages.begin();
 
@@ -97,10 +102,13 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
 
         int samplesToProcess = stopAtSample - currentSample;
-        //PROCESS AUDIO HERE
 
+        //PROCESS AUDIO HERE
         for (int i = currentSample; i < stopAtSample; i++)
         {
+
+            phaseCounter.processSample();
+
             for (auto& voice : voices)
             {
                 if (voice.isActive())
@@ -110,6 +118,16 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                 ch0[i] += sample;
                 ch1[i] += sample;
                 }
+            }
+        }
+
+        //This will synchronize inactive voices with global time
+        //So oscillators running at the same frequency will all be in phase
+        for (auto& voice : voices)
+        {
+            if (!voice.isActive())
+            {
+                voice.setTime(phaseCounter.getTime());
             }
         }
 

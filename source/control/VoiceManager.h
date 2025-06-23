@@ -35,6 +35,15 @@ namespace Electrophilia::Control
         EventOutput<Midi::MessageNoteOn>& noteOn_out(int i) {    return voices[i].noteOn_out;    };
         EventOutput<Midi::MessageNoteOff>& noteOff_out(int i) {    return voices[i].noteOff_out;    };
 
+        bool isAtLeastOneVoiceActive()
+        {
+            for (VoiceController& voice : voices)
+            {
+                if (voice.active) return true;
+            }
+            return false;
+        }
+
         void handleNoteOn(const Midi::MessageNoteOn message)
         {
             auto& voice = voiceDeque.front();

@@ -84,6 +84,8 @@ private:
         vec4 out = 0.0f;
         vec4 lastOut = 0.0f;
 
+        float _time;
+
     public:
         void setContext(const Context context)
         {
@@ -98,11 +100,25 @@ private:
 
             delta = frequency * c.T;
 
+            vec4 t = _time / frequency;
+            phase = t - vec4::truncate(t);
+
             n = vec4::truncate(18000.0f / frequency);
+        }
+
+        void setTime(const double time)
+        {
+            const vec4 t = vec4(float(time)) / frequency;
+
+            _time = float(time);
+
+            phase = t - vec4::truncate(t);
         }
 
         vec4 processSample()
         {
+            _time += c.T;
+
             phase += delta;
             phase -= vec4::truncate(phase);
 
