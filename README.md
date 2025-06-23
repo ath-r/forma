@@ -2,9 +2,13 @@
 
 **VERONIKA** is a digital emulation of a transistor combo organ manufactured in the GDR during the 1980s. It currently focuses on a specific single-manual model, though voicings from other models may be added in the future.
 
-Features:
+Implemented features:
 
-* *we are here (nothing is made yet)*
+* Oscillators generate antialiased square waves using bandlimited impulse trains based on the closed-form Dirichlet kernel.
+
+* Oscillators use SIMD to compute multiple stops in parallel, e.g. 16′, 8′, 4′, and 2′ stops are computed at the cost of a single oscillator.
+
+* Polysynth-style voice allocation, with a maximum of 16 voices.
 
 Planned features (high to low priority):
 
