@@ -67,6 +67,9 @@ juce_add_plugin("${PROJECT_NAME}"
     # On MacOS, plugin is copied to /Users/yourname/Library/Audio/Plug-Ins/
     COPY_PLUGIN_AFTER_BUILD TRUE
 
+    NEEDS_MIDI_INPUT TRUE
+    IS_SYNTH TRUE
+
     # Change me!
     # A four-character plugin id
     # First character MUST be uppercase for AU formats
@@ -127,7 +130,7 @@ target_compile_definitions(SharedCode
     VERSION="${CURRENT_VERSION}"
 
     # JucePlugin_Name is for some reason doesn't use the nicer PRODUCT_NAME
-    PRODUCT_NAME_WITHOUT_VERSION="Pamplejuce"
+    PRODUCT_NAME_WITHOUT_VERSION="VERONIKA"
 )
 
 # Link to any other modules you added (with juce_add_module) here!

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <deque>
 
 #include "Events.h"
@@ -13,14 +14,14 @@ namespace Electrophilia::Control
         struct VoiceController
         {
             bool active = false;
-            int pitch = 69; //actually this funny number is the MIDI note number for 440hz
+            int note = 69;
             int channel = 0;
 
             EventOutput<Midi::MessageNoteOn> noteOn_out;
             EventOutput<Midi::MessageNoteOff> noteOff_out;
         };
 
-        VoiceController voices[16];
+        std::array<VoiceController, 16> voices;
 
         std::deque<VoiceController*> voiceDeque;
 
@@ -34,14 +35,14 @@ namespace Electrophilia::Control
         EventOutput<Midi::MessageNoteOn>& noteOn_out(int i) {    return voices[i].noteOn_out;    };
         EventOutput<Midi::MessageNoteOff>& noteOff_out(int i) {    return voices[i].noteOff_out;    };
 
-        void handleNoteOn(const Midi::MessageNoteOn message) 
+        void handleNoteOn(const Midi::MessageNoteOn message)
         {
             auto& voice = voiceDeque.front();
 
             if (!voice->active)
             {
                 voice->active = true;
-                voice->pitch = message.note;
+                voice->note = message.note;
                 voice->noteOn_out.fire(message);
 
                 voiceDeque.pop_front();
@@ -49,11 +50,11 @@ namespace Electrophilia::Control
             }
         };
 
-        void handleNoteOff(const Midi::MessageNoteOff message) 
+        void handleNoteOff(const Midi::MessageNoteOff message)
         {
             for (VoiceController& voice : voices)
             {
-                if (voice.pitch == message.note)
+                if (voice.note == message.note)
                 {
                     voice.active = false;
                     voice.noteOff_out.fire(message);

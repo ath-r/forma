@@ -33,6 +33,28 @@ namespace Electrophilia::Control::Midi
         unsigned char data1;
         unsigned char data2;
 
+        static Message fromRawData(const unsigned char* data, int size)
+        {
+            Message message;
+
+            if (size > 0)
+            {
+                message.status = data[0];
+            }
+
+            if (size > 1)
+            {
+                message.data1 = data[1];
+            }
+
+            if (size > 2)
+            {
+                message.data2 = data[2];
+            }
+
+            return message;
+        }
+
         MessageType type()
         {
             return static_cast<MessageType>(status & 0xF0);
@@ -48,30 +70,34 @@ namespace Electrophilia::Control::Midi
             return type() == MessageType::NoteOn;
         }
 
+        bool isNoteOff()
+        {
+            return type() == MessageType::NoteOff;
+        }
+
+        bool isNoteOnOrOff()
+        {
+            return isNoteOn() || isNoteOff();
+        }
+
         explicit operator MessageNoteOn() const
         {
             return MessageNoteOn
             {
-                .channel = status & 0x0F,
+                .channel = static_cast<unsigned char>(status & 0x0F),
                 .note = data1,
                 .velocity = data2
             };
-        }
-
-        bool isNoteOff()
-        {
-            return type() == MessageType::NoteOff;
         }
 
         explicit operator MessageNoteOff() const
         {
             return MessageNoteOff
             {
-                .channel = status & 0x0F,
+                .channel = static_cast<unsigned char>(status & 0x0F),
                 .note = data1,
                 .velocity = data2
             };
         }
     };
 }
-

@@ -3,7 +3,21 @@
 
 #include "PluginParameters.h"
 #include <algorithm>
+#include <cmath>
 #include <functional>
+#include <numbers>
+
+
+#include "VeronikaVoice.h"
+#include "control/Midi.h"
+#include "dsp/Context.h"
+#include "juce_audio_basics/juce_audio_basics.h"
+#include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_data_structures/juce_data_structures.h"
+
+#include "dsp/BlitSquare.h"
+#include "math/Math.h"
+#include "control/Events.h"
 
 namespace Electrophilia::Plugin::Tremolo
 {
@@ -22,11 +36,186 @@ PluginProcessor::PluginProcessor()
                        ),
     treeState(*this, nullptr, "PARAMETER", createParameterLayout())
 {
+    for (int i = 0; i < 16; i++)
+    {
+        voiceManager.noteOn_out(i).addMemberCallback(voices[i], &Electrophilia::Veronika::VeronikaVoice::handleNoteOn);
+        voiceManager.noteOff_out(i).addMemberCallback(voices[i], &Electrophilia::Veronika::VeronikaVoice::handleNoteOff);
+        contextOut.addMemberCallback(voices[i], &Electrophilia::Veronika::VeronikaVoice::setContext);
+    }
 }
 
 PluginProcessor::~PluginProcessor()
 {
 }
+
+//==============================================================================
+void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+{
+    contextOut.fire(Electrophilia::Dsp::Context(sampleRate));
+}
+
+void PluginProcessor::releaseResources()
+{
+    // When playback stops, you can use this as an opportunity to free up any
+    // spare memory, etc.
+}
+
+void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
+                                              juce::MidiBuffer& midiMessages)
+{
+    juce::ignoreUnused (midiMessages);
+
+    juce::ScopedNoDenormals noDenormals;
+    const auto totalNumInputChannels  = getTotalNumInputChannels();
+    const auto totalNumOutputChannels = getTotalNumOutputChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+    {
+        buffer.clear (i, 0, numSamples);
+    }
+
+    auto ch0 = buffer.getWritePointer(0);
+    auto ch1 = buffer.getWritePointer(1);
+
+    // This loop will iterate over all the midi events AND the audio frames after the last midi event
+    // If there are no midi events, then it will just go through the audio frames in one go
+
+    int midiEventCount = midiMessages.getNumEvents();
+    auto iterator = midiMessages.begin();
+
+    int currentSample = 0;
+    for (int i_midi = 0; i_midi < midiEventCount + 1; i_midi++)
+    {
+        bool processMidi = i_midi < midiEventCount;
+
+        int stopAtSample = numSamples;
+        if (processMidi)
+        {
+            juce::MidiMessageMetadata metadata = *iterator;
+            stopAtSample = metadata.samplePosition;
+        }
+
+        int samplesToProcess = stopAtSample - currentSample;
+        //PROCESS AUDIO HERE
+
+        for (int i = currentSample; i < stopAtSample; i++)
+        {
+            for (auto& voice : voices)
+            {
+                if (voice.isActive())
+                {
+                auto sample = voice.processSample().sum() / 128.0f;
+
+                ch0[i] += sample;
+                ch1[i] += sample;
+                }
+            }
+        }
+
+        currentSample = stopAtSample;
+
+        if (processMidi)
+        {
+            juce::MidiMessageMetadata metadata = *iterator;
+            auto currentMidiEvent = metadata.getMessage();
+
+            Electrophilia::Control::Midi::Message message = Electrophilia::Control::Midi::Message::fromRawData(currentMidiEvent.getRawData(), currentMidiEvent.getRawDataSize());
+
+            if (message.isNoteOnOrOff())
+            {
+                int noteNumber = message.data1;
+
+                constexpr int lowestNote = Electrophilia::Math::C1_MIDI_NOTE_NUMBER;
+                constexpr int highestNote = lowestNote + 61;
+
+                if ((noteNumber >= lowestNote) && (noteNumber <= highestNote))
+                {
+                     // fire midi events here
+
+                     if (message.isNoteOn())
+                     {
+                        voiceManager.handleNoteOn(Electrophilia::Control::Midi::MessageNoteOn(message));
+                     }
+                     if (message.isNoteOff())
+                     {
+                        voiceManager.handleNoteOff(Electrophilia::Control::Midi::MessageNoteOff(message));
+                     }
+                }
+            }
+
+            if (i_midi < (midiEventCount - 1)) iterator++;
+        }
+
+    }
+
+}
+
+//==============================================================================
+bool PluginProcessor::hasEditor() const
+{
+    return true; // (change this to false if you choose to not supply an editor)
+}
+
+juce::AudioProcessorEditor* PluginProcessor::createEditor()
+{
+    return new PluginEditor (*this);
+}
+
+//==============================================================================
+void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
+{
+    auto state = treeState.copyState();
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
+
+}
+
+void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
+{
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+    if (xmlState.get() != nullptr)
+    {
+        if (xmlState->hasTagName (treeState.state.getType()))
+        {
+            treeState.replaceState (juce::ValueTree::fromXml (*xmlState));
+        }
+    }
+}
+
+using namespace Electrophilia::Plugin::Tremolo;
+
+juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+
+    for (int i = 0; i < PARAM_COUNT; ++i)
+    {
+        auto paramData = ParametersByID[i];
+
+        params.push_back (std::make_unique<juce::AudioParameterFloat> (
+                juce::ParameterID {paramData.id, 0},
+                paramData.name,
+                juce::NormalisableRange<float>(paramData.min, paramData.max),
+                paramData.def,
+                paramData.name,
+                juce::AudioProcessorParameter::genericParameter,
+                [paramData](float value, int){ return juce::String(paramData.getStringFromValue(value)); }
+                )
+            );
+    }
+
+    return {params.begin(), params.end()};
+}
+
+//==============================================================================
+// This creates new instances of the plugin..
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new PluginProcessor();
+}
+
+//===============================================================================
 
 //==============================================================================
 const juce::String PluginProcessor::getName() const
@@ -93,20 +282,6 @@ void PluginProcessor::changeProgramName (int index, const juce::String& newName)
     juce::ignoreUnused (index, newName);
 }
 
-//==============================================================================
-void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
-{
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
-}
-
-void PluginProcessor::releaseResources()
-{
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
-}
-
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
@@ -127,95 +302,4 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 
     return true;
   #endif
-}
-
-void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
-                                              juce::MidiBuffer& midiMessages)
-{
-    juce::ignoreUnused (midiMessages);
-
-    juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-        juce::ignoreUnused (channelData);
-        // ..do something to the data...
-    }
-}
-
-//==============================================================================
-bool PluginProcessor::hasEditor() const
-{
-    return true; // (change this to false if you choose to not supply an editor)
-}
-
-juce::AudioProcessorEditor* PluginProcessor::createEditor()
-{
-    return new PluginEditor (*this);
-}
-
-//==============================================================================
-void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
-{
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused (destData);
-}
-
-void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
-{
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused (data, sizeInBytes);
-}
-
-using namespace Electrophilia::Plugin::Tremolo;
-
-juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
-{
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-
-    for (int i = 0; i < PARAM_COUNT; ++i)
-    {
-        auto paramData = ParametersByID[i];
-
-        params.push_back (std::make_unique<juce::AudioParameterFloat> (
-                juce::ParameterID {paramData.id, 0},
-                paramData.name,
-                juce::NormalisableRange<float>(paramData.min, paramData.max),
-                paramData.def,
-                paramData.name,
-                juce::AudioProcessorParameter::genericParameter,
-                [paramData](float value, int){ return juce::String(paramData.getStringFromValue(value)); }
-                )
-            );
-    }
-
-    return {params.begin(), params.end()};
-}
-
-//==============================================================================
-// This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new PluginProcessor();
 }

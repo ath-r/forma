@@ -40,3 +40,5 @@ packaging/Output/*
 Tests-b12d07c_include.cmake
 CPM_modules/FindCatch2.cmake
 Benchmarks-b12d07c_include.cmake
+VERONIKA_artefacts/JuceLibraryCode/Defs.txt
+VERONIKA_artefacts/JuceLibraryCode/Info.txt
