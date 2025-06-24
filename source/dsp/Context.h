@@ -7,6 +7,6 @@ namespace Electrophilia::Dsp
         float SR;
         float T;
 
-        Context(float sampleRate) : SR(sampleRate), T(1.0f / SR) {};
+        Context(float sampleRate);
     };
 }

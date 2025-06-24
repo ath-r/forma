@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Context.h"
-#include "../math/Math.h"
+#include "../math/Trigonometry.h"
 
 namespace Electrophilia::Dsp
 {

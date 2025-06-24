@@ -1,7 +1,6 @@
 #pragma once
 
-#include "math/Math.h"
-#include "dsp/BlitSquare.h"
+#include "dsp/BlitSquareSimd.h"
 #include "dsp/Context.h"
 
 #include "control/Midi.h"
@@ -9,7 +8,6 @@
 namespace Electrophilia::Veronika
 {
     using namespace Electrophilia::Dsp;
-    using namespace Electrophilia::Math;
     using namespace Electrophilia::Control;
 
     class VeronikaVoice
@@ -21,47 +19,18 @@ namespace Electrophilia::Veronika
         float gate = 0.0f;
 
     public:
+        void setContext (Context context);
 
-        void setContext(Context context)
-        {
-            c = context;
-            setFrequency(frequency);
-        }
+        void setFrequency (float f);
 
-        void setFrequency(float f)
-        {
-            static const float multipliers[4] = {1.0f, 2.0f, 4.0f, 8.0f};
-            static const vec4 mult = vec4::fromRawArray(multipliers);
+        void setTime (double t);
 
-            frequency = f;
-            octaves.setFrequency(mult * f);
-        }
+        bool isActive();
 
-        void setTime(double t)
-        {
-            octaves.setTime(t);
-        }
+        void handleNoteOn (Midi::MessageNoteOn message);
 
-        bool isActive()
-        {
-            return gate > 0.0f;
-        }
+        void handleNoteOff (Midi::MessageNoteOff message);
 
-        void handleNoteOn(Midi::MessageNoteOn message)
-        {
-            gate = 1.0f;
-
-            setFrequency(Math::noteToFrequency(message.note));
-        }
-
-        void handleNoteOff(Midi::MessageNoteOff message)
-        {
-            gate = 0.0f;
-        }
-
-        vec4 processSample()
-        {
-            return octaves.processSample() * gate;
-        }
+        vec4 processSample();
     };
 }

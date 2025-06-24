@@ -2,22 +2,18 @@
 #include "PluginEditor.h"
 
 #include "PluginParameters.h"
-#include <algorithm>
 #include <cmath>
-#include <functional>
-#include <numbers>
 
+
+#include "juce_audio_basics/juce_audio_basics.h"
+#include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_data_structures/juce_data_structures.h"
 
 #include "VeronikaVoice.h"
 #include "control/Midi.h"
 #include "dsp/Context.h"
 #include "dsp/PhaseCounter.h"
-#include "juce_audio_basics/juce_audio_basics.h"
-#include "juce_audio_processors/juce_audio_processors.h"
-#include "juce_data_structures/juce_data_structures.h"
-
-#include "dsp/BlitSquare.h"
-#include "math/Math.h"
+#include "math/Conversion.h"
 #include "control/Events.h"
 
 namespace Electrophilia::Plugin::Tremolo
