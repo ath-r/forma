@@ -62,9 +62,9 @@ namespace Electrophilia::Math
     template <typename T>
     static inline T fastTan(T x) noexcept
     {
-        auto x2 = x * x;
-        auto numerator = x * (-135135 + x2 * (17325 + x2 * (-378 + x2)));
-        auto denominator = -135135 + x2 * (62370 + x2 * (-3150 + 28 * x2));
+        T x2 = x * x;
+        T numerator = x * (-135135 + x2 * (17325 + x2 * (-378 + x2)));
+        T denominator = -135135 + x2 * (62370 + x2 * (-3150 + 28 * x2));
         return numerator / denominator;
     }
 }

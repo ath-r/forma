@@ -1,11 +1,17 @@
 #include "Context.h"
 #include "SIMD.h"
 
+#include "Filter.h"
+
 namespace Electrophilia::Dsp::Oscillator
 {
     class BlitSquareSimd
     {
+
         Context c = Context(48000.0f);
+
+        Filter1P<vec4> filter1, filter2;
+
         vec4 n;
 
         vec4 phase = 0.0;
@@ -28,6 +34,8 @@ namespace Electrophilia::Dsp::Oscillator
 
     private:
         vec4 foldArgument (vec4 x);
+
+        vec4 sinc (vec4 x);
 
         vec4 sin2pi9 (vec4 x);
 

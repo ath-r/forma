@@ -27,21 +27,21 @@ namespace Electrophilia::Dsp
 
         void setCutoffFrequencyPrewarped(T freq)
         {
-            const T wd = freq * 6.28318531f;
-            const T wa = Math::fastTan(wd * c.T * 0.5f) * (2.0f * c.SR);
-            const T g = wa * c.T * 0.5f;
+            const T wd = freq * Math::tau<T>;
+            const T wa = Math::fastTan(wd * T(c.T) * T(0.5)) * (T(c.SR * 2.0));
+            const T g = wa * T(c.T * 0.5);
 
             G = g / (g + 1.0f);
         }
 
         void setCutoffFrequency(T freq)
         {
-            G = c.T * freq * 0.5f;
+            G = freq * T(c.T) * T(0.5);
         }
 
         void setTime(T time)
         {
-            G = 0.5f / (c.SR * time);
+            G = T(0.5) / (time * T(c.SR));
         }
 
         inline T process(T x)

@@ -6,8 +6,12 @@ namespace Electrophilia::Dsp::Oscillator
     void BlitSquareSimd::setContext (const Context context)
     {
         c = context;
+        filter1.setContext(c);
+        filter2.setContext(c);
 
         setFrequency (frequency);
+        filter1.setCutoffFrequency(frequency);
+        filter2.setCutoffFrequency(frequency * 0.5f);
     }
 
     void BlitSquareSimd::setFrequency (const vec4 newFrequency)
@@ -19,14 +23,17 @@ namespace Electrophilia::Dsp::Oscillator
         vec4 t = _time / frequency;
         phase = t - vec4::truncate (t);
 
-        n = vec4::truncate (18000.0f / frequency);
+        n = vec4::truncate (15000.0f / frequency);
+
+        filter1.setCutoffFrequency(frequency);
+        filter2.setCutoffFrequency(frequency);
     }
 
     void BlitSquareSimd::setTime (const double time)
     {
         const vec4 t = vec4 (float (time)) / frequency;
 
-        _time = float (time);
+        _time = float(time);
 
         phase = t - vec4::truncate (t);
     }
@@ -38,12 +45,17 @@ namespace Electrophilia::Dsp::Oscillator
         phase += delta;
         phase -= vec4::truncate (phase);
 
-        vec4 core = (dirichlet (phase) - dirichlet (phase + 0.5f)) / (n * 2.0f);
+        const vec4 centeredPhase = phase - 0.5f;
 
-        out = core * delta + lastOut * (vec4 (1.0f) - delta);
+        const vec4 core = dirichlet(centeredPhase) - dirichlet(centeredPhase + 0.5f);
+
+        out = core + lastOut * (vec4(1.0f) - delta);
         lastOut = out;
 
-        return out * 128.0f;
+        const vec4 f1 = out - filter1.process(out);
+        const vec4 f2 = f1 - filter2.process(f1);
+
+        return f2;
     }
 
     vec4 BlitSquareSimd::foldArgument (vec4 x)
@@ -70,15 +82,27 @@ namespace Electrophilia::Dsp::Oscillator
 
     vec4 BlitSquareSimd::dirichlet (vec4 x)
     {
-        const vec4 threshold = 1e-4;
+        const vec4 aMask = vec4::max(vec4(1.0f) - vec4::abs(x * 10000.0f), 0.0f);
+        const vec4 bMask = vec4(1.0f) - aMask;
+        const vec4 n2 = n * 2.0f;
 
         vec4 nominator = sin2pi9 ((n + 0.5f) * x);
-        vec4 denominator = sin2pi9 (x * 0.5f);
+        vec4 denominator = sin2pi9 (x * 0.5f) * n2;
 
-        vec4 fallback = n * 2.0f - 1.0f;
+        vec4 fallback = (n2 - 1.0f) / n2;
 
-        auto cond = vec4::lessThan (vec4::abs (denominator), threshold);
+        return fallback * aMask + (nominator / denominator) * bMask;
+    }
 
-        return (fallback & cond) + ((nominator / denominator) & ~cond);
+    vec4 BlitSquareSimd::sinc (vec4 x)
+    {
+        const vec4 aMask = vec4::max(vec4(1.0f) - vec4::abs(x * 10.0f), 0.0f);
+        const vec4 bMask = vec4(1.0f) - aMask;
+
+        const vec4 x2 = x * x;
+        const vec4 a = vec4(1.0f) - x2 * 1.6449f;
+        const vec4 b = sin2pi9(x * 0.5f) / (x * Math::pi<float>);
+
+        return a * aMask + b * bMask;
     }
 }
