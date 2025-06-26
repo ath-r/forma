@@ -4,7 +4,7 @@
 
 Implemented features:
 
-* Oscillators generate antialiased square waves using bandlimited steps based on trigonometric expression of sinc integral.
+* Oscillators generate antialiased square waves using bandlimited steps based on a closed-form approximation of the Sinc integral using trigonometric functions.
 
 * Oscillators use SIMD to compute multiple stops in parallel, e.g. 16′, 8′, 4′, and 2′ stops are computed at the cost of a single oscillator.
 
