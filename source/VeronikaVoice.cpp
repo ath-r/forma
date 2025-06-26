@@ -9,6 +9,7 @@ namespace Electrophilia::Veronika
     void VeronikaVoice::setContext (Context context)
     {
         c = context;
+        octaves.setContext(c);
         setFrequency (frequency);
     }
     void VeronikaVoice::setFrequency (float f)
@@ -24,14 +25,19 @@ namespace Electrophilia::Veronika
 
     bool VeronikaVoice::isActive() { return gate > 0.0f; }
 
+    int VeronikaVoice::getNote() { return note; }
+
     void VeronikaVoice::handleNoteOn (Midi::MessageNoteOn message)
     {
         gate = 1.0f;
+        note = message.note;
 
-        setFrequency (Math::noteToFrequency (message.note));
+        setFrequency (Math::noteToFrequency (note));
     }
 
     void VeronikaVoice::handleNoteOff (Midi::MessageNoteOff message) { gate = 0.0f; }
 
     vec4 VeronikaVoice::processSample() { return octaves.processSample() * gate; }
+
+
 }

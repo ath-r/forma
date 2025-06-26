@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dsp/BlitSquareSimd.h"
+#include "dsp/SquareSimd.h"
 #include "dsp/Context.h"
 
 #include "control/Midi.h"
@@ -13,10 +13,12 @@ namespace Electrophilia::Veronika
     class VeronikaVoice
     {
         Context c = Context(48000.0f);
-        Oscillator::BlitSquareSimd octaves;
+        Oscillator::SquareSimd octaves;
 
         float frequency = 440.0f;
         float gate = 0.0f;
+
+        int note;
 
     public:
         void setContext (Context context);
@@ -26,6 +28,8 @@ namespace Electrophilia::Veronika
         void setTime (double t);
 
         bool isActive();
+
+        int getNote();
 
         void handleNoteOn (Midi::MessageNoteOn message);
 
