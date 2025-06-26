@@ -1,23 +1,30 @@
 #pragma once
 
 #include <numbers>
-#include <cmath>
+
+#include "Clamp.h"
 
 namespace Electrophilia::Math
 {
     template <typename T> static constexpr T pi = std::numbers::pi_v<T>;
     template <typename T> static constexpr T tau = pi<T> * T(2.0);
 
+    template <typename T> static constexpr T invPi = T(1.0) / pi<T>;
+    template <typename T> static constexpr T invTau = T(1.0) / tau<T>;
+
     static constexpr float fpi = pi<float>;
     static constexpr float ftau = pi<float> * 2.0f;
+
+    static constexpr float finvPi = invPi<float>;
+    static constexpr float finvTau = invTau<float>;
 
     template <typename T>
     static inline T foldArgument(T x)
     {
-        const T half = T(0.5);
+        const T half = 0.5;
         x = fastmod1f(x + half) - half;
 
-        return std::max(std::min(x, half - x), -half - x);
+        return max(min(x, half - x), -half - x);
     }
 
     /**
@@ -26,10 +33,14 @@ namespace Electrophilia::Math
     template <typename T>
     static inline T sin2pi5(T x) noexcept
     {
-        const auto x1 = foldArgument(x);
-        const auto x2 = x1 * x1;
+        const T x1 = foldArgument(x);
+        const T x2 = x1 * x1;
 
-        return x1*(6.2812800766220821491468958126456729 + x2*(-41.0952426871208970211323332525800187 + 73.5855147347551640956688672796423323*x2));
+        const T a = 6.2812800766220821491468958126456729;
+        const T b = -41.0952426871208970211323332525800187;
+        const T c = 73.5855147347551640956688672796423323;
+
+        return x1 * (a + x2 * (b + c * x2));
     }
 
     /**
@@ -41,7 +52,12 @@ namespace Electrophilia::Math
         const auto x1 = foldArgument(x);
         const auto x2 = x1 * x1;
 
-        return x1*(6.28316404430247135671540270030948533 + x2*(-41.3371423711001029236311900250633048 + x2*(81.3407688876640676542096535737693472 - 70.9934332720751750562132689396061123*x2)));
+        const T a = 6.28316404430247135671540270030948533;
+        const T b = -41.3371423711001029236311900250633048;
+        const T c = 81.3407688876640676542096535737693472;
+        const T d = 70.9934332720751750562132689396061123;
+
+        return x1 * (a + x2 * (b + x2 * (c - d * x2)));
     }
 
     /**
@@ -53,7 +69,13 @@ namespace Electrophilia::Math
         const auto x1 = foldArgument(x);
         const auto x2 = x1 * x1;
 
-        return x1*(6.28318516008947744301885339855754539 + x2*(-41.3416550314162780771649724741397745 + x2*(81.6010040732617735242889484141942461 + x2*(-76.5497822935957426856648840708956891 + 39.5367060657302079906898367421553316*x2))));
+        const T a = 6.28318516008947744301885339855754539f;
+        const T b = -41.3416550314162780771649724741397745f;
+        const T c = 81.6010040732617735242889484141942461f;
+        const T d = -76.5497822935957426856648840708956891f;
+        const T e = 39.5367060657302079906898367421553316f;
+
+        return x1 * (a + x2 * (b + x2 * (c + x2 * (d + x2 * e))));
     }
 
     /**
@@ -62,9 +84,19 @@ namespace Electrophilia::Math
     template <typename T>
     static inline T fastTan(T x) noexcept
     {
-        T x2 = x * x;
-        T numerator = x * (-135135 + x2 * (17325 + x2 * (-378 + x2)));
-        T denominator = -135135 + x2 * (62370 + x2 * (-3150 + 28 * x2));
+        const T x2 = x * x;
+
+        const T a = -135135;
+        const T b = 17325;
+        const T c = -378;
+        const T d = 62370;
+        const T e = -3150;
+        const T f = 28;
+
+        const T numerator = x * (a + x2 * (b + x2 * (c + x2)));
+        const T denominator = a + x2 * (d + x2 * (e + f * x2));
         return numerator / denominator;
     }
+
+
 }

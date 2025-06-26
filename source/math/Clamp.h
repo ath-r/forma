@@ -10,16 +10,23 @@ namespace Electrophilia::Math
 
     float fastmod1f (float x);
 
-    /** efficient floating point min/max
-    c/o stephen mccaul
-    */
-    float fmax (float a, float b);
+    template <typename T>
+    static inline T max(T a, T b)
+    {
+        return a > b ? a : b;
+    }
 
-    float fmin (float a, float b);
+    template <typename T>
+    static inline T min(T a, T b)
+    {
+        return a < b ? a : b;
+    }
 
-    /** quick fp clamp
-    */
-    float fclamp (float in, float min, float max);
+    template <typename T>
+    static inline T clamp(T x, T a, T b)
+    {
+        return min(max(x, a), b);
+    }
 
     #endif
 }
