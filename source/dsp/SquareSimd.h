@@ -2,10 +2,11 @@
 #include "SIMD.h"
 
 #include "Filter.h"
+#include <array>
 
 namespace Electrophilia::Dsp::Oscillator
 {
-    class BlitSquareSimd
+    class SquareSimd
     {
 
         Context c = Context(48000.0f);
@@ -13,6 +14,7 @@ namespace Electrophilia::Dsp::Oscillator
         Filter1P<vec4> filter1, filter2;
 
         vec4 n;
+        vec4 r;
 
         vec4 phase = 0.0;
         vec4 frequency = 0.0f;
@@ -20,6 +22,9 @@ namespace Electrophilia::Dsp::Oscillator
 
         vec4 out = 0.0f;
         vec4 lastOut = 0.0f;
+
+        static constexpr int blepLength = 4;
+        std::array<vec4, blepLength> blepBuffer;
 
         float _time;
 
@@ -40,5 +45,7 @@ namespace Electrophilia::Dsp::Oscillator
         vec4 sin2pi9 (vec4 x);
 
         vec4 dirichlet (vec4 x);
+
+        vec4 sincIntegral (vec4 x);
     };
 }
