@@ -9,8 +9,12 @@ namespace Electrophilia::Veronika
     void VeronikaVoice::setContext (Context context)
     {
         c = context;
+
         octaves.setContext(c);
         setFrequency (frequency);
+
+        gateSmoother.setContext(c);
+        gateSmoother.setTime(0.005);
     }
     void VeronikaVoice::setFrequency (float f)
     {
@@ -18,12 +22,13 @@ namespace Electrophilia::Veronika
         static const vec4 mult = vec4::fromRawArray (multipliers);
 
         frequency = f;
+        vec4 fmult = mult * f;
         octaves.setFrequency (mult * f);
     }
 
     void VeronikaVoice::setTime (double t) { octaves.setTime (t); }
 
-    bool VeronikaVoice::isActive() { return gate > 0.0f; }
+    bool VeronikaVoice::isActive() { return gate > 0.0f || gateSmoother.last() > 0.0f; }
 
     int VeronikaVoice::getNote() { return note; }
 
@@ -37,7 +42,14 @@ namespace Electrophilia::Veronika
 
     void VeronikaVoice::handleNoteOff (Midi::MessageNoteOff message) { gate = 0.0f; }
 
-    vec4 VeronikaVoice::processSample() { return octaves.processSample() * gate; }
+    vec4 VeronikaVoice::processSample()
+    {
+        gateSmoother.process(gate);
+
+        const vec4 f0 = octaves.processSample() * gateSmoother.last();
+
+        return f0;
+    }
 
 
 }

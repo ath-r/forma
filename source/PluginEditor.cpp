@@ -10,7 +10,6 @@
 
 #include <BinaryData.h>
 
-
 using namespace Electrophilia::Plugin::Tremolo;
 
 using namespace Electrophilia::Gui;
@@ -63,8 +62,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (600, 450);
-
-
 }
 
 PluginEditor::~PluginEditor()

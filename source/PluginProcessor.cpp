@@ -5,6 +5,7 @@
 #include <cmath>
 
 
+#include "VeronikaTimbreProcessor.h"
 #include "juce_audio_basics/juce_audio_basics.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_data_structures/juce_data_structures.h"
@@ -34,6 +35,7 @@ PluginProcessor::PluginProcessor()
     treeState(*this, nullptr, "PARAMETER", createParameterLayout())
 {
     contextOut.addMemberCallback(phaseCounter, &Electrophilia::Dsp::PhaseCounter::setContext);
+    contextOut.addMemberCallback(timbreProcessor, &Electrophilia::Veronika::TimbreProcessor::setContext);
 
     for (int i = 0; i < 16; i++)
     {
@@ -109,12 +111,13 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             {
                 if (voice.isActive())
                 {
-                auto sample = voice.processSample().sum() / 128.0f;
-
-                ch0[i] += sample;
-                ch1[i] += sample;
+                    timbreProcessor.addSignal(voice.processSample(), voice.getNote());
                 }
             }
+
+            auto sample = timbreProcessor.processSample();
+            ch0[i] = sample;
+            ch1[i] = sample;
         }
 
         //This will synchronize inactive voices with global time

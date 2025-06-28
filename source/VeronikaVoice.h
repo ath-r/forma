@@ -2,6 +2,7 @@
 
 #include "dsp/SquareSimd.h"
 #include "dsp/Context.h"
+#include "dsp/cv/LinearSmoother.h"
 
 #include "control/Midi.h"
 
@@ -13,12 +14,15 @@ namespace Electrophilia::Veronika
     class VeronikaVoice
     {
         Context c = Context(48000.0f);
-        Oscillator::SquareSimd octaves;
-
-        float frequency = 440.0f;
-        float gate = 0.0f;
 
         int note;
+        float frequency = 440.0f;
+        Oscillator::SquareSimd octaves;
+
+
+        Cv::LinearSmoother<float> gateSmoother;
+
+        float gate = 0.0f;
 
     public:
         void setContext (Context context);

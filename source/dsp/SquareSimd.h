@@ -11,8 +11,6 @@ namespace Electrophilia::Dsp::Oscillator
 
         Context c = Context(48000.0f);
 
-        Filter1P<vec4> filter1, filter2;
-
         vec4 n;
         vec4 r;
 

@@ -1,20 +1,14 @@
 #include "SquareSimd.h"
 #include "SIMD.h"
 
-#include "../math/Exp.h"
-
 namespace Electrophilia::Dsp::Oscillator
 {
 
     void SquareSimd::setContext (const Context context)
     {
         c = context;
-        filter1.setContext(c);
-        filter2.setContext(c);
 
         setFrequency (frequency);
-        filter1.setCutoffFrequency(frequency);
-        filter2.setCutoffFrequency(frequency * 0.5f);
     }
 
     void SquareSimd::setFrequency (const vec4 newFrequency)
@@ -26,9 +20,7 @@ namespace Electrophilia::Dsp::Oscillator
         setTime(_time);
 
         n = vec4::truncate (7500.0f / frequency);
-
-        filter1.setCutoffFrequency(frequency);
-        filter2.setCutoffFrequency(frequency);
+        n = vec4::max(n, 1.0f);
     }
 
     void SquareSimd::setTime (const double time)
@@ -104,10 +96,9 @@ namespace Electrophilia::Dsp::Oscillator
 
         return (a * aMask + b * bMask);
     }
+
     vec4 SquareSimd::sincIntegral (vec4 x)
     {
-        const vec4 xCos = (x + 0.25f);
-
         constexpr float pi1 = 1.0f + (1.0f / Math::fpi);
 
         const vec4 f0 = sin2pi9(x * 0.5f) * pi1;
@@ -127,5 +118,5 @@ namespace Electrophilia::Dsp::Oscillator
         const vec4 si = w0 * f0 + w1 * f1;
 
         return si / pi1;
-    };
+    }
 }

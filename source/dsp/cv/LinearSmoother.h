@@ -33,7 +33,7 @@ namespace Electrophilia::Dsp::Cv
         {
             time = newTime;
 
-            delta = time * c.T;
+            delta = c.T / time;
         }
 
         virtual inline void setTargetValue(T value)
@@ -49,9 +49,7 @@ namespace Electrophilia::Dsp::Cv
         virtual inline T process()
         {
             auto diff = targetValue - currentValue;
-            diff = std::min(diff, delta);
-            diff = std::max(diff, -delta);
-
+            diff = std::clamp(diff, -delta, delta);
             currentValue += diff;
 
             return currentValue;

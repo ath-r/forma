@@ -13,6 +13,7 @@
 
 #include "control/VoiceManager.h"
 #include "VeronikaVoice.h"
+#include "VeronikaTimbreProcessor.h"
 
 class PluginProcessor : public juce::AudioProcessor
 {
@@ -54,6 +55,8 @@ private:
 
     Electrophilia::Control::VoiceManager voiceManager;
     std::array<Electrophilia::Veronika::VeronikaVoice, 16> voices;
+
+    Electrophilia::Veronika::TimbreProcessor timbreProcessor;
 
     Electrophilia::Control::EventOutput<Electrophilia::Dsp::Context> contextOut;
 

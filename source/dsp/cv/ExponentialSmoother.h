@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../dsp/Filter.h"
+#include "../Filter.h"
 
 namespace Electrophilia::Dsp::Cv
 {
