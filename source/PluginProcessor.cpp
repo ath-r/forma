@@ -2,25 +2,14 @@
 #include "PluginEditor.h"
 
 #include "PluginParameters.h"
+#include <array>
 #include <cmath>
 
-
-#include "VeronikaTimbreProcessor.h"
 #include "juce_audio_basics/juce_audio_basics.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_data_structures/juce_data_structures.h"
 
-#include "VeronikaVoice.h"
 #include "control/Midi.h"
-#include "dsp/Context.h"
-#include "dsp/PhaseCounter.h"
-#include "math/Conversion.h"
-#include "control/Events.h"
-
-namespace Electrophilia::Plugin::Tremolo
-{
-
-}
 
 //==============================================================================
 PluginProcessor::PluginProcessor()
@@ -34,14 +23,9 @@ PluginProcessor::PluginProcessor()
                        ),
     treeState(*this, nullptr, "PARAMETER", createParameterLayout())
 {
-    contextOut.addMemberCallback(phaseCounter, &Electrophilia::Dsp::PhaseCounter::setContext);
-    contextOut.addMemberCallback(timbreProcessor, &Electrophilia::Veronika::TimbreProcessor::setContext);
-
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < Electrophilia::Veronika::PARAM_COUNT; ++i)
     {
-        voiceManager.noteOn_out(i).addMemberCallback(voices[i], &Electrophilia::Veronika::VeronikaVoice::handleNoteOn);
-        voiceManager.noteOff_out(i).addMemberCallback(voices[i], &Electrophilia::Veronika::VeronikaVoice::handleNoteOff);
-        contextOut.addMemberCallback(voices[i], &Electrophilia::Veronika::VeronikaVoice::setContext);
+        auto paramData = Electrophilia::Veronika::ParametersByID[i];
     }
 }
 
@@ -52,7 +36,7 @@ PluginProcessor::~PluginProcessor()
 //==============================================================================
 void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    contextOut.fire(Electrophilia::Dsp::Context(sampleRate));
+    veronikaSynth.setContext(sampleRate);
 }
 
 void PluginProcessor::releaseResources()
@@ -79,93 +63,26 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto ch0 = buffer.getWritePointer(0);
     auto ch1 = buffer.getWritePointer(1);
 
-    // This loop will iterate over all the midi events AND the audio frames after the last midi event
-    // If there are no midi events, then it will just go through the audio frames in one go
-
-    if (!voiceManager.isAtLeastOneVoiceActive()) phaseCounter.reset();
-
+    static std::array<Electrophilia::Control::Midi::MessageMeta, 10000> midiEvents;
     int midiEventCount = midiMessages.getNumEvents();
-    auto iterator = midiMessages.begin();
+    juce::MidiBufferIterator iterator = midiMessages.begin();
 
-    int currentSample = 0;
-    for (int i_midi = 0; i_midi < midiEventCount + 1; i_midi++)
+    for (int i = 0; i < midiEventCount; i++)
     {
-        bool processMidi = i_midi < midiEventCount;
-
-        int stopAtSample = numSamples;
-        if (processMidi)
+        juce::MidiMessageMetadata juceMetadata = *iterator;
+        Electrophilia::Control::Midi::MessageMeta metadata =
         {
-            juce::MidiMessageMetadata metadata = *iterator;
-            stopAtSample = metadata.samplePosition;
-        }
+        Electrophilia::Control::Midi::Message::fromRawData(juceMetadata.data, juceMetadata.numBytes),
+        juceMetadata.samplePosition
+        };
 
-        int samplesToProcess = stopAtSample - currentSample;
+        midiEvents[i] = metadata;
 
-        //PROCESS AUDIO HERE
-        for (int i = currentSample; i < stopAtSample; i++)
-        {
-
-            phaseCounter.processSample();
-
-            for (auto& voice : voices)
-            {
-                if (voice.isActive())
-                {
-                    timbreProcessor.addSignal(voice.processSample(), voice.getNote());
-                }
-            }
-
-            auto sample = timbreProcessor.processSample();
-            ch0[i] = sample;
-            ch1[i] = sample;
-        }
-
-        //This will synchronize inactive voices with global time
-        //So oscillators running at the same frequency will all be in phase
-        for (auto& voice : voices)
-        {
-            if (!voice.isActive())
-            {
-                voice.setTime(phaseCounter.getTime());
-            }
-        }
-
-        currentSample = stopAtSample;
-
-        if (processMidi)
-        {
-            juce::MidiMessageMetadata metadata = *iterator;
-            auto currentMidiEvent = metadata.getMessage();
-
-            Electrophilia::Control::Midi::Message message = Electrophilia::Control::Midi::Message::fromRawData(currentMidiEvent.getRawData(), currentMidiEvent.getRawDataSize());
-
-            if (message.isNoteOnOrOff())
-            {
-                int noteNumber = message.data1;
-
-                constexpr int lowestNote = Electrophilia::Math::C1_MIDI_NOTE_NUMBER;
-                constexpr int highestNote = lowestNote + 61;
-
-                if ((noteNumber >= lowestNote) && (noteNumber <= highestNote))
-                {
-                     // fire midi events here
-
-                     if (message.isNoteOn())
-                     {
-                        voiceManager.handleNoteOn(Electrophilia::Control::Midi::MessageNoteOn(message));
-                     }
-                     if (message.isNoteOff())
-                     {
-                        voiceManager.handleNoteOff(Electrophilia::Control::Midi::MessageNoteOff(message));
-                     }
-                }
-            }
-
-            if (i_midi < (midiEventCount - 1)) iterator++;
-        }
-
+        iterator++;
     }
 
+    veronikaSynth.process(ch0, numSamples, midiEvents.data(), midiEventCount);
+    buffer.copyFrom(1, 0, buffer.getReadPointer(0), numSamples);
 }
 
 //==============================================================================
@@ -200,15 +117,13 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
     }
 }
 
-using namespace Electrophilia::Plugin::Tremolo;
-
 juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
-    for (int i = 0; i < PARAM_COUNT; ++i)
+    for (int i = 0; i < Electrophilia::Veronika::PARAM_COUNT; ++i)
     {
-        auto paramData = ParametersByID[i];
+        auto paramData = Electrophilia::Veronika::ParametersByID[i];
 
         params.push_back (std::make_unique<juce::AudioParameterFloat> (
                 juce::ParameterID {paramData.id, 0},

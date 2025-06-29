@@ -1,28 +1,12 @@
 #pragma once
 #include <cmath>
-#include <string>
-#include <format>
 
-struct ParameterData
+#include "control/Parameter.h"
+
+namespace Electrophilia::Veronika
 {
-    int hints;
-    std::string name;
-    std::string id;
-    std::string unit;
-    float def;
-    float min;
-    float max;
 
-    std::string getStringFromValue(float value) const
-    {
-        return std::format("{:.2f}", value);
-    }
-
-};
-
-namespace Electrophilia::Plugin::Tremolo
-{
-    static const ParameterData TestParameter
+    static const Control::Parameter TestParameter
     {
         .name = "Frequency",
         .id = "test",
@@ -32,7 +16,7 @@ namespace Electrophilia::Plugin::Tremolo
         .max = 16.0f
     };
 
-    static const ParameterData Flute16
+    static const Control::Parameter Flute16
     {
         .name = "16′",
         .id = "f16",
@@ -41,7 +25,7 @@ namespace Electrophilia::Plugin::Tremolo
         .max = 10.0f
     };
 
-    static const ParameterData Flute8
+    static const Control::Parameter Flute8
     {
         .name = "8′",
         .id = "f8",
@@ -50,7 +34,7 @@ namespace Electrophilia::Plugin::Tremolo
         .max = 10.0f
     };
 
-    static const ParameterData Flute5
+    static const Control::Parameter Flute5
     {
         .name = "5⅓′",
         .id = "f5",
@@ -59,7 +43,7 @@ namespace Electrophilia::Plugin::Tremolo
         .max = 10.0f
     };
 
-    static const ParameterData Flute4
+    static const Control::Parameter Flute4
     {
         .name = "4′",
         .id = "f4",
@@ -68,7 +52,7 @@ namespace Electrophilia::Plugin::Tremolo
         .max = 10.0f
     };
 
-    static const ParameterData Flute2
+    static const Control::Parameter Flute2
     {
         .name = "2′",
         .id = "f2",
@@ -77,7 +61,7 @@ namespace Electrophilia::Plugin::Tremolo
         .max = 10.0f
     };
 
-    static const ParameterData Flute1
+    static const Control::Parameter Flute1
     {
         .name = "1⅗′",
         .id = "f1",
@@ -98,7 +82,7 @@ namespace Electrophilia::Plugin::Tremolo
         PARAM_COUNT
     };
 
-    static const ParameterData ParametersByID[PARAM_COUNT]
+    static const Control::Parameter ParametersByID[PARAM_COUNT]
     {
         [TEST_ID] = TestParameter,
         [F16] = Flute16,

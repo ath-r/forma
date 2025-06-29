@@ -29,56 +29,21 @@ namespace Electrophilia::Control::Midi
 
     struct Message
     {
-        unsigned char status;
-        unsigned char data1;
-        unsigned char data2;
+        unsigned char status = 0;
+        unsigned char data1 = 0;
+        unsigned char data2 = 0;
 
-        static Message fromRawData(const unsigned char* data, int size)
-        {
-            Message message;
+        static Message fromRawData (const unsigned char* data, int size);
 
-            if (size > 0)
-            {
-                message.status = data[0];
-            }
+        MessageType type();
 
-            if (size > 1)
-            {
-                message.data1 = data[1];
-            }
+        unsigned char channel();
 
-            if (size > 2)
-            {
-                message.data2 = data[2];
-            }
+        bool isNoteOn();
 
-            return message;
-        }
+        bool isNoteOff();
 
-        MessageType type()
-        {
-            return static_cast<MessageType>(status & 0xF0);
-        }
-
-        unsigned char channel()
-        {
-            return status & 0x0F;
-        }
-
-        bool isNoteOn()
-        {
-            return type() == MessageType::NoteOn;
-        }
-
-        bool isNoteOff()
-        {
-            return type() == MessageType::NoteOff;
-        }
-
-        bool isNoteOnOrOff()
-        {
-            return isNoteOn() || isNoteOff();
-        }
+        bool isNoteOnOrOff();
 
         explicit operator MessageNoteOn() const
         {
@@ -99,5 +64,11 @@ namespace Electrophilia::Control::Midi
                 .velocity = data2
             };
         }
+    };
+
+    struct MessageMeta
+    {
+        Message message;
+        int samplePosition;
     };
 }

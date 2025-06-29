@@ -10,7 +10,7 @@
 
 #include <BinaryData.h>
 
-using namespace Electrophilia::Plugin::Tremolo;
+using namespace Electrophilia::Veronika;
 
 using namespace Electrophilia::Gui;
 

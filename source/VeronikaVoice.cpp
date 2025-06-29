@@ -23,7 +23,7 @@ namespace Electrophilia::Veronika
 
         frequency = f;
         vec4 fmult = mult * f;
-        octaves.setFrequency (mult * f);
+        octaves.setFrequency (fmult);
     }
 
     void VeronikaVoice::setTime (double t) { octaves.setTime (t); }

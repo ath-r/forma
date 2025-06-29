@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 namespace Electrophilia::Math
 {
     static constexpr int C1_MIDI_NOTE_NUMBER = 24;
@@ -20,4 +21,6 @@ namespace Electrophilia::Math
     float amplitudeRatioToDecibels (float v1, float v2);
 
     float decibelsToAmplitudeRatio (float db);
+
+    float linearVolumeToLog (float x, float dB_at0);
 }

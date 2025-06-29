@@ -25,4 +25,10 @@ namespace Electrophilia::Math
     float amplitudeRatioToDecibels (float v1, float v2) { return 10.0f * std::log10 (v1 / v2); }
 
     float decibelsToAmplitudeRatio (float db) { return std::pow (10.0f, db / 10.0f); }
+
+    float linearVolumeToLog (float x, float dB_at0)
+    {
+        const float dB = std::lerp (dB_at0, 0.0f, x);
+        return decibelsToAmplitude (dB);
+    }
 }

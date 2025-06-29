@@ -1,19 +1,14 @@
 #pragma once
 
-#include "control/Events.h"
-#include "dsp/Context.h"
-#include "dsp/PhaseCounter.h"
+
 #include "juce_audio_basics/juce_audio_basics.h"
-#include <array>
 #include <juce_audio_processors/juce_audio_processors.h>
+
+#include "VeronikaSynth.h"
 
 #if (MSVC)
 #include "ipps.h"
 #endif
-
-#include "control/VoiceManager.h"
-#include "VeronikaVoice.h"
-#include "VeronikaTimbreProcessor.h"
 
 class PluginProcessor : public juce::AudioProcessor
 {
@@ -51,14 +46,7 @@ public:
 
 private:
 
-    Electrophilia::Dsp::PhaseCounter phaseCounter;
-
-    Electrophilia::Control::VoiceManager voiceManager;
-    std::array<Electrophilia::Veronika::VeronikaVoice, 16> voices;
-
-    Electrophilia::Veronika::TimbreProcessor timbreProcessor;
-
-    Electrophilia::Control::EventOutput<Electrophilia::Dsp::Context> contextOut;
+    Electrophilia::Veronika::VeronikaSynth veronikaSynth;
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
