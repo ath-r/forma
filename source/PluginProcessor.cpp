@@ -1,10 +1,13 @@
 #include "PluginProcessor.h"
+#include "ParameterObserver.h"
 #include "PluginEditor.h"
 
 #include "PluginParameters.h"
 #include <array>
 #include <cmath>
 
+#include "VeronikaSynth.h"
+#include "control/Parameter.h"
 #include "juce_audio_basics/juce_audio_basics.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_data_structures/juce_data_structures.h"
@@ -23,10 +26,23 @@ PluginProcessor::PluginProcessor()
                        ),
     treeState(*this, nullptr, "PARAMETER", createParameterLayout())
 {
-    for (int i = 0; i < Electrophilia::Veronika::PARAM_COUNT; ++i)
+    using namespace Electrophilia::Veronika;
+
+    for (int i = 0; i < PARAM_COUNT; ++i)
     {
-        auto paramData = Electrophilia::Veronika::ParametersByID[i];
+        auto& paramData = ParametersByID[i];
+        auto& id = paramData.id;
+        auto& observer = parameterObservers[i];
+
+        treeState.addParameterListener(id, &observer);
+        observer.parameter = treeState.getParameter(id);
+
     }
+
+    parameterObservers[ParameterIDs::F16].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute16);
+    parameterObservers[ParameterIDs::F8].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute8);
+    parameterObservers[ParameterIDs::F4].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute4);
+    parameterObservers[ParameterIDs::F2].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute2);
 }
 
 PluginProcessor::~PluginProcessor()
@@ -37,6 +53,9 @@ PluginProcessor::~PluginProcessor()
 void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     veronikaSynth.setContext(sampleRate);
+
+    for (auto& observer : parameterObservers) observer.forceCheck();
+
 }
 
 void PluginProcessor::releaseResources()
@@ -54,6 +73,8 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     const auto totalNumInputChannels  = getTotalNumInputChannels();
     const auto totalNumOutputChannels = getTotalNumOutputChannels();
     const auto numSamples = buffer.getNumSamples();
+
+    for (auto& observer : parameterObservers) observer.forceCheck();
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
     {

@@ -1,7 +1,10 @@
 #pragma once
 
+#include "PluginParameters.h"
+#include "ParameterObserver.h"
 
 #include "juce_audio_basics/juce_audio_basics.h"
+#include <array>
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "VeronikaSynth.h"
@@ -49,6 +52,7 @@ private:
     Electrophilia::Veronika::VeronikaSynth veronikaSynth;
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    std::array<ParameterObserver, Electrophilia::Veronika::PARAM_COUNT> parameterObservers;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };

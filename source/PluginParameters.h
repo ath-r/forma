@@ -20,54 +20,54 @@ namespace Electrophilia::Veronika
     {
         .name = "16′",
         .id = "f16",
-        .def = 10.0f,
+        .def = 1.0f,
         .min = 0.0f,
-        .max = 10.0f
+        .max = 1.0f
     };
 
     static const Control::Parameter Flute8
     {
         .name = "8′",
         .id = "f8",
-        .def = 10.0f,
+        .def = 1.0f,
         .min = 0.0f,
-        .max = 10.0f
+        .max = 1.0f
     };
 
     static const Control::Parameter Flute5
     {
         .name = "5⅓′",
         .id = "f5",
-        .def = 10.0f,
+        .def = 1.0f,
         .min = 0.0f,
-        .max = 10.0f
+        .max = 1.0f
     };
 
     static const Control::Parameter Flute4
     {
         .name = "4′",
         .id = "f4",
-        .def = 10.0f,
+        .def = 1.0f,
         .min = 0.0f,
-        .max = 10.0f
+        .max = 1.0f
     };
 
     static const Control::Parameter Flute2
     {
         .name = "2′",
         .id = "f2",
-        .def = 10.0f,
+        .def = 1.0f,
         .min = 0.0f,
-        .max = 10.0f
+        .max = 1.0f
     };
 
     static const Control::Parameter Flute1
     {
         .name = "1⅗′",
         .id = "f1",
-        .def = 10.0f,
+        .def = 1.0f,
         .min = 0.0f,
-        .max = 10.0f
+        .max = 1.0f
     };
 
     enum ParameterIDs

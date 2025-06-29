@@ -161,7 +161,7 @@ namespace Electrophilia::Veronika
             inputs[input] += in * gain;
         }
 
-        float processSample()
+        vec4 processSample()
         {
             const vec4 out1 = tp1.process(inputs[0]) * Math::decibelsToAmplitude(45.5);
             const vec4 out2 = tp2.process(inputs[1]) * Math::decibelsToAmplitude(39.5);
@@ -175,7 +175,7 @@ namespace Electrophilia::Veronika
                 x = 0.0f;
             }
 
-            return (out1 + out2 + out3 + out4 + out5 + out6).sum() * Math::decibelsToAmplitude(-40);
+            return (out1 + out2 + out3 + out4 + out5 + out6) * Math::decibelsToAmplitude(-40);
 
         }
     };

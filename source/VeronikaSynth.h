@@ -23,15 +23,8 @@ namespace Electrophilia::Veronika
     {
         Control::VoiceManager voiceManager;
 
-        float parameterFlute16;
-        float parameterFlute8;
-        float parameterFlute513;
-        float parameterFlute4;
-        float parameterFlute2;
-        float parameterFlute135;
-
-        vec4 parameterFluteStops1;
-        vec4 parameterFluteStops2;
+        vec4 parameterFluteStops1 = 0;
+        vec4 parameterFluteStops2 = 0;
 
         std::array<VeronikaVoice, 16> voices;
         Dsp::PhaseCounter phaseCounter;
@@ -41,7 +34,7 @@ namespace Electrophilia::Veronika
         Dsp::Filter1P<vec4> parameterFluteStops2Smoother;
 
 
-        static constexpr float minVolumeOfStop = -1000;
+        static constexpr float minVolumeOfStop = -20.0f;
 
 public:
 
@@ -52,6 +45,9 @@ public:
                 voiceManager.noteOn_out(i).addMemberCallback(voices[i], &VeronikaVoice::handleNoteOn);
                 voiceManager.noteOff_out(i).addMemberCallback(voices[i], &VeronikaVoice::handleNoteOff);
             }
+
+            parameterFluteStops1Smoother.setCutoffFrequency(100.0f);
+            parameterFluteStops2Smoother.setCutoffFrequency(100.0f);
         }
 
         void setContext(Dsp::Context context)
@@ -69,22 +65,22 @@ public:
 
         void setParameterFlute16(float x)
         {
-            parameterFluteStops1[0] = Math::linearVolumeToLog(x, minVolumeOfStop);
+            parameterFluteStops1[0] = std::lerp(0.1f, 1.0f, x);
         }
 
         void setParameterFlute8(float x)
         {
-            parameterFluteStops1[1] = Math::linearVolumeToLog(x, minVolumeOfStop);
+            parameterFluteStops1[1] = std::lerp(0.1f, 1.0f, x);;
         }
 
         void setParameterFlute4(float x)
         {
-            parameterFluteStops1[2] = Math::linearVolumeToLog(x, minVolumeOfStop);
+            parameterFluteStops1[2] = std::lerp(0.1f, 1.0f, x);;
         }
 
         void setParameterFlute2(float x)
         {
-            parameterFluteStops1[3] = Math::linearVolumeToLog(x, minVolumeOfStop);
+            parameterFluteStops1[3] = std::lerp(0.1f, 1.0f, x);;
         }
 
         void processBlock(float* buffer, int numberOfSamples) override
@@ -95,16 +91,19 @@ public:
             {
                 phaseCounter.processSample();
 
+                parameterFluteStops1Smoother.process(parameterFluteStops1);
+                parameterFluteStops2Smoother.process(parameterFluteStops2);
+
                 for (auto& voice : voices)
                 {
                     if (voice.isActive())
                     {
-                        timbreProcessor.addSignal(voice.processSample(), voice.getNote());
+                        timbreProcessor.addSignal(voice.processSample() * parameterFluteStops1Smoother.last(), voice.getNote());
                     }
                 }
 
-                auto sample = timbreProcessor.processSample();
-                buffer[i] = sample;
+                auto sample = timbreProcessor.processSample() * parameterFluteStops1Smoother.last();
+                buffer[i] = sample.sum();
 
                 //This will synchronize inactive voices with global time
                 //So oscillators running at the same frequency will all be in phase

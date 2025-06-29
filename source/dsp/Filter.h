@@ -13,6 +13,8 @@ namespace Electrophilia::Dsp
         T z1 = 0.0f;
         T y;
 
+        T frequency;
+
     public:
 
         void reset()
@@ -23,10 +25,14 @@ namespace Electrophilia::Dsp
         void setContext(const Context context)
         {
             c = context;
+
+            setCutoffFrequency(frequency);
         }
 
         void setCutoffFrequencyPrewarped(T freq)
         {
+            frequency = freq;
+
             const T wd = freq * Math::tau<T>;
             const T wa = Math::fastTan(wd * T(c.T) * T(0.5)) * (T(c.SR * 2.0));
             const T g = wa * T(c.T * 0.5);
@@ -36,6 +42,8 @@ namespace Electrophilia::Dsp
 
         void setCutoffFrequency(T freq)
         {
+            frequency = freq;
+
             G = freq * T(c.T) * T(0.5);
         }
 
