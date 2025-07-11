@@ -2,6 +2,7 @@
 
 #include "Context.h"
 #include "../math/Trigonometry.h"
+#include "SIMD.h"
 
 namespace Electrophilia::Dsp
 {
@@ -44,7 +45,8 @@ namespace Electrophilia::Dsp
         {
             frequency = freq;
 
-            G = freq * T(c.T) * T(0.5);
+            const T g = freq * T(c.T) * Math::fpi;
+            G = g / (g + 1.0f);
         }
 
         void setTime(T time)
