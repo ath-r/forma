@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdlib>
 
 #include "dsp/SIMD.h"
 #include "dsp/Context.h"
@@ -71,6 +72,22 @@ namespace Electrophilia::Veronika
             2873, 6088, 10240, 13000
         };
 
+        static constexpr auto db = Math::decibelsToAmplitude;
+
+        const float tp1SquareGains[4] = {  db(-40), db(-45), db(-47), db(-50)};
+        const float tp2SquareGains[4] = {  db(-45), db(-52), db(-57), db(-60)};
+        const float tp3SquareGains[4] = {  db(-50), db(-57), db(-55), db(-55)};
+        const float tp4SquareGains[4] = {  db(-55), db(-65), db(-65), db(-65)};
+        const float tp5SquareGains[4] = {  db(-60), db(-70), db(-70), db(-70)};
+        const float tp6SquareGains[4] = {  db(-65), db(-70), db(-70), db(-75)};
+
+        const vec4 tp1SquareGain = vec4::fromRawArray(tp1SquareGains);
+        const vec4 tp2SquareGain = vec4::fromRawArray(tp2SquareGains);
+        const vec4 tp3SquareGain = vec4::fromRawArray(tp3SquareGains);
+        const vec4 tp4SquareGain = vec4::fromRawArray(tp4SquareGains);
+        const vec4 tp5SquareGain = vec4::fromRawArray(tp5SquareGains);
+        const vec4 tp6SquareGain = vec4::fromRawArray(tp6SquareGains);
+
         template<int size>
         class FilterBank
         {
@@ -113,7 +130,7 @@ namespace Electrophilia::Veronika
 
                 const vec4 out = filters[filters.size() - 1].last();
 
-                //return in;
+                //return out;
                 return out - hp.process(out);
             }
         };
@@ -158,24 +175,24 @@ namespace Electrophilia::Veronika
             float dB = 16.0f * (float(relativeNote) / 12.0f);
             float gain = Math::decibelsToAmplitude(dB);
 
-            inputs[input] += in * gain;
+            inputs[input] += in;
         }
 
         vec4 processSample()
         {
-            const vec4 out1 = tp1.process(inputs[0]) * Math::decibelsToAmplitude(45.5);
-            const vec4 out2 = tp2.process(inputs[1]) * Math::decibelsToAmplitude(39.5);
-            const vec4 out3 = tp3.process(inputs[2]) * Math::decibelsToAmplitude(31.5);
-            const vec4 out4 = tp4.process(inputs[3]) * Math::decibelsToAmplitude(24.1);
-            const vec4 out5 = tp5.process(inputs[4]) * Math::decibelsToAmplitude(10.5);
-            const vec4 out6 = tp6.process(inputs[5]) * Math::decibelsToAmplitude(-8.0f);
+            const vec4 out1 = tp1.process(inputs[0]) + inputs[0] * tp1SquareGain;
+            const vec4 out2 = tp2.process(inputs[1]) + inputs[1] * tp2SquareGain;
+            const vec4 out3 = tp3.process(inputs[2]) + inputs[2] * tp3SquareGain;
+            const vec4 out4 = tp4.process(inputs[3]) + inputs[3] * tp4SquareGain;
+            const vec4 out5 = tp5.process(inputs[4]) + inputs[4] * tp5SquareGain;
+            const vec4 out6 = tp6.process(inputs[5]) + inputs[5] * tp6SquareGain;
 
             for (auto& x : inputs)
             {
                 x = 0.0f;
             }
 
-            return (out1 + out2 + out3 + out4 + out5 + out6) * Math::decibelsToAmplitude(-40);
+            return (out1 + out2 + out3 + out4 + out5 + out6) * Math::decibelsToAmplitude(-18);
 
         }
     };

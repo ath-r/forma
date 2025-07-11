@@ -18,12 +18,6 @@ namespace Electrophilia::Dsp::Oscillator
         vec4 frequency = 0.0f;
         vec4 delta = 0.0f;
 
-        vec4 out = 0.0f;
-        vec4 lastOut = 0.0f;
-
-        static constexpr int blepLength = 4;
-        std::array<vec4, blepLength> blepBuffer;
-
         float _time;
 
     public:

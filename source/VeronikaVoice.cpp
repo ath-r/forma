@@ -22,7 +22,7 @@ namespace Electrophilia::Veronika
         static const vec4 mult = vec4::fromRawArray (multipliers);
 
         frequency = f;
-        vec4 fmult = mult * f;
+        vec4 fmult = mult * f * 0.5f; // 0.5f because base frequency is 16' i.e. one octave lower than reference
         octaves.setFrequency (fmult);
     }
 
@@ -34,10 +34,14 @@ namespace Electrophilia::Veronika
 
     void VeronikaVoice::handleNoteOn (Midi::MessageNoteOn message)
     {
-        gate = 1.0f;
-        note = message.note;
+        if (gate == 0.0f)
+        {
+            gate = 1.0f;
+            note = message.note;
 
-        setFrequency (Math::noteToFrequency (note));
+            setFrequency (Math::noteToFrequency (note));
+        }
+
     }
 
     void VeronikaVoice::handleNoteOff (Midi::MessageNoteOff message) { gate = 0.0f; }
@@ -46,7 +50,7 @@ namespace Electrophilia::Veronika
     {
         gateSmoother.process(gate);
 
-        const vec4 f0 = octaves.processSample() * gateSmoother.last();
+        const vec4 f0 = octaves.processSample() * gate;
 
         return f0;
     }

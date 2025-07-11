@@ -34,7 +34,7 @@ namespace Electrophilia::Veronika
         Dsp::Filter1P<vec4> parameterFluteStops2Smoother;
 
 
-        static constexpr float minVolumeOfStop = -20.0f;
+        const float minVolumeOfStop = Math::decibelsToAmplitude(-50);
 
 public:
 
@@ -65,22 +65,26 @@ public:
 
         void setParameterFlute16(float x)
         {
-            parameterFluteStops1[0] = std::lerp(0.1f, 1.0f, x);
+            float a = 0.1f;
+            float b = 1.0f;
+
+            parameterFluteStops1[0] = std::lerp(minVolumeOfStop, 1.0f, x);
+
         }
 
         void setParameterFlute8(float x)
         {
-            parameterFluteStops1[1] = std::lerp(0.1f, 1.0f, x);;
+            parameterFluteStops1[1] = std::lerp(minVolumeOfStop, 1.0f, x);
         }
 
         void setParameterFlute4(float x)
         {
-            parameterFluteStops1[2] = std::lerp(0.1f, 1.0f, x);;
+            parameterFluteStops1[2] = std::lerp(minVolumeOfStop, 1.0f, x);
         }
 
         void setParameterFlute2(float x)
         {
-            parameterFluteStops1[3] = std::lerp(0.1f, 1.0f, x);;
+            parameterFluteStops1[3] = std::lerp(minVolumeOfStop, 1.0f, x);
         }
 
         void processBlock(float* buffer, int numberOfSamples) override
@@ -94,15 +98,19 @@ public:
                 parameterFluteStops1Smoother.process(parameterFluteStops1);
                 parameterFluteStops2Smoother.process(parameterFluteStops2);
 
+                vec4 rawSquare = 0.0f;
                 for (auto& voice : voices)
                 {
                     if (voice.isActive())
                     {
-                        timbreProcessor.addSignal(voice.processSample() * parameterFluteStops1Smoother.last(), voice.getNote());
+                        vec4 sample = voice.processSample();
+                        timbreProcessor.addSignal(voice.processSample(), voice.getNote());
+
+                        rawSquare += sample;
                     }
                 }
 
-                auto sample = timbreProcessor.processSample() * parameterFluteStops1Smoother.last();
+                auto sample = (timbreProcessor.processSample()) * parameterFluteStops1Smoother.last();
                 buffer[i] = sample.sum();
 
                 //This will synchronize inactive voices with global time
