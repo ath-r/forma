@@ -10,13 +10,13 @@ Implemented features:
 
 * Polysynth-style voice allocation, with a maximum of 16 voices. Oscillators are synced such that identical frequencies don't cancel each other out.
 
-Planned features (high to low priority):
+* Accurate *FLUTES II* frequency response voicing from the **Formation 1** model. Mostly accurate, actually. I voiced 5⅓′and 1⅗′ stops to be a little bit duller, so they would work better with the rest of stops. Also, their frequency ratio with fundamental is natural instead of tempered like in the original organ. Tempered mutations are just ugly. Polysynth architecture makes arbitrary tuning such as this very easy to implement.
 
-* Accurate *FLUTES II* frequency response voicing from the **Formation 1** model.
+Planned features (high to low priority):
 
 * Possible *FLUTES II* nonlinearity.
 
-* Non-simultaneous key-on behavior across stops, emulating the original keyboard’s attack characteristics.
+* Non-simultaneous key-on behavior across stops, like in physical organ.
 
 * *SOLO* stops from the **Formation 1**: *Clarinet, Oboe, and Nasal*. Including the non-linear behaviour of formant filters.
 
