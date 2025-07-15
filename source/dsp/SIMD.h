@@ -8,6 +8,8 @@
 using vec4 = juce::dsp::SIMDRegister<float>;
 using vec4i = juce::dsp::SIMDRegister<int>;
 
+vec4 vec4fromFloats (float a, float b, float c, float d);
+
 //Packed 32-bit integers to packed 32-bit floats:
 #if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
 inline vec4 float4 (const vec4i a)

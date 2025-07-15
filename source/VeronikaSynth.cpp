@@ -23,15 +23,19 @@ namespace Electrophilia::Veronika
         }
         phaseCounter.setContext (context);
 
-        timbreProcessor.setContext (context);
+        timbreProcessor1.setContext (context);
+        timbreProcessor2.setContext(context);
         parameterFluteStops1Smoother.setContext (context);
         parameterFluteStops2Smoother.setContext (context);
     }
 
-    void VeronikaSynth::setParameterFlute16 (float x) { parameterFluteStops1[1] = std::lerp (minVolumeOfStop, 1.0f, x); }
+    void VeronikaSynth::setParameterFlute16 (float x) { parameterFluteStops1[0] = std::lerp (minVolumeOfStop, 1.0f, x); }
     void VeronikaSynth::setParameterFlute8 (float x) { parameterFluteStops1[1] = std::lerp (minVolumeOfStop, 1.0f, x); }
     void VeronikaSynth::setParameterFlute4 (float x) { parameterFluteStops1[2] = std::lerp (minVolumeOfStop, 1.0f, x); }
-    void VeronikaSynth::setParameterFlute2 (float x) { parameterFluteStops1[3] = std::lerp (minVolumeOfStop, 1.0f, x); }
+    void VeronikaSynth::setParameterFlute2 (float x) { parameterFluteStops1[3] = std::lerp (minVolumeOfStop, 0.5f, x); }
+
+    void VeronikaSynth::setParameterFlute5 (float x) { parameterFluteStops2[1] = std::lerp (minVolumeOfStop, 1.0f, x);};
+    void VeronikaSynth::setParameterFlute1 (float x) { parameterFluteStops2[2] = std::lerp (minVolumeOfStop, 1.0f, x);};
 
     void VeronikaSynth::processBlock (float* buffer, int numberOfSamples)
     {
@@ -45,19 +49,23 @@ namespace Electrophilia::Veronika
             parameterFluteStops1Smoother.process (parameterFluteStops1);
             parameterFluteStops2Smoother.process (parameterFluteStops2);
 
-            vec4 rawSquare = 0.0f;
             for (auto& voice : voices)
             {
                 if (voice.isActive())
                 {
-                    vec4 sample = voice.processSample();
-                    timbreProcessor.addSignal (voice.processSample(), voice.getNote());
+                    vec4 octaves;
+                    vec4 mutations;
+                    int note = voice.getNote();
 
-                    rawSquare += sample;
+                    voice.processSample(octaves, mutations);
+                    timbreProcessor1.addSignal (octaves, note);
+                    timbreProcessor2.addSignal(mutations, note);
                 }
             }
 
-            auto sample = (timbreProcessor.processSample()) * parameterFluteStops1Smoother.last();
+            auto sample = (timbreProcessor1.processSample()) * parameterFluteStops1Smoother.last();
+            sample += (timbreProcessor2.processSample()) * parameterFluteStops2Smoother.last();
+
             buffer[i] = sample.sum();
 
             //This will synchronize inactive voices with global time
@@ -78,7 +86,7 @@ namespace Electrophilia::Veronika
         {
             int noteNumber = message.data1;
 
-            constexpr int lowestNote = Electrophilia::Math::C1_MIDI_NOTE_NUMBER;
+            constexpr int lowestNote = Electrophilia::Math::C2_MIDI_NOTE_NUMBER;
             constexpr int highestNote = lowestNote + 61;
 
             if ((noteNumber >= lowestNote) && (noteNumber <= highestNote))
@@ -95,4 +103,5 @@ namespace Electrophilia::Veronika
             }
         }
     }
+
 }

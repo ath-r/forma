@@ -14,6 +14,65 @@ namespace Electrophilia::Veronika
 {
     class TimbreProcessor
     {
+        template<int size>
+        class FilterBank
+        {
+            Dsp::Context c = 48000.0f;
+            std::array<Dsp::Filter1P<vec4>, size> filters;
+
+            Dsp::Filter1P<vec4> hp;
+            vec4 wetGain = 1.0f;
+            vec4 dryGain = 0.0f;
+
+        public:
+            void setContext(Dsp::Context context)
+            {
+                c = context;
+                hp.setContext(c);
+
+                for (auto& filter : filters)
+                {
+                    filter.setContext(c);
+                    filter.reset();
+                }
+            }
+
+            void setFrequencies(float* freqs)
+            {
+                for (int i = 0; i < filters.size(); i++)
+                {
+                    filters[i].setCutoffFrequency(vec4::fromRawArray(&freqs[i * 4]));
+                }
+
+                hp.setCutoffFrequency(vec4::fromRawArray(freqs));
+            }
+
+            void setWetGain(vec4 gain)
+            {
+                wetGain = gain;
+            }
+
+            void setDryGain(vec4 gain)
+            {
+                dryGain = gain;
+            }
+
+            vec4 process(vec4 in)
+            {
+                filters[0].process(in);
+
+                for (int i = 1; i < filters.size(); i++)
+                {
+                    filters[i].process(filters[i - 1].last());
+                }
+
+                const vec4 out = filters[filters.size() - 1].last() * wetGain + in * dryGain;
+
+                //return out;
+                return out - hp.process(out);
+            }
+        };
+
         Dsp::Context c = 48000.0f;
 
         std::array<vec4, 6> inputs;
@@ -74,66 +133,12 @@ namespace Electrophilia::Veronika
 
         static constexpr auto db = Math::decibelsToAmplitude;
 
-        const float tp1SquareGains[4] = {  db(-40), db(-45), db(-47), db(-50)};
-        const float tp2SquareGains[4] = {  db(-45), db(-52), db(-57), db(-60)};
-        const float tp3SquareGains[4] = {  db(-50), db(-57), db(-55), db(-55)};
-        const float tp4SquareGains[4] = {  db(-55), db(-65), db(-65), db(-65)};
-        const float tp5SquareGains[4] = {  db(-60), db(-70), db(-70), db(-70)};
-        const float tp6SquareGains[4] = {  db(-65), db(-70), db(-70), db(-75)};
-
-        const vec4 tp1SquareGain = vec4::fromRawArray(tp1SquareGains);
-        const vec4 tp2SquareGain = vec4::fromRawArray(tp2SquareGains);
-        const vec4 tp3SquareGain = vec4::fromRawArray(tp3SquareGains);
-        const vec4 tp4SquareGain = vec4::fromRawArray(tp4SquareGains);
-        const vec4 tp5SquareGain = vec4::fromRawArray(tp5SquareGains);
-        const vec4 tp6SquareGain = vec4::fromRawArray(tp6SquareGains);
-
-        template<int size>
-        class FilterBank
-        {
-            Dsp::Context c = 48000.0f;
-            std::array<Dsp::Filter1P<vec4>, size> filters;
-
-            Dsp::Filter1P<vec4> hp;
-
-        public:
-            void setContext(Dsp::Context context)
-            {
-                c = context;
-                hp.setContext(c);
-
-                for (auto& filter : filters)
-                {
-                    filter.setContext(c);
-                    filter.reset();
-                }
-            }
-
-            void setFrequencies(float* freqs)
-            {
-                for (int i = 0; i < filters.size(); i++)
-                {
-                    filters[i].setCutoffFrequency(vec4::fromRawArray(&freqs[i * 4]));
-                }
-
-                hp.setCutoffFrequency(vec4::fromRawArray(freqs));
-            }
-
-            vec4 process(vec4 in)
-            {
-                filters[0].process(in);
-
-                for (int i = 1; i < filters.size(); i++)
-                {
-                    filters[i].process(filters[i - 1].last());
-                }
-
-                const vec4 out = filters[filters.size() - 1].last();
-
-                //return out;
-                return out - hp.process(out);
-            }
-        };
+        const vec4 tp1SquareGain = vec4fromFloats(db(-40), db(-45), db(-47), db(-50));
+        const vec4 tp2SquareGain = vec4fromFloats(db(-45), db(-52), db(-57), db(-60));
+        const vec4 tp3SquareGain = vec4fromFloats(db(-50), db(-57), db(-55), db(-55));
+        const vec4 tp4SquareGain = vec4fromFloats(db(-55), db(-65), db(-65), db(-65));
+        const vec4 tp5SquareGain = vec4fromFloats(db(-60), db(-70), db(-70), db(-70));
+        const vec4 tp6SquareGain = vec4fromFloats(db(-65), db(-70), db(-70), db(-75));
 
         FilterBank<6> tp1;
         FilterBank<6> tp2;
@@ -150,42 +155,45 @@ namespace Electrophilia::Veronika
 
             tp1.setContext(c);
             tp1.setFrequencies(tp1freqs);
+            tp1.setDryGain(tp1SquareGain);
 
             tp2.setContext(c);
             tp2.setFrequencies(tp2freqs);
+            tp2.setDryGain(tp2SquareGain);
 
             tp3.setContext(c);
             tp3.setFrequencies(tp3freqs);
+            tp3.setDryGain(tp3SquareGain);
 
             tp4.setContext(c);
             tp4.setFrequencies(tp4freqs);
+            tp4.setDryGain(tp4SquareGain);
 
             tp5.setContext(c);
             tp5.setFrequencies(tp5freqs);
+            tp5.setDryGain(tp5SquareGain);
 
             tp6.setContext(c);
             tp6.setFrequencies(tp6freqs);
+            tp6.setDryGain(tp6SquareGain);
         }
 
         void addSignal(vec4 in, int midiNote)
         {
-            int relativeNote = midiNote - Math::C1_MIDI_NOTE_NUMBER;
+            int relativeNote = midiNote - Math::C2_MIDI_NOTE_NUMBER;
             int input = std::clamp((relativeNote + 6) / 12, 0, 5);
-
-            float dB = 16.0f * (float(relativeNote) / 12.0f);
-            float gain = Math::decibelsToAmplitude(dB);
 
             inputs[input] += in;
         }
 
         vec4 processSample()
         {
-            const vec4 out1 = tp1.process(inputs[0]) + inputs[0] * tp1SquareGain;
-            const vec4 out2 = tp2.process(inputs[1]) + inputs[1] * tp2SquareGain;
-            const vec4 out3 = tp3.process(inputs[2]) + inputs[2] * tp3SquareGain;
-            const vec4 out4 = tp4.process(inputs[3]) + inputs[3] * tp4SquareGain;
-            const vec4 out5 = tp5.process(inputs[4]) + inputs[4] * tp5SquareGain;
-            const vec4 out6 = tp6.process(inputs[5]) + inputs[5] * tp6SquareGain;
+            const vec4 out1 = tp1.process(inputs[0]);
+            const vec4 out2 = tp2.process(inputs[1]);
+            const vec4 out3 = tp3.process(inputs[2]);
+            const vec4 out4 = tp4.process(inputs[3]);
+            const vec4 out5 = tp5.process(inputs[4]);
+            const vec4 out6 = tp6.process(inputs[5]);
 
             for (auto& x : inputs)
             {

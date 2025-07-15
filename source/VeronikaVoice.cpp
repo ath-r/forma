@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VeronikaVoice.h"
+#include "dsp/SIMD.h"
 #include "math/Conversion.h"
 
 namespace Electrophilia::Veronika
@@ -10,23 +11,29 @@ namespace Electrophilia::Veronika
     {
         c = context;
 
-        octaves.setContext(c);
+        squareOctaves.setContext(c);
+        squareMutations.setContext(c);
         setFrequency (frequency);
 
         gateSmoother.setContext(c);
         gateSmoother.setTime(0.005);
     }
+
     void VeronikaVoice::setFrequency (float f)
     {
-        static const float multipliers[4] = { 1.0f, 2.0f, 4.0f, 8.0f };
-        static const vec4 mult = vec4::fromRawArray (multipliers);
+        static const vec4 mult = vec4fromFloats (0.5f, 1.0f, 2.0f, 4.0f);
+        static const vec4 mult2 = vec4fromFloats(1.0f, 1.5f, 3.0f, 1.0f);
 
         frequency = f;
-        vec4 fmult = mult * f * 0.5f; // 0.5f because base frequency is 16' i.e. one octave lower than reference
-        octaves.setFrequency (fmult);
+        squareOctaves.setFrequency ( mult * frequency);
+        squareMutations.setFrequency ( mult2 * frequency);
     }
 
-    void VeronikaVoice::setTime (double t) { octaves.setTime (t); }
+    void VeronikaVoice::setTime (double t)
+    {
+        squareOctaves.setTime (t);
+        squareMutations.setTime(t);
+    }
 
     bool VeronikaVoice::isActive() { return gate > 0.0f || gateSmoother.last() > 0.0f; }
 
@@ -46,13 +53,14 @@ namespace Electrophilia::Veronika
 
     void VeronikaVoice::handleNoteOff (Midi::MessageNoteOff message) { gate = 0.0f; }
 
-    vec4 VeronikaVoice::processSample()
+    vec4 VeronikaVoice::processSample(vec4& octaves, vec4& mutations)
     {
         gateSmoother.process(gate);
 
-        const vec4 f0 = octaves.processSample() * gate;
+        octaves = squareOctaves.processSample() * gate;
+        mutations = squareMutations.processSample() * gate;
 
-        return f0;
+        return octaves;
     }
 
 

@@ -99,4 +99,44 @@ namespace Electrophilia::Math
     }
 
 
+    template <typename T>
+    static inline T chebyshev2(T x) noexcept
+    {
+        // 2x^2 - 1
+
+        return x * x * 2.0 - 1.0;
+    }
+
+    template <typename T>
+    static inline T chebyshev3(T x) noexcept
+    {
+        // 4x^3 - 3x
+
+        return x * x * x * 4.0 - x * 3.0;
+    }
+
+    template <typename T>
+    static inline T chebyshev5(T x) noexcept
+    {
+        // 16x^5 - 20x^3 + 5x
+
+        const T x2 = x * x;
+        const T x3 = x2 * x;
+        const T x5 = x3 * x2;
+
+        return x5 * 16.0 - x3 * 20 + x * 5;
+    }
+
+    template <typename T>
+    static inline T chebyshev7(T x) noexcept
+    {
+        // 64x^7 - 112x^5 + 56x^3 - 7x
+
+        const T x2 = x * x;
+        const T x3 = x2 * x;
+        const T x5 = x3 * x2;
+        const T x7 = x5 * x2;
+
+        return x7 * 64.0 - x5 * 112.0 + x3 * 56.0 - x * 7.0;
+    }
 }

@@ -43,6 +43,9 @@ PluginProcessor::PluginProcessor()
     parameterObservers[ParameterIDs::F8].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute8);
     parameterObservers[ParameterIDs::F4].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute4);
     parameterObservers[ParameterIDs::F2].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute2);
+
+    parameterObservers[ParameterIDs::F5].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute5);
+    parameterObservers[ParameterIDs::F1].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute1);
 }
 
 PluginProcessor::~PluginProcessor()

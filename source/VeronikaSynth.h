@@ -27,13 +27,16 @@ namespace Electrophilia::Veronika
         vec4 parameterFluteStops2 = 0;
 
         std::array<VeronikaVoice, 16> voices;
+        std::array<VeronikaVoice, 16> mutationVoices;
         Dsp::PhaseCounter phaseCounter;
-        TimbreProcessor timbreProcessor;
+
+        TimbreProcessor timbreProcessor1;
+        TimbreProcessor timbreProcessor2;
 
         Dsp::Filter1P<vec4> parameterFluteStops1Smoother;
         Dsp::Filter1P<vec4> parameterFluteStops2Smoother;
 
-        const float minVolumeOfStop = Math::decibelsToAmplitude(-50);
+        const float minVolumeOfStop = Math::decibelsToAmplitude(-40);
 
 public:
     VeronikaSynth();
@@ -47,6 +50,10 @@ public:
     void setParameterFlute4 (float x);
 
     void setParameterFlute2 (float x);
+
+    void setParameterFlute5 (float x);
+
+    void setParameterFlute1 (float x);
 
     void processBlock (float* buffer, int numberOfSamples) override;
 

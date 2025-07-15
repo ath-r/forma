@@ -17,8 +17,8 @@ namespace Electrophilia::Veronika
 
         int note;
         float frequency = 440.0f;
-        Oscillator::SquareSimd octaves;
-
+        Oscillator::SquareSimd squareOctaves;
+        Oscillator::SquareSimd squareMutations;
 
         Cv::LinearSmoother<float> gateSmoother;
 
@@ -39,6 +39,6 @@ namespace Electrophilia::Veronika
 
         void handleNoteOff (Midi::MessageNoteOff message);
 
-        vec4 processSample();
+        vec4 processSample(vec4& octaves, vec4& mutations);
     };
 }
