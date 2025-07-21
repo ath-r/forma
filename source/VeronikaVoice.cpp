@@ -29,7 +29,12 @@ namespace Electrophilia::Veronika
     void VeronikaVoice::setFrequency (float f)
     {
         static const vec4 mult = vec4fromFloats (0.5f, 1.0f, 2.0f, 4.0f);
-        static const vec4 mult2 = vec4fromFloats(1.0f, 1.5f, 3.0f, 1.0f);
+        static const vec4 mult2 = vec4fromFloats (
+            1.0f,
+            Math::semitonesToFrequencyRatio(7.0f),
+            Math::semitonesToFrequencyRatio(28.0f),
+            1.0f
+        );
 
         frequency = f;
         squareOctaves.setFrequency ( mult * frequency);
