@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <deque>
 
 #include "Events.h"
 #include "Midi.h"
@@ -23,54 +22,14 @@ namespace Electrophilia::Control
 
         std::array<VoiceController, 16> voices;
 
-        std::deque<VoiceController*> voiceDeque;
-
     public:
+        EventOutput<Midi::MessageNoteOn>& noteOn_out (int i);
+        EventOutput<Midi::MessageNoteOff>& noteOff_out (int i);
 
-        VoiceManager()
-        {
-            for (VoiceController& voice : voices)   voiceDeque.push_back(&voice);
-        }
+        bool isAtLeastOneVoiceActive();
 
-        EventOutput<Midi::MessageNoteOn>& noteOn_out(int i) {    return voices[i].noteOn_out;    };
-        EventOutput<Midi::MessageNoteOff>& noteOff_out(int i) {    return voices[i].noteOff_out;    };
+        void handleNoteOn (const Midi::MessageNoteOn message);
 
-        bool isAtLeastOneVoiceActive()
-        {
-            for (VoiceController& voice : voices)
-            {
-                if (voice.active) return true;
-            }
-            return false;
-        }
-
-        void handleNoteOn(const Midi::MessageNoteOn message)
-        {
-            auto& voice = voiceDeque.front();
-
-            if (!voice->active)
-            {
-                voice->active = true;
-                voice->note = message.note;
-                voice->noteOn_out.fire(message);
-
-                voiceDeque.pop_front();
-                voiceDeque.push_back(voice);
-            }
-        };
-
-        void handleNoteOff(const Midi::MessageNoteOff message)
-        {
-            for (VoiceController& voice : voices)
-            {
-                if (voice.note == message.note)
-                {
-                    voice.active = false;
-                    voice.noteOff_out.fire(message);
-                    //break;
-                }
-            }
-        };
-
+        void handleNoteOff (const Midi::MessageNoteOff message);
     };
 }
