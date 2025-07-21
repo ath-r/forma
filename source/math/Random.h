@@ -2,9 +2,18 @@
 
 namespace Electrophilia::Math
 {
-    static int fastRandomInteger();
+    class RNG
+    {
+        int seed = 0;
 
-    static float fastRandomFloat();
+        static const int a = 1664525;
+        static const int c = 1013904223;
 
-    static float fastRandomNormal();
+    public:
+        void setSeed(int newSeed);
+
+        int getInt();
+
+        float getFloat();
+    };
 }

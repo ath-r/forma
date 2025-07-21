@@ -24,4 +24,9 @@ namespace Electrophilia::Math
     float decibelsToAmplitudeRatio (float db);
 
     float linearVolumeToLog (float x, float dB_at0);
+
+    float logerp2 (float a, float b, float x);
+
+    float logerp10 (float a, float b, float x);
+
 }

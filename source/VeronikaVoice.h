@@ -1,10 +1,12 @@
 #pragma once
 
+#include "dsp/Filter.h"
 #include "dsp/SquareSimd.h"
 #include "dsp/Context.h"
 #include "dsp/cv/LinearSmoother.h"
 
 #include "control/Midi.h"
+#include "math/Random.h"
 
 namespace Electrophilia::Veronika
 {
@@ -20,7 +22,18 @@ namespace Electrophilia::Veronika
         Oscillator::SquareSimd squareOctaves;
         Oscillator::SquareSimd squareMutations;
 
-        Cv::LinearSmoother<float> gateSmoother;
+        Math::RNG rng;
+        vec4 actionThresholdOctaves;
+        vec4 actionThresholdMutations;
+
+        Filter1P<vec4> actionOctaves;
+        Filter1P<vec4> actionMutations;
+
+        Cv::LinearSmoother<float> gateTimer;
+        static constexpr float minVelocityGateAttack = 0.0001f;
+        static constexpr float maxVelocityGateAttack = 0.1f;
+
+
 
         float gate = 0.0f;
 

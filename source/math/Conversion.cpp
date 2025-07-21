@@ -31,4 +31,18 @@ namespace Electrophilia::Math
         const float dB = std::lerp (dB_at0, 0.0f, x);
         return decibelsToAmplitude (dB);
     }
+
+    float logerp2 (float a, float b, float x)
+    {
+        const float log = std::log2 (b / a);
+
+        return a * std::pow (10, log * x);
+    }
+
+    float logerp10 (float a, float b, float x)
+    {
+        const float log = std::log10 (b / a);
+
+        return a * std::pow (10, log * x);
+    }
 }
