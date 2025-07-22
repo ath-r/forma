@@ -13,8 +13,8 @@ namespace Electrophilia::Control
         struct VoiceController
         {
             bool active = false;
-            int note = 69;
-            int channel = 0;
+            unsigned char note = 69;
+            unsigned char channel = 0;
 
             EventOutput<Midi::MessageNoteOn> noteOn_out;
             EventOutput<Midi::MessageNoteOff> noteOff_out;
@@ -28,8 +28,12 @@ namespace Electrophilia::Control
 
         bool isAtLeastOneVoiceActive();
 
+        bool isNoteAlreadyPressed (int note);
+
         void handleNoteOn (const Midi::MessageNoteOn message);
 
         void handleNoteOff (const Midi::MessageNoteOff message);
+
+        void handleAllNotesOff (const Midi::MessageAllNotesOff message);
     };
 }

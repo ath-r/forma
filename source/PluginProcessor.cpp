@@ -87,7 +87,6 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto ch0 = buffer.getWritePointer(0);
     auto ch1 = buffer.getWritePointer(1);
 
-    static std::array<Electrophilia::Control::Midi::MessageMeta, 10000> midiEvents;
     int midiEventCount = midiMessages.getNumEvents();
     juce::MidiBufferIterator iterator = midiMessages.begin();
 
@@ -104,6 +103,7 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
         iterator++;
     }
+    midiMessages.clear();
 
     veronikaSynth.process(ch0, numSamples, midiEvents.data(), midiEventCount);
     buffer.copyFrom(1, 0, buffer.getReadPointer(0), numSamples);

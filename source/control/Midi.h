@@ -13,6 +13,18 @@ namespace Electrophilia::Control::Midi
         PitchBend = 0xE0
     };
 
+    enum class ChannelModeMessages : unsigned char
+    {
+        AllSoundOff = 120,
+        ResetAllControllers = 121,
+        LocalControl = 122,
+        AllNotesOff = 123,
+        OmniModeOff = 124,
+        OmniModeOn = 125,
+        MonoModeOn = 126,
+        PolyModeOn = 127
+    };
+
     struct MessageNoteOn
     {
         unsigned char channel;
@@ -27,6 +39,11 @@ namespace Electrophilia::Control::Midi
         unsigned char velocity;
     };
 
+    struct MessageAllNotesOff
+    {
+        unsigned char channel;
+    };
+
     struct Message
     {
         unsigned char status = 0;
@@ -35,21 +52,25 @@ namespace Electrophilia::Control::Midi
 
         static Message fromRawData (const unsigned char* data, int size);
 
-        MessageType type();
+        [[nodiscard]] MessageType type() const;
 
-        unsigned char channel();
+        [[nodiscard]] unsigned char channel() const;
 
-        bool isNoteOn();
+        [[nodiscard]] bool isNoteOn() const;
 
-        bool isNoteOff();
+        [[nodiscard]] bool isNoteOff() const;
 
-        bool isNoteOnOrOff();
+        [[nodiscard]] bool isNoteOnOrOff() const;
+
+        [[nodiscard]] bool isControlChange() const;
+
+        [[nodiscard]] bool isAllNotesOff() const;
 
         explicit operator MessageNoteOn() const
         {
             return MessageNoteOn
             {
-                .channel = static_cast<unsigned char>(status & 0x0F),
+                .channel = channel(),
                 .note = data1,
                 .velocity = data2
             };
@@ -59,9 +80,17 @@ namespace Electrophilia::Control::Midi
         {
             return MessageNoteOff
             {
-                .channel = static_cast<unsigned char>(status & 0x0F),
+                .channel = channel(),
                 .note = data1,
                 .velocity = data2
+            };
+        }
+
+        explicit operator MessageAllNotesOff() const
+        {
+            return MessageAllNotesOff
+            {
+                .channel = channel()
             };
         }
     };

@@ -16,8 +16,20 @@ namespace Electrophilia::Control
         return false;
     }
 
+    bool VoiceManager::isNoteAlreadyPressed (int note)
+    {
+        for (VoiceController& voice : voices)
+        {
+            if (voice.active && voice.note == note)
+                return true;
+        }
+        return false;
+    }
+
     void VoiceManager::handleNoteOn (const Midi::MessageNoteOn message)
     {
+        if (isNoteAlreadyPressed(message.note)) return;
+
         for (auto& voice : voices)
         {
             if (!voice.active)
@@ -26,10 +38,10 @@ namespace Electrophilia::Control
                 voice.note = message.note;
                 voice.noteOn_out.fire (message);
 
-                break;
+                return;
             }
         }
-    };
+    }
 
     void VoiceManager::handleNoteOff (const Midi::MessageNoteOff message)
     {
@@ -39,9 +51,16 @@ namespace Electrophilia::Control
             {
                 voice.active = false;
                 voice.noteOff_out.fire (message);
-
-                break;
             }
         }
-    };
+    }
+
+    void VoiceManager::handleAllNotesOff (const Midi::MessageAllNotesOff message)
+    {
+        for (auto& voice : voices)
+        {
+            voice.active = false;
+            voice.noteOff_out.fire ({   .channel = message.channel, .note = voice.note, .velocity = 0   });
+        }
+    }
 }

@@ -25,13 +25,21 @@ namespace Electrophilia::Control::Midi
         return message;
     }
 
-    MessageType Message::type() { return static_cast<MessageType> (status & 0xF0); }
+    MessageType Message::type() const { return static_cast<MessageType> (status & 0xF0); }
 
-    unsigned char Message::channel() { return status & 0x0F; }
+    unsigned char Message::channel() const { return status & 0x0F; }
 
-    bool Message::isNoteOn() { return type() == MessageType::NoteOn; }
+    bool Message::isNoteOn() const { return type() == MessageType::NoteOn; }
 
-    bool Message::isNoteOff() { return type() == MessageType::NoteOff; }
+    bool Message::isNoteOff() const { return type() == MessageType::NoteOff; }
 
-    bool Message::isNoteOnOrOff() { return isNoteOn() || isNoteOff(); }
+    bool Message::isNoteOnOrOff() const { return isNoteOn() || isNoteOff(); }
+
+    bool Message::isControlChange() const { return type() == MessageType::ControlChange; }
+
+    bool Message::isAllNotesOff() const
+    {
+        return isControlChange() && (data1 == static_cast<unsigned char> (ChannelModeMessages::AllNotesOff));
+    }
+
 }

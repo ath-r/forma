@@ -49,6 +49,8 @@ public:
 
 private:
 
+    std::array<Electrophilia::Control::Midi::MessageMeta, 10000> midiEvents;
+
     Electrophilia::Veronika::VeronikaSynth veronikaSynth;
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

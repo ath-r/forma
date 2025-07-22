@@ -82,6 +82,12 @@ namespace Electrophilia::Veronika
 
     void VeronikaSynth::handleMidiEvent (Control::Midi::Message message)
     {
+        if (message.isAllNotesOff())
+        {
+            voiceManager.handleAllNotesOff(Midi::MessageAllNotesOff (message));
+            return;
+        }
+
         if (message.isNoteOnOrOff())
         {
             int noteNumber = message.data1;
@@ -94,13 +100,16 @@ namespace Electrophilia::Veronika
                 // fire midi events here
                 if (message.isNoteOn())
                 {
-                    voiceManager.handleNoteOn (Electrophilia::Control::Midi::MessageNoteOn (message));
+                    voiceManager.handleNoteOn (Midi::MessageNoteOn (message));
                 }
+
                 if (message.isNoteOff())
                 {
-                    voiceManager.handleNoteOff (Electrophilia::Control::Midi::MessageNoteOff (message));
+                    voiceManager.handleNoteOff (Midi::MessageNoteOff (message));
                 }
             }
+
+            return;
         }
     }
 
