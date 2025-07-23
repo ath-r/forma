@@ -61,7 +61,7 @@ namespace Electrophilia::Math
     }
 
     /**
-        * @brief Sin(2πx). Expects 0...1 input. With 32-bit float max. measured abs error is 3.72529e-07 (-128 dB). This is as precise as this type of approximation gets within 32-bit floats.
+        * @brief Sin(2πx). Expects 0...1 input. With 32-bit float max. measured abs error is 3.72529e-07 (-128 dB).
         */
     template <typename T>
     static inline T sin2pi9(T x) noexcept
@@ -69,11 +69,11 @@ namespace Electrophilia::Math
         const auto x1 = foldArgument(x);
         const auto x2 = x1 * x1;
 
-        const T a = 6.28318516008947744301885339855754539f;
-        const T b = -41.3416550314162780771649724741397745f;
-        const T c = 81.6010040732617735242889484141942461f;
-        const T d = -76.5497822935957426856648840708956891f;
-        const T e = 39.5367060657302079906898367421553316f;
+        const T a = 6.28318516008947744301885339855754539;
+        const T b = -41.3416550314162780771649724741397745;
+        const T c = 81.6010040732617735242889484141942461;
+        const T d = -76.5497822935957426856648840708956891;
+        const T e = 39.5367060657302079906898367421553316;
 
         return x1 * (a + x2 * (b + x2 * (c + x2 * (d + x2 * e))));
     }
