@@ -7,7 +7,7 @@ namespace Electrophilia::Math
     static constexpr int C2_MIDI_NOTE_NUMBER = C1_MIDI_NOTE_NUMBER + 12;
     static constexpr int A4_MIDI_NOTE_NUMBER = 69;
 
-    float noteToFrequency (const int p, float referenceFrequency = 440.0f);
+    float noteToFrequency (int p, float referenceFrequency = 440.0f);
 
     float frequencyToNote (float freq, float referenceFrequency = 440.0f);
 

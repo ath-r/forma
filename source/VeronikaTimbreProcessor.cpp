@@ -56,6 +56,8 @@ namespace Electrophilia::Veronika
             x = 0.0f;
         }
 
-        return (out1 + out2 + out3 + out4 + out5 + out6) * Math::decibelsToAmplitude (-18);
+        const vec4 sum = (out1 + out2 + out3 + out4 + out5 + out6);
+
+        return nonlinearity.process(sum * 0.0625f) * 16.0f * Math::decibelsToAmplitude (-18);
     }
 }
