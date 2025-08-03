@@ -4,11 +4,11 @@
 
 namespace Electrophilia::Waveshaper
 {
-    constexpr double TOL = 1.0e-5;
-
     class ADAA1
     {
     public:
+
+        static constexpr double TOL = 1.0e-5;
 
         void reset()
         {

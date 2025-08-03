@@ -8,13 +8,11 @@ Implemented features:
 
 * Polysynth-style voice allocation with oscillators across voices synced so they won't cancel each other out.
 
-* (Mostly) Accurate *FLUTES II* frequency response voicing from the **Formation 1** model. 5⅓′and 1⅗′ stops are voiced to be a little bit duller.
+* (Mostly) Accurate *FLUTES II* frequency response voicing from the **Formation 1** model. 5⅓′and 1⅗′ stops are voiced to be a little bit duller. Slightly nonlinear amplifying stage is included.
 
 * Realistic janky keyboard action in which stops are not activated simultaneously. Velocity-sensitive.
 
 Planned features (high to low priority):
-
-* Possible *FLUTES II* nonlinearity.
 
 * Noise floor.
 

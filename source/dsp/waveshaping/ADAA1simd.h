@@ -6,11 +6,10 @@
 
 namespace Electrophilia::Waveshaper
 {
-    const vec4 TOL = 1.0e-8;
-
     class ADAA1simd
     {
     public:
+        const vec4 TOL = 1.0e-8;
 
         void reset()
         {
