@@ -59,11 +59,8 @@ namespace Electrophilia::Veronika
             note = message.note;
 
             rng.setSeed(message.note);
-            for (int i = 0; i < 4; i++)
-            {
-                actionThresholdOctaves[i] = rng.getFloat();
-                actionThresholdMutations[i] = rng.getFloat();
-            }
+            actionThresholdOctaves = rng.getVec4();
+            actionThresholdMutations = rng.getVec4();
 
             const float x = float(message.velocity) / 127.0f;
             const float x1 = 1.0f - x;

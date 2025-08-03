@@ -22,7 +22,7 @@ namespace Electrophilia::Veronika
         Oscillator::SquareSimd squareOctaves;
         Oscillator::SquareSimd squareMutations;
 
-        Math::RNG rng;
+        Math::Random::LCG rng;
         vec4 actionThresholdOctaves;
         vec4 actionThresholdMutations;
 
