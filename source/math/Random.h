@@ -55,17 +55,15 @@ namespace Electrophilia::Math::Random
 
     public:
         void setSeed(int newSeed);
-
         int getInt() override;
     };
 
     class Mersenne : public RNG
     {
-        std::mt19937 rng;
+        std::mt19937 rng = std::mt19937();
 
     public:
         void setSeed (int newSeed);
-
         int getInt() override;
     };
 }

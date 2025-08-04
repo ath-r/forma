@@ -8,7 +8,11 @@ namespace Electrophilia::Math
         return (T(0) < val) - (val < T(0));
     }
 
-    float fastmod1f (float x);
+    template <typename T>
+    static inline T fastmod1f (T x)
+    {
+        return x - static_cast<int>(x);
+    };
 
     template <typename T>
     static inline T max(T a, T b)

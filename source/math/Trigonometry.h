@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdlib>
 #include <numbers>
 
 #include "Clamp.h"
@@ -25,6 +26,16 @@ namespace Electrophilia::Math
         x = fastmod1f(x + half) - half;
 
         return max(min(x, half - x), -half - x);
+    }
+
+    template <typename T>
+    static inline T sin2piParabola(T x) noexcept
+    {
+        const T x1 = foldArgument(x);
+        const T x2 = x1 * x1;
+        const T xabs = std::abs(x1);
+
+        return (xabs * 4.0 - x2 * 8.0) * 2.0 * sign(x1);
     }
 
     /**
@@ -76,6 +87,19 @@ namespace Electrophilia::Math
         const T e = 39.5367060657302079906898367421553316;
 
         return x1 * (a + x2 * (b + x2 * (c + x2 * (d + x2 * e))));
+    }
+
+    template <typename T>
+    static inline T dirichlet(T x, int n) noexcept
+    {
+        const auto x1 = foldArgument(x);
+
+        const auto cos = sin2pi9(x1 + 0.25);
+        const auto cos2 = cos * cos;
+
+        if (std::abs(x1) < 0.01) return 1;
+
+        return sin2pi9(x1 * n) / (x * T(n) * pi<T>);
     }
 
     /**

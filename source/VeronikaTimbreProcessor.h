@@ -12,6 +12,7 @@
 #include "math/Polynomial.h"
 
 #include "VeronikaFilterNonlinearity.h"
+#include "VeronikaHum.h"
 
 
 namespace Electrophilia::Veronika
@@ -152,6 +153,8 @@ namespace Electrophilia::Veronika
         FilterBank<3> tp6;
 
         Waveshaper::VeronikaFilterStageNonlinearity nonlinearity;
+
+        VeronikaHum hum;
 
     public:
         void setContext (Dsp::Context context);

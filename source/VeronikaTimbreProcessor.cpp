@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VeronikaTimbreProcessor.h"
+#include "math/Conversion.h"
 
 namespace Electrophilia::Veronika
 {
@@ -32,6 +33,8 @@ namespace Electrophilia::Veronika
         tp6.setContext (c);
         tp6.setFrequencies (tp6freqs);
         tp6.setDryGain (tp6SquareGain);
+
+        hum.setContext(c);
     }
 
     void TimbreProcessor::addSignal (vec4 in, int midiNote)
@@ -44,20 +47,22 @@ namespace Electrophilia::Veronika
 
     vec4 TimbreProcessor::processSample()
     {
-        const vec4 out1 = tp1.process (inputs[0]);
-        const vec4 out2 = tp2.process (inputs[1]);
-        const vec4 out3 = tp3.process (inputs[2]);
-        const vec4 out4 = tp4.process (inputs[3]);
-        const vec4 out5 = tp5.process (inputs[4]);
-        const vec4 out6 = tp6.process (inputs[5]);
+        const vec4 h = hum.process() * Math::DB_MINUS50;
+
+        const vec4 out1 = tp1.process (inputs[0] + h);
+        const vec4 out2 = tp2.process (inputs[1] + h);
+        const vec4 out3 = tp3.process (inputs[2] + h);
+        const vec4 out4 = tp4.process (inputs[3] + h);
+        const vec4 out5 = tp5.process (inputs[4] + h);
+        const vec4 out6 = tp6.process (inputs[5] + h);
 
         for (auto& x : inputs)
         {
             x = 0.0f;
         }
 
-        const vec4 sum = (out1 + out2 + out3 + out4 + out5 + out6);
+        const vec4 sum = out1 + out2 + out3 + out4 + out5 + out6 + h;
 
-        return nonlinearity.process(sum * 0.0625f) * 16.0f * Math::decibelsToAmplitude (-18);
+        return nonlinearity.process(sum * 0.0625f) * 16.0f * Math::DB_MINUS18;
     }
 }
