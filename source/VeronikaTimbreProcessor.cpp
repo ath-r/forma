@@ -47,7 +47,7 @@ namespace Electrophilia::Veronika
 
     vec4 TimbreProcessor::processSample()
     {
-        const vec4 h = hum.process() * Math::DB_MINUS50;
+        const vec4 h = hum.process() * Math::DB_MINUS50 * Math::DB_MINUS12;
 
         const vec4 out1 = tp1.process (inputs[0] + h);
         const vec4 out2 = tp2.process (inputs[1] + h);

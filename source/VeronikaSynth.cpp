@@ -45,10 +45,12 @@ namespace Electrophilia::Veronika
         if (voiceManager.isAtLeastOneVoiceActive())
         {
             gate = 1.0f;
+            gateSmoother.setTime(0.001f);
         }
         else
         {
             gate = 0.0f;
+            gateSmoother.setTime(1.0f);
 
             phaseCounter.reset();
         }

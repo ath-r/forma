@@ -12,9 +12,9 @@ Implemented features:
 
 * Realistic janky keyboard action in which stops are not activated simultaneously. Velocity-sensitive.
 
-Planned features (high to low priority):
+* Noise floor and hum (gated).
 
-* Noise floor.
+Planned features (high to low priority):
 
 * Noisy potentiometers.
 
