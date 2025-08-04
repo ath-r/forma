@@ -13,10 +13,10 @@ namespace Electrophilia::Math
 
     float semitonesToFrequencyRatio (float semitones);
 
-    static constexpr float DB_MINUS6 = 0.501187234;
-    static constexpr float DB_MINUS12 = 0.251188643;
-    static constexpr float DB_MINUS18 = 0.125892541;
-    static constexpr float DB_MINUS24 = 0.063095734;
+    static constexpr float DB_MINUS6 = 0.501187234f;
+    static constexpr float DB_MINUS12 = 0.251188643f;
+    static constexpr float DB_MINUS18 = 0.125892541f;
+    static constexpr float DB_MINUS24 = 0.063095734f;
     static constexpr float DB_MINUS30 = 0.031622777f;
     static constexpr float DB_MINUS50 = 0.003162278f;
 

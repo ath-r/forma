@@ -11,6 +11,7 @@
 #include "dsp/SIMD.h"
 #include "dsp/Filter.h"
 #include "dsp/PhaseCounter.h"
+#include "dsp/cv/LinearSmoother.h"
 
 #include "VeronikaTimbreProcessor.h"
 #include "VeronikaVoice.h"
@@ -35,6 +36,9 @@ namespace Electrophilia::Veronika
 
         Dsp::Filter1P<vec4> parameterFluteStops1Smoother;
         Dsp::Filter1P<vec4> parameterFluteStops2Smoother;
+
+        float gate = 0.0f;
+        Dsp::Cv::LinearSmoother<float> gateSmoother;
 
         const float minVolumeOfStop = Math::decibelsToAmplitude(-40);
 

@@ -27,6 +27,9 @@ namespace Electrophilia::Veronika
         timbreProcessor2.setContext(context);
         parameterFluteStops1Smoother.setContext (context);
         parameterFluteStops2Smoother.setContext (context);
+
+        gateSmoother.setContext(context);
+        gateSmoother.setTime(0.001f);
     }
 
     void VeronikaSynth::setParameterFlute16 (float x) { parameterFluteStops1[0] = std::lerp (minVolumeOfStop, 1.0f, x); }
@@ -39,8 +42,17 @@ namespace Electrophilia::Veronika
 
     void VeronikaSynth::processBlock (float* buffer, int numberOfSamples)
     {
-        if (!voiceManager.isAtLeastOneVoiceActive())
+        if (voiceManager.isAtLeastOneVoiceActive())
+        {
+            gate = 1.0f;
+        }
+        else
+        {
+            gate = 0.0f;
+
             phaseCounter.reset();
+        }
+
 
         for (int i = 0; i < numberOfSamples; i++)
         {
@@ -66,7 +78,7 @@ namespace Electrophilia::Veronika
             auto sample = (timbreProcessor1.processSample()) * parameterFluteStops1Smoother.last();
             sample += (timbreProcessor2.processSample()) * parameterFluteStops2Smoother.last();
 
-            buffer[i] = sample.sum();
+            buffer[i] = sample.sum() * gateSmoother.process(gate);
 
             //This will synchronize inactive voices with global time
             //So oscillators running at the same frequency will all be in phase
