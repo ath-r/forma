@@ -3,9 +3,9 @@
 #include "dsp/waveshaping/ADAA1simd.h"
 #include "math/Polynomial.h"
 
-namespace Electrophilia::Waveshaper
+namespace Ath::Waveshaper
 {
-    class VeronikaFilterStageNonlinearity : public ADAA1simd
+    class FormaFilterStageNonlinearity : public ADAA1simd
     {
         Math::Polynomial<vec4, 14> polynomial =
         {

@@ -6,7 +6,7 @@
 #include "Slider.h"
 #include "KnobNamedTicks.h"
 
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
     class KnobWithLabel : public juce::Component
     {

@@ -2,7 +2,7 @@
 
 #include "../Filter.h"
 
-namespace Electrophilia::Dsp::Cv
+namespace Ath::Dsp::Cv
 {
     template <typename T>
     class ExponentialSmoother : private Filter1P<T>

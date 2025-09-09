@@ -2,7 +2,7 @@
 
 #include <BinaryData.h>
 
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
     juce::Typeface::Ptr getTypeface(fontsIds font)
     {

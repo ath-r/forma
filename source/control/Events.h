@@ -2,7 +2,7 @@
 #include <vector>
 #include <functional>
 
-namespace Electrophilia::Control
+namespace Ath::Control
 {
     #define MEMBER_FUNCTION(instance, method) std::bind(method, std::ref(instance), std::placeholders::_1) 
 

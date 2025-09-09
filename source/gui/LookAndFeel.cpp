@@ -8,7 +8,7 @@
 #include "Properties.h"
 #include <cstdlib>
 
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
     LookAndFeel::LookAndFeel()
     {

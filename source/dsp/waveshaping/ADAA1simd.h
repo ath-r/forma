@@ -4,7 +4,7 @@
 
 #include "../SIMD.h"
 
-namespace Electrophilia::Waveshaper
+namespace Ath::Waveshaper
 {
     class ADAA1simd
     {

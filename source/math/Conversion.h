@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cmath>
-namespace Electrophilia::Math
+namespace Ath::Math
 {
     static constexpr int C1_MIDI_NOTE_NUMBER = 24;
     static constexpr int C2_MIDI_NOTE_NUMBER = C1_MIDI_NOTE_NUMBER + 12;

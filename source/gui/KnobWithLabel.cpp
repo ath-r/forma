@@ -5,7 +5,7 @@
 #include "Fonts.h"
 #include "Properties.h"
 #include "juce_gui_basics/juce_gui_basics.h"
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
     KnobWithLabel::KnobWithLabel (const juce::String& parameterId, juce::AudioProcessorValueTreeState& stateToControl)
         : knob(parameterId, stateToControl), ticks(knob)

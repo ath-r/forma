@@ -7,7 +7,7 @@
 #include "Fonts.h"
 #include <cmath>
 
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
     KnobNamedTicks::KnobNamedTicks(juce::Slider & slider) : slider(slider)
     {

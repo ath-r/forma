@@ -10,9 +10,9 @@
 
 #include <BinaryData.h>
 
-using namespace Electrophilia::Veronika;
+using namespace Ath::Forma;
 
-using namespace Electrophilia::Gui;
+using namespace Ath::Gui;
 
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p),
@@ -35,7 +35,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
         ParametersByID[F1].id,
         processorRef.treeState)
 {
-    Electrophilia::Gui::LookAndFeel::setDefaultLookAndFeel(&lookAndFeel);
+    Ath::Gui::LookAndFeel::setDefaultLookAndFeel(&lookAndFeel);
 
     juce::ignoreUnused (processorRef);
 

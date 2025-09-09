@@ -27,8 +27,8 @@ private:
     std::unique_ptr<melatonin::Inspector> inspector;
     juce::TextButton inspectButton { "Inspect the UI" };
 
-    Electrophilia::Gui::SliderWithLabel flute16, flute8, flute5, flute4, flute2, flute1;
+    Ath::Gui::SliderWithLabel flute16, flute8, flute5, flute4, flute2, flute1;
 
-    Electrophilia::Gui::LookAndFeel lookAndFeel;
+    Ath::Gui::LookAndFeel lookAndFeel;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

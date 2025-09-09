@@ -2,7 +2,7 @@
 
 #include "Clamp.h"
 
-namespace Electrophilia::Math
+namespace Ath::Math
 {
 
 }

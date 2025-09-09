@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-namespace Electrophilia::Waveshaper
+namespace Ath::Waveshaper
 {
     class ADAA1
     {

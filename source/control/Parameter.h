@@ -3,7 +3,7 @@
 #include <string>
 #include <format>
 
-namespace Electrophilia::Control
+namespace Ath::Control
 {
     struct Parameter
     {

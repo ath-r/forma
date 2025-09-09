@@ -11,11 +11,11 @@
 
 #include "math/Polynomial.h"
 
-#include "VeronikaFilterNonlinearity.h"
-#include "VeronikaHum.h"
+#include "FormaFilterNonlinearity.h"
+#include "FormaHum.h"
 
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
     class TimbreProcessor
     {
@@ -152,9 +152,9 @@ namespace Electrophilia::Veronika
         FilterBank<4> tp5;
         FilterBank<3> tp6;
 
-        Waveshaper::VeronikaFilterStageNonlinearity nonlinearity;
+        Waveshaper::FormaFilterStageNonlinearity nonlinearity;
 
-        VeronikaHum hum;
+        FormaHum hum;
 
     public:
         void setContext (Dsp::Context context);

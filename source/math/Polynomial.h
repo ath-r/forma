@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace Electrophilia::Math
+namespace Ath::Math
 {
     template <typename T, int N>
     struct Polynomial

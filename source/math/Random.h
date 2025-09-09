@@ -5,7 +5,7 @@
 #include "Polynomial.h"
 #include "../dsp/SIMD.h"
 
-namespace Electrophilia::Math::Random
+namespace Ath::Math::Random
 {
     class RNG
     {

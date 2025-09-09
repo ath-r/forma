@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Electrophilia::Math
+namespace Ath::Math
 {
     #ifndef BASICS
     template <typename T> int sign(T val)

@@ -4,7 +4,7 @@
 #include "../math/Trigonometry.h"
 #include "SIMD.h"
 
-namespace Electrophilia::Dsp
+namespace Ath::Dsp
 {
     template <typename T>
     class Filter1P

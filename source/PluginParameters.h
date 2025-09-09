@@ -3,7 +3,7 @@
 
 #include "control/Parameter.h"
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
 
     static const Control::Parameter TestParameter

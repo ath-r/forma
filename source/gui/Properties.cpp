@@ -2,7 +2,7 @@
 
 #include "Properties.h"
 
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
 
     juce::var Properties::get(const juce::Component & component, propertyIds id)

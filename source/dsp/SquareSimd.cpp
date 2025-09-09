@@ -1,7 +1,7 @@
 #include "SquareSimd.h"
 #include "SIMD.h"
 
-namespace Electrophilia::Dsp::Oscillator
+namespace Ath::Dsp::Oscillator
 {
 
     void SquareSimd::setContext (const Context context)

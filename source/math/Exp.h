@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Electrophilia::Math
+namespace Ath::Math
 {
     /**
     * @brief Exponent at -1 < x < 1. Error at -1 is 2.26e-4. Error at 1 is -1.76e-4.

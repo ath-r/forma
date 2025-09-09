@@ -1,14 +1,14 @@
-#include "VeronikaHum.h"
+#include "FormaHum.h"
 
 #include "math/Conversion.h"
 #include "math/Trigonometry.h"
 
 #include <cmath>
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
 
-    void VeronikaHum::setContext (Dsp::Context context)
+    void FormaHum::setContext (Dsp::Context context)
     {
         c = context;
         filter.setContext (c);
@@ -17,7 +17,7 @@ namespace Electrophilia::Veronika
         delta = 50.0f * c.T;
     }
 
-    vec4 VeronikaHum::process()
+    vec4 FormaHum::process()
     {
         phase += delta;
         phase -= floor (phase);

@@ -13,22 +13,22 @@
 #include "dsp/PhaseCounter.h"
 #include "dsp/cv/LinearSmoother.h"
 
-#include "VeronikaTimbreProcessor.h"
-#include "VeronikaVoice.h"
+#include "FormaTimbreProcessor.h"
+#include "FormaVoice.h"
 
 #include <array>
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
-    class VeronikaSynth : public Processor::MidiAudioProcessor
+    class FormaSynth : public Processor::MidiAudioProcessor
     {
         Control::VoiceManager voiceManager;
 
         vec4 parameterFluteStops1 = 0;
         vec4 parameterFluteStops2 = 0;
 
-        std::array<VeronikaVoice, 16> voices;
-        std::array<VeronikaVoice, 16> mutationVoices;
+        std::array<FormaVoice, 16> voices;
+        std::array<FormaVoice, 16> mutationVoices;
         Dsp::PhaseCounter phaseCounter;
 
         TimbreProcessor timbreProcessor1;
@@ -43,7 +43,7 @@ namespace Electrophilia::Veronika
         const float minVolumeOfStop = Math::DB_MINUS60;
 
 public:
-    VeronikaSynth();
+    FormaSynth();
 
     void setContext (Dsp::Context context);
 

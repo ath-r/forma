@@ -2,7 +2,7 @@
 
 #include "PhaseCounter.h"
 
-namespace Electrophilia::Dsp
+namespace Ath::Dsp
 {
     void PhaseCounter::setContext(Context context)
     {

@@ -9,7 +9,7 @@ class ParameterObserver : public juce::AudioProcessorValueTreeState::Listener
 public:
 
     juce::RangedAudioParameter* parameter;
-    Electrophilia::Control::EventOutput<float> eventOut;
+    Ath::Control::EventOutput<float> eventOut;
 
     void parameterChanged(const juce::String& parameterID, float newValue) override
     {

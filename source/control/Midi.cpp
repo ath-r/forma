@@ -1,6 +1,6 @@
 #include "Midi.h"
 
-namespace Electrophilia::Control::Midi
+namespace Ath::Control::Midi
 {
 
     Message Message::fromRawData (const unsigned char* data, int size)

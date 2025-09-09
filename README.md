@@ -1,6 +1,6 @@
 ![](assets/images/logobg.svg)
 
-**VERONIKA** is a digital emulation of a transistor combo organ manufactured in the GDR during the 1980s. It focuses on a specific single-manual model, though voicings from other models may be added in the future.
+**FORMA** is a digital emulation of a transistor combo organ manufactured in the GDR during the 1980s. It focuses on a specific single-manual model, though voicings from other models may be added in the future.
 
 Implemented features:
 

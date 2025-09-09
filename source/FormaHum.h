@@ -5,9 +5,9 @@
 #include "dsp/Filter.h"
 #include "math/Random.h"
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
-    class VeronikaHum
+    class FormaHum
     {
         Dsp::Context c = Dsp::Context(48000.0f);
         Dsp::Filter1P<vec4> filter;

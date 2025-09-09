@@ -8,12 +8,12 @@
 #include "control/Midi.h"
 #include "math/Random.h"
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
-    using namespace Electrophilia::Dsp;
-    using namespace Electrophilia::Control;
+    using namespace Ath::Dsp;
+    using namespace Ath::Control;
 
-    class VeronikaVoice
+    class FormaVoice
     {
         Context c = Context(48000.0f);
 

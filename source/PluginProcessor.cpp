@@ -6,7 +6,7 @@
 #include <array>
 #include <cmath>
 
-#include "VeronikaSynth.h"
+#include "FormaSynth.h"
 #include "control/Parameter.h"
 #include "juce_audio_basics/juce_audio_basics.h"
 #include "juce_audio_processors/juce_audio_processors.h"
@@ -26,7 +26,7 @@ PluginProcessor::PluginProcessor()
                        ),
     treeState(*this, nullptr, "PARAMETER", createParameterLayout())
 {
-    using namespace Electrophilia::Veronika;
+    using namespace Ath::Forma;
 
     for (int i = 0; i < PARAM_COUNT; ++i)
     {
@@ -39,13 +39,13 @@ PluginProcessor::PluginProcessor()
 
     }
 
-    parameterObservers[ParameterIDs::F16].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute16);
-    parameterObservers[ParameterIDs::F8].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute8);
-    parameterObservers[ParameterIDs::F4].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute4);
-    parameterObservers[ParameterIDs::F2].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute2);
+    parameterObservers[ParameterIDs::F16].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute16);
+    parameterObservers[ParameterIDs::F8].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute8);
+    parameterObservers[ParameterIDs::F4].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute4);
+    parameterObservers[ParameterIDs::F2].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute2);
 
-    parameterObservers[ParameterIDs::F5].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute5);
-    parameterObservers[ParameterIDs::F1].eventOut.addMemberCallback(veronikaSynth, &VeronikaSynth::setParameterFlute1);
+    parameterObservers[ParameterIDs::F5].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute5);
+    parameterObservers[ParameterIDs::F1].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute1);
 }
 
 PluginProcessor::~PluginProcessor()
@@ -55,7 +55,7 @@ PluginProcessor::~PluginProcessor()
 //==============================================================================
 void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    veronikaSynth.setContext(sampleRate);
+    formaSynth.setContext(sampleRate);
 
     for (auto& observer : parameterObservers) observer.forceCheck();
 
@@ -93,9 +93,9 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (int i = 0; i < midiEventCount; i++)
     {
         juce::MidiMessageMetadata juceMetadata = *iterator;
-        Electrophilia::Control::Midi::MessageMeta metadata =
+        Ath::Control::Midi::MessageMeta metadata =
         {
-        Electrophilia::Control::Midi::Message::fromRawData(juceMetadata.data, juceMetadata.numBytes),
+        Ath::Control::Midi::Message::fromRawData(juceMetadata.data, juceMetadata.numBytes),
         juceMetadata.samplePosition
         };
 
@@ -105,7 +105,7 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
     midiMessages.clear();
 
-    veronikaSynth.process(ch0, numSamples, midiEvents.data(), midiEventCount);
+    formaSynth.process(ch0, numSamples, midiEvents.data(), midiEventCount);
     buffer.copyFrom(1, 0, buffer.getReadPointer(0), numSamples);
 }
 
@@ -145,9 +145,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
-    for (int i = 0; i < Electrophilia::Veronika::PARAM_COUNT; ++i)
+    for (int i = 0; i < Ath::Forma::PARAM_COUNT; ++i)
     {
-        auto paramData = Electrophilia::Veronika::ParametersByID[i];
+        auto paramData = Ath::Forma::ParametersByID[i];
 
         params.push_back (std::make_unique<juce::AudioParameterFloat> (
                 juce::ParameterID {paramData.id, 0},

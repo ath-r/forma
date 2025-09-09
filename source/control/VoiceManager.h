@@ -5,7 +5,7 @@
 #include "Events.h"
 #include "Midi.h"
 
-namespace Electrophilia::Control
+namespace Ath::Control
 {
 
     class VoiceManager

@@ -5,7 +5,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
 
     using VarArray = juce::Array<juce::var>;

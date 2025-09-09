@@ -2,7 +2,7 @@
 
 #include "../control/Midi.h"
 
-namespace Electrophilia::Processor
+namespace Ath::Processor
 {
 
     class MidiAudioProcessor

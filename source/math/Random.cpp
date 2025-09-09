@@ -1,6 +1,6 @@
 #include "Random.h"
 
-namespace Electrophilia::Math::Random
+namespace Ath::Math::Random
 {
     float RNG::getFloat() { return float (getInt()) * 4.6566129e-10f; }
     float RNG::getFloatBipolar() { return getFloat() * 2.0f - 1.0f; }

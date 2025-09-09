@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace Electrophilia::Math
+namespace Ath::Math
 {
     float noteToFrequency (const int p, float referenceFrequency)
     {

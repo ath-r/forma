@@ -7,7 +7,7 @@
 #include <array>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "VeronikaSynth.h"
+#include "FormaSynth.h"
 
 #if (MSVC)
 #include "ipps.h"
@@ -49,12 +49,12 @@ public:
 
 private:
 
-    std::array<Electrophilia::Control::Midi::MessageMeta, 10000> midiEvents;
+    std::array<Ath::Control::Midi::MessageMeta, 10000> midiEvents;
 
-    Electrophilia::Veronika::VeronikaSynth veronikaSynth;
+    Ath::Forma::FormaSynth formaSynth;
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    std::array<ParameterObserver, Electrophilia::Veronika::PARAM_COUNT> parameterObservers;
+    std::array<ParameterObserver, Ath::Forma::PARAM_COUNT> parameterObservers;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };

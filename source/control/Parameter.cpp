@@ -1,6 +1,6 @@
 #include "Parameter.h"
 
-namespace Electrophilia::Control
+namespace Ath::Control
 {
 
     std::string Parameter::getStringFromValue (float value) { return std::format ("{:.2f}", value); }

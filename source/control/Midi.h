@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Electrophilia::Control::Midi
+namespace Ath::Control::Midi
 {
     enum class MessageType : unsigned char
     {

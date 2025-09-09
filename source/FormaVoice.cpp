@@ -1,14 +1,14 @@
 #pragma once
 
-#include "VeronikaVoice.h"
+#include "FormaVoice.h"
 #include "dsp/SIMD.h"
 #include "math/Conversion.h"
 #include <cmath>
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
 
-    void VeronikaVoice::setContext (Context context)
+    void FormaVoice::setContext (Context context)
     {
         c = context;
 
@@ -26,7 +26,7 @@ namespace Electrophilia::Veronika
         actionMutations.setTime(0.0001f);
     }
 
-    void VeronikaVoice::setFrequency (float f)
+    void FormaVoice::setFrequency (float f)
     {
         static const vec4 mult = vec4fromFloats (0.5f, 1.0f, 2.0f, 4.0f);
         static const vec4 mult2 = vec4fromFloats (
@@ -41,17 +41,17 @@ namespace Electrophilia::Veronika
         squareMutations.setFrequency ( mult2 * frequency);
     }
 
-    void VeronikaVoice::setTime (double t)
+    void FormaVoice::setTime (double t)
     {
         squareOctaves.setTime (t);
         squareMutations.setTime(t);
     }
 
-    bool VeronikaVoice::isActive() { return gate > 0.0f || gateTimer.last() > 0.0f; }
+    bool FormaVoice::isActive() { return gate > 0.0f || gateTimer.last() > 0.0f; }
 
-    int VeronikaVoice::getNote() { return note; }
+    int FormaVoice::getNote() { return note; }
 
-    void VeronikaVoice::handleNoteOn (Midi::MessageNoteOn message)
+    void FormaVoice::handleNoteOn (Midi::MessageNoteOn message)
     {
         if (gate == 0.0f)
         {
@@ -73,9 +73,9 @@ namespace Electrophilia::Veronika
 
     }
 
-    void VeronikaVoice::handleNoteOff (Midi::MessageNoteOff message) { gate = 0.0f; }
+    void FormaVoice::handleNoteOff (Midi::MessageNoteOff message) { gate = 0.0f; }
 
-    vec4 VeronikaVoice::processSample(vec4& octaves, vec4& mutations)
+    vec4 FormaVoice::processSample(vec4& octaves, vec4& mutations)
     {
         gateTimer.process(gate);
 

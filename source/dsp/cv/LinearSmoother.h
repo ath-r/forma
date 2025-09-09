@@ -3,7 +3,7 @@
 #include "../Context.h"
 #include <algorithm>
 
-namespace Electrophilia::Dsp::Cv
+namespace Ath::Dsp::Cv
 {
     template <typename T>
     class LinearSmoother

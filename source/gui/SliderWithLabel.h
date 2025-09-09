@@ -5,7 +5,7 @@
 
 #include "Slider.h"
 
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
     class SliderWithLabel : public juce::Component
     {

@@ -5,7 +5,7 @@
 
 #include "Clamp.h"
 
-namespace Electrophilia::Math
+namespace Ath::Math
 {
     template <typename T> static constexpr T pi = std::numbers::pi_v<T>;
     template <typename T> static constexpr T tau = pi<T> * T(2.0);

@@ -4,7 +4,7 @@
 #include "Filter.h"
 #include <array>
 
-namespace Electrophilia::Dsp::Oscillator
+namespace Ath::Dsp::Oscillator
 {
     class SquareSimd
     {

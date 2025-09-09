@@ -1,9 +1,9 @@
 #pragma once
 
-#include "VeronikaTimbreProcessor.h"
+#include "FormaTimbreProcessor.h"
 #include "math/Conversion.h"
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
 
     void TimbreProcessor::setContext (Dsp::Context context)

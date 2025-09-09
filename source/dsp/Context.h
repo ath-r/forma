@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Electrophilia::Dsp
+namespace Ath::Dsp
 {
     struct Context
     {

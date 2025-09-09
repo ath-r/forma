@@ -1,6 +1,6 @@
 #include "VoiceManager.h"
 
-namespace Electrophilia::Control
+namespace Ath::Control
 {
 
     EventOutput<Midi::MessageNoteOn>& VoiceManager::noteOn_out (int i) { return voices[i].noteOn_out; };

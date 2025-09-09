@@ -3,7 +3,7 @@
 #include "juce_graphics/juce_graphics.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace Electrophilia::Gui
+namespace Ath::Gui
 {
     class LookAndFeel : public juce::LookAndFeel_V4
     {

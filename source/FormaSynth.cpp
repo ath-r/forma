@@ -1,22 +1,22 @@
-#include "VeronikaSynth.h"
+#include "FormaSynth.h"
 #include "math/Conversion.h"
 
-namespace Electrophilia::Veronika
+namespace Ath::Forma
 {
 
-    VeronikaSynth::VeronikaSynth()
+    FormaSynth::FormaSynth()
     {
         for (int i = 0; i < 16; i++)
         {
-            voiceManager.noteOn_out (i).addMemberCallback (voices[i], &VeronikaVoice::handleNoteOn);
-            voiceManager.noteOff_out (i).addMemberCallback (voices[i], &VeronikaVoice::handleNoteOff);
+            voiceManager.noteOn_out (i).addMemberCallback (voices[i], &FormaVoice::handleNoteOn);
+            voiceManager.noteOff_out (i).addMemberCallback (voices[i], &FormaVoice::handleNoteOff);
         }
 
         parameterFluteStops1Smoother.setCutoffFrequency (100.0f);
         parameterFluteStops2Smoother.setCutoffFrequency (100.0f);
     }
 
-    void VeronikaSynth::setContext (Dsp::Context context)
+    void FormaSynth::setContext (Dsp::Context context)
     {
         for (auto& voice : voices)
         {
@@ -33,15 +33,15 @@ namespace Electrophilia::Veronika
         gateSmoother.setTime(0.001f);
     }
 
-    void VeronikaSynth::setParameterFlute16 (float x) { parameterFluteStops1[0] = std::lerp (Math::DB_MINUS60, 1.0f, x); }
-    void VeronikaSynth::setParameterFlute8 (float x) { parameterFluteStops1[1] = std::lerp (Math::DB_MINUS60, 1.0f, x); }
-    void VeronikaSynth::setParameterFlute4 (float x) { parameterFluteStops1[2] = std::lerp (Math::DB_MINUS48, 1.0f, x); }
-    void VeronikaSynth::setParameterFlute2 (float x) { parameterFluteStops1[3] = std::lerp (Math::DB_MINUS48, 0.5f, x); }
+    void FormaSynth::setParameterFlute16 (float x) { parameterFluteStops1[0] = std::lerp (Math::DB_MINUS60, 1.0f, x); }
+    void FormaSynth::setParameterFlute8 (float x) { parameterFluteStops1[1] = std::lerp (Math::DB_MINUS60, 1.0f, x); }
+    void FormaSynth::setParameterFlute4 (float x) { parameterFluteStops1[2] = std::lerp (Math::DB_MINUS48, 1.0f, x); }
+    void FormaSynth::setParameterFlute2 (float x) { parameterFluteStops1[3] = std::lerp (Math::DB_MINUS48, 0.5f, x); }
 
-    void VeronikaSynth::setParameterFlute5 (float x) { parameterFluteStops2[1] = std::lerp (Math::DB_MINUS48, 1.0f, x);};
-    void VeronikaSynth::setParameterFlute1 (float x) { parameterFluteStops2[2] = std::lerp (Math::DB_MINUS30, 1.0f, x);};
+    void FormaSynth::setParameterFlute5 (float x) { parameterFluteStops2[1] = std::lerp (Math::DB_MINUS48, 1.0f, x);};
+    void FormaSynth::setParameterFlute1 (float x) { parameterFluteStops2[2] = std::lerp (Math::DB_MINUS30, 1.0f, x);};
 
-    void VeronikaSynth::processBlock (float* buffer, int numberOfSamples)
+    void FormaSynth::processBlock (float* buffer, int numberOfSamples)
     {
         if (voiceManager.isAtLeastOneVoiceActive())
         {
@@ -95,7 +95,7 @@ namespace Electrophilia::Veronika
         }
     }
 
-    void VeronikaSynth::handleMidiEvent (Control::Midi::Message message)
+    void FormaSynth::handleMidiEvent (Control::Midi::Message message)
     {
         if (message.isAllNotesOff())
         {
@@ -107,7 +107,7 @@ namespace Electrophilia::Veronika
         {
             int noteNumber = message.data1;
 
-            constexpr int lowestNote = Electrophilia::Math::C2_MIDI_NOTE_NUMBER;
+            constexpr int lowestNote = Ath::Math::C2_MIDI_NOTE_NUMBER;
             constexpr int highestNote = lowestNote + 61;
 
             if ((noteNumber >= lowestNote) && (noteNumber <= highestNote))
