@@ -1,6 +1,5 @@
 #include "SliderWithLabel.h"
 #include "KnobWithLabel.h"
-#include "clap/ext/gui.h"
 #include "juce_events/juce_events.h"
 #include "juce_graphics/juce_graphics.h"
 
