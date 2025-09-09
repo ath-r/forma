@@ -40,7 +40,7 @@ namespace Electrophilia::Veronika
         float gate = 0.0f;
         Dsp::Cv::LinearSmoother<float> gateSmoother;
 
-        const float minVolumeOfStop = Math::decibelsToAmplitude(-40);
+        const float minVolumeOfStop = Math::DB_MINUS60;
 
 public:
     VeronikaSynth();

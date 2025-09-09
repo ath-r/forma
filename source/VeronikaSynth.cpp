@@ -1,4 +1,5 @@
 #include "VeronikaSynth.h"
+#include "math/Conversion.h"
 
 namespace Electrophilia::Veronika
 {
@@ -32,13 +33,13 @@ namespace Electrophilia::Veronika
         gateSmoother.setTime(0.001f);
     }
 
-    void VeronikaSynth::setParameterFlute16 (float x) { parameterFluteStops1[0] = std::lerp (minVolumeOfStop, 1.0f, x); }
-    void VeronikaSynth::setParameterFlute8 (float x) { parameterFluteStops1[1] = std::lerp (minVolumeOfStop, 1.0f, x); }
-    void VeronikaSynth::setParameterFlute4 (float x) { parameterFluteStops1[2] = std::lerp (minVolumeOfStop, 1.0f, x); }
-    void VeronikaSynth::setParameterFlute2 (float x) { parameterFluteStops1[3] = std::lerp (minVolumeOfStop, 0.5f, x); }
+    void VeronikaSynth::setParameterFlute16 (float x) { parameterFluteStops1[0] = std::lerp (Math::DB_MINUS60, 1.0f, x); }
+    void VeronikaSynth::setParameterFlute8 (float x) { parameterFluteStops1[1] = std::lerp (Math::DB_MINUS60, 1.0f, x); }
+    void VeronikaSynth::setParameterFlute4 (float x) { parameterFluteStops1[2] = std::lerp (Math::DB_MINUS48, 1.0f, x); }
+    void VeronikaSynth::setParameterFlute2 (float x) { parameterFluteStops1[3] = std::lerp (Math::DB_MINUS48, 0.5f, x); }
 
-    void VeronikaSynth::setParameterFlute5 (float x) { parameterFluteStops2[1] = std::lerp (minVolumeOfStop, 1.0f, x);};
-    void VeronikaSynth::setParameterFlute1 (float x) { parameterFluteStops2[2] = std::lerp (minVolumeOfStop, 1.0f, x);};
+    void VeronikaSynth::setParameterFlute5 (float x) { parameterFluteStops2[1] = std::lerp (Math::DB_MINUS48, 1.0f, x);};
+    void VeronikaSynth::setParameterFlute1 (float x) { parameterFluteStops2[2] = std::lerp (Math::DB_MINUS30, 1.0f, x);};
 
     void VeronikaSynth::processBlock (float* buffer, int numberOfSamples)
     {

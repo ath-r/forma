@@ -23,7 +23,7 @@ namespace Electrophilia::Veronika
         phase -= floor (phase);
 
         ///*
-        float s = Math::sin2piParabola (phase);
+        float s = Math::sin2piParabola (phase) * Math::DB_MINUS24;
         s += Math::sin2piParabola (phase * 5.0f) * Math::DB_MINUS30;
         s += Math::sin2piParabola (phase * 7.0f) * Math::DB_MINUS24;
         s += Math::sin2piParabola (phase * 11.0f) * Math::DB_MINUS18;
@@ -31,7 +31,7 @@ namespace Electrophilia::Veronika
         s += Math::sin2piParabola (phase * 17.0f) * Math::DB_MINUS24;
         s += Math::sin2piParabola (phase * 100.0f) * Math::DB_MINUS24;
 
-        float d = Math::dirichlet (phase, 400) * Math::DB_MINUS12;
+        float d = Math::dirichlet (phase, 400) * Math::DB_MINUS24;
         //*/
 
         return filter.process (rng.getVec4Bipolar()) * Math::DB_MINUS12 + s + d;
