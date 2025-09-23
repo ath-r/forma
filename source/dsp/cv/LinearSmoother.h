@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Context.h"
-#include <algorithm>
+#include "../../math/Clamp.h"
 
 namespace Ath::Dsp::Cv
 {
@@ -49,7 +49,7 @@ namespace Ath::Dsp::Cv
         virtual inline T process()
         {
             auto diff = targetValue - currentValue;
-            diff = std::clamp(diff, -delta, delta);
+            diff = Math::clamp(diff, -delta, delta);
             currentValue += diff;
 
             return currentValue;

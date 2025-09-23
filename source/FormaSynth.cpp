@@ -1,49 +1,57 @@
 #include "FormaSynth.h"
+#include "control/Midi.h"
 #include "math/Conversion.h"
+#include "math/Random.h"
+#include "math/Simd.h"
 
 namespace Ath::Forma
 {
 
     FormaSynth::FormaSynth()
     {
-        for (int i = 0; i < 16; i++)
-        {
-            voiceManager.noteOn_out (i).addMemberCallback (voices[i], &FormaVoice::handleNoteOn);
-            voiceManager.noteOff_out (i).addMemberCallback (voices[i], &FormaVoice::handleNoteOff);
-        }
-
-        parameterFluteStops1Smoother.setCutoffFrequency (100.0f);
-        parameterFluteStops2Smoother.setCutoffFrequency (100.0f);
+        
     }
 
     void FormaSynth::setContext (Dsp::Context context)
     {
-        for (auto& voice : voices)
-        {
-            voice.setContext (context);
-        }
         phaseCounter.setContext (context);
 
-        timbreProcessor1.setContext (context);
-        timbreProcessor2.setContext(context);
-        parameterFluteStops1Smoother.setContext (context);
-        parameterFluteStops2Smoother.setContext (context);
+        for (int i = 0; i < OSC_NUMBER; i++)
+        {
+            auto& osc = oscillators[i];
+
+            osc.setContext(context);
+
+            Simd::float8 baseFrequency = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER + i * 8);
+            float sqrt2 = 1.414213562f;
+            Simd::float8 multipliers = {
+                1.0f, 
+                1.059463094f, 
+                1.122462048f, 
+                1.189207115f, 
+                1.25992105f, 
+                1.334839854f, 
+                1.414213562f, 
+                1.498307077f
+            };
+            Simd::float8 frequencies = baseFrequency * multipliers;
+            
+            osc.setFrequency(frequencies);
+        }
+        
+        for (auto& smoother : parameterSmootherFluteStops)
+        {
+            smoother.setContext(context);
+            smoother.setTime(0.002f);
+        }
 
         gateSmoother.setContext(context);
         gateSmoother.setTime(0.001f);
     }
 
-    void FormaSynth::setParameterFlute16 (float x) { parameterFluteStops1[0] = std::lerp (Math::DB_MINUS60, 1.0f, x); }
-    void FormaSynth::setParameterFlute8 (float x) { parameterFluteStops1[1] = std::lerp (Math::DB_MINUS60, 1.0f, x); }
-    void FormaSynth::setParameterFlute4 (float x) { parameterFluteStops1[2] = std::lerp (Math::DB_MINUS48, 1.0f, x); }
-    void FormaSynth::setParameterFlute2 (float x) { parameterFluteStops1[3] = std::lerp (Math::DB_MINUS48, 0.5f, x); }
-
-    void FormaSynth::setParameterFlute5 (float x) { parameterFluteStops2[1] = std::lerp (Math::DB_MINUS48, 1.0f, x);};
-    void FormaSynth::setParameterFlute1 (float x) { parameterFluteStops2[2] = std::lerp (Math::DB_MINUS30, 1.0f, x);};
-
     void FormaSynth::processBlock (float* buffer, int numberOfSamples)
     {
-        if (voiceManager.isAtLeastOneVoiceActive())
+        if (true)
         {
             gate = 1.0f;
             gateSmoother.setTime(0.001f);
@@ -53,45 +61,40 @@ namespace Ath::Forma
             gate = 0.0f;
             gateSmoother.setTime(1.0f);
 
+            //reset global time when all voices are inactive:
             phaseCounter.reset();
         }
 
+        //sync oscillators to global time:
+        //for (auto& osc : oscillators) osc.setTime(phaseCounter.getTime());
 
         for (int i = 0; i < numberOfSamples; i++)
         {
-            phaseCounter.processSample();
+            //process phase counter:
+            phaseCounter.processSample(); 
 
-            parameterFluteStops1Smoother.process (parameterFluteStops1);
-            parameterFluteStops2Smoother.process (parameterFluteStops2);
-
-            for (auto& voice : voices)
+            //process parameter smoothers:
+            for (auto& smoother : parameterSmootherFluteStops)
             {
-                if (voice.isActive())
-                {
-                    vec4 octaves;
-                    vec4 mutations;
-                    int note = voice.getNote();
-
-                    voice.processSample(octaves, mutations);
-                    timbreProcessor1.addSignal (octaves, note);
-                    timbreProcessor2.addSignal(mutations, note);
-                }
+                smoother.process();
             }
 
-            auto sample = (timbreProcessor1.processSample()) * parameterFluteStops1Smoother.last();
-            sample += (timbreProcessor2.processSample()) * parameterFluteStops2Smoother.last();
+            buffer[i] = 0.0f;
 
-            buffer[i] = sample.sum() * gateSmoother.process(gate);
-
-            //This will synchronize inactive voices with global time
-            //So oscillators running at the same frequency will all be in phase
-            for (auto& voice : voices)
+            //process oscillators:
+            for (int n = 0; n < OSC_NUMBER; n++)
             {
-                if (!voice.isActive())
-                {
-                    voice.setTime (phaseCounter.getTime());
-                }
+                auto sample = oscillators[n].processSample();
+                oscillatorOutputs[n] = sample;
+
+                buffer[i] += sample[1] * Math::DB_MINUS18;
             }
+
+            //write to buffer:
+
+            buffer[i] = oscillatorOutputs[0][0] * Math::DB_MINUS18;
+
+            //buffer[i] = sample.sum() * gateSmoother.process(gate);
         }
     }
 
@@ -99,7 +102,6 @@ namespace Ath::Forma
     {
         if (message.isAllNotesOff())
         {
-            voiceManager.handleAllNotesOff(Midi::MessageAllNotesOff (message));
             return;
         }
 
@@ -110,22 +112,56 @@ namespace Ath::Forma
             constexpr int lowestNote = Ath::Math::C2_MIDI_NOTE_NUMBER;
             constexpr int highestNote = lowestNote + 61;
 
-            if ((noteNumber >= lowestNote) && (noteNumber <= highestNote))
+            if ((noteNumber >= lowestNote) && (noteNumber < highestNote))
             {
+                int note = noteNumber - lowestNote;
+
                 // fire midi events here
                 if (message.isNoteOn())
                 {
-                    voiceManager.handleNoteOn (Midi::MessageNoteOn (message));
-                }
 
-                if (message.isNoteOff())
+                }
+                else if (message.isNoteOff())
                 {
-                    voiceManager.handleNoteOff (Midi::MessageNoteOff (message));
+                    for (int i = 0; i < 6; i++)
+                    {
+
+                    }
                 }
             }
 
             return;
         }
     }
+
+    void FormaSynth::setParameterFlute16 (float x) 
+    { 
+        parameterSmootherFluteStops[0].setTargetValue(std::lerp (Math::DB_MINUS60, 1.0f, x)); 
+    }
+
+    void FormaSynth::setParameterFlute8 (float x) 
+    { 
+        parameterSmootherFluteStops[1].setTargetValue(std::lerp (Math::DB_MINUS60, 1.0f, x)); 
+    }
+
+    void FormaSynth::setParameterFlute4 (float x) 
+    { 
+        parameterSmootherFluteStops[2].setTargetValue(std::lerp (Math::DB_MINUS48, 1.0f, x)); 
+    }
+    
+    void FormaSynth::setParameterFlute2 (float x) 
+    { 
+        parameterSmootherFluteStops[3].setTargetValue(std::lerp (Math::DB_MINUS48, 1.0f, x)); 
+    }
+
+    void FormaSynth::setParameterFlute5 (float x) 
+    { 
+        parameterSmootherFluteStops[4].setTargetValue(std::lerp (Math::DB_MINUS48, 1.0f, x));
+    };
+
+    void FormaSynth::setParameterFlute1 (float x) 
+    { 
+        parameterSmootherFluteStops[5].setTargetValue(std::lerp (Math::DB_MINUS30, 1.0f, x));
+    };
 
 }

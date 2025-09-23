@@ -2,7 +2,6 @@
 
 #include "Context.h"
 #include "../math/Trigonometry.h"
-#include "SIMD.h"
 
 namespace Ath::Dsp
 {

@@ -6,20 +6,6 @@ namespace Ath::Math::Random
     float RNG::getFloatBipolar() { return getFloat() * 2.0f - 1.0f; }
     float RNG::getFloatNormal() { return standardNormalDistributionCDF.evaluate (getFloat()); }
 
-    vec4 RNG::getVec4()
-    {
-        vec4 v;
-
-        for (int i = 0; i < 4; i++)
-        {
-            v[i] = getFloat();
-        }
-
-        return v;
-    }
-    vec4 RNG::getVec4Bipolar() { return getVec4() * 2.0f - 1.0f; }
-    vec4 RNG::getVec4Normal() { return standardNormalDistributionCDFvec4.evaluate (getVec4()); }
-
     void LCG::setSeed(int newSeed) { seed = newSeed; }
     int LCG::getInt() { seed = seed * a + c; return seed;}
 

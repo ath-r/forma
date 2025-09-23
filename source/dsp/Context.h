@@ -7,6 +7,8 @@ namespace Ath::Dsp
         float SR;
         float T;
 
+        Context();
+
         Context(float sampleRate);
     };
 }

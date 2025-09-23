@@ -3,7 +3,6 @@
 #include <random>
 
 #include "Polynomial.h"
-#include "../dsp/SIMD.h"
 
 namespace Ath::Math::Random
 {
@@ -21,16 +20,6 @@ namespace Ath::Math::Random
             }
         };
 
-        Polynomial<vec4, 14> standardNormalDistributionCDFvec4 =
-        {
-            {
-                8.47155472e+05, -5.44607728e+06,  1.55758263e+07, -2.61329842e+07,
-                2.85596620e+07, -2.13472861e+07,  1.11525726e+07, -4.09061521e+06,
-                1.04357194e+06, -1.80971771e+05,  2.05359845e+04, -1.44748702e+03,
-                6.36541186e+01, -2.89386774e+00
-            }
-        };
-
         virtual int getInt() = 0;
 
         float getFloat();
@@ -38,12 +27,6 @@ namespace Ath::Math::Random
         float getFloatBipolar();
 
         float getFloatNormal();
-
-        vec4 getVec4();
-
-        vec4 getVec4Bipolar();
-
-        vec4 getVec4Normal();
     };
 
     class LCG : public RNG

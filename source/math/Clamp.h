@@ -3,9 +3,22 @@
 namespace Ath::Math
 {
     #ifndef BASICS
-    template <typename T> int sign(T val)
+    template <typename T> 
+    static inline T sign(T val)
+    {   auto cond = val >= T(0);
+        return T(cond) - T(!cond);
+    }
+
+    template <typename T>
+    static inline T abs (T x)
     {
-        return (T(0) < val) - (val < T(0));
+        return (x >= 0) ? x : -x;
+    }
+
+    template <typename T>
+    static inline T truncate (T x)
+    {
+        return static_cast<int>(x);
     }
 
     template <typename T>

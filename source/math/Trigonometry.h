@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <cstdlib>
 #include <numbers>
 
@@ -66,9 +67,10 @@ namespace Ath::Math
         const T a = 6.28316404430247135671540270030948533;
         const T b = -41.3371423711001029236311900250633048;
         const T c = 81.3407688876640676542096535737693472;
-        const T d = 70.9934332720751750562132689396061123;
+        const T d = -70.9934332720751750562132689396061123;
 
-        return x1 * (a + x2 * (b + x2 * (c - d * x2)));
+        return x1 * (a + x2 * (b + x2 * (c + d * x2)));
+        
     }
 
     /**
