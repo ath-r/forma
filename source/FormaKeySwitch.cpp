@@ -9,38 +9,51 @@ namespace Ath::Forma
     void FormaKeySwitch::setContext (Context context)
     {
         c = context;
+        filter.setContext(context);
+        filter.setCutoffFrequency(5000.0f);
     }
 
-    void FormaKeySwitch::setThreshold (float threshold) 
+    void FormaKeySwitch::init (int keyNumber) 
     {
-        actionThreshold = threshold;
+        Math::Random::LCG rng;
+        rng.setSeed(keyNumber);
+        actionThreshold = {
+            rng.getFloat(), 
+            rng.getFloat(),
+            rng.getFloat(),
+            rng.getFloat(),
+            rng.getFloat(),
+            rng.getFloat(),
+            0.0f,
+            0.0f
+        };
     };
 
-    bool FormaKeySwitch::isActive() { return gate > 0.0f || value > 0.0f; }
+    bool FormaKeySwitch::isActive() { return true; }
 
     void FormaKeySwitch::handleNoteOn (Midi::MessageNoteOn message)
     {
         gate = 1.0f;
 
-        const float x = float(message.velocity) / 127.0f;
-        const float x1 = 1.0f - x;
-        const float ease = 1.0f - x1 * x1 * x1;
-        const float time = std::lerp(maxVelocityGateAttack, minVelocityGateAttack, ease);
+        const Simd::float8 x = float(message.velocity) / 127.0f;
+        const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
         
-        delta = c.T / time;
+        delta = Simd::float8(c.T) / time;
     }
 
     void FormaKeySwitch::handleNoteOff (Midi::MessageNoteOff message) 
     { 
         gate = 0.0f;
-        delta = -c.T / time;
+        delta = Simd::float8(-c.T) / time;
     }
 
-    float FormaKeySwitch::processSample()
+    Simd::float8 FormaKeySwitch::processSample()
     {
         value += delta;
-        value = Math::clamp(value, 0.0f, 1.0f);
+        value = Simd::clamp(value, 0.0f, 1.0f);
 
-        return value > actionThreshold ? 1.0f : 0.0f;
+        auto logic = Simd::blend(Simd::float8(1.0f), Simd::float8(0.0f), value > actionThreshold);
+
+        return filter.process(logic);
     }
 }

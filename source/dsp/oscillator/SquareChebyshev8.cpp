@@ -64,7 +64,7 @@ namespace Ath::Dsp::Oscillator
 
             falloff = Simd::max(Simd::min(fma(falloff_freq, i_f, falloff_b), 1.0f), 0.0f);
 
-            sum += (cheb_i / i_f) * mult[i % 4];
+            sum += cheb_i * Simd::recip(i_f) * mult[i % 4];
             i_f += 2.0f;
         }
 

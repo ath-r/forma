@@ -9,7 +9,6 @@ namespace Ath::Forma
 
     FormaSynth::FormaSynth()
     {
-        
     }
 
     void FormaSynth::setContext (Dsp::Context context)
@@ -18,31 +17,38 @@ namespace Ath::Forma
 
         for (int i = 0; i < OSC_NUMBER; i++)
         {
-            auto& osc = oscillators[i];
-
-            osc.setContext(context);
-
-            Simd::float8 baseFrequency = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER + i * 8);
-            float sqrt2 = 1.414213562f;
+            Simd::float8 baseFrequency = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER + i);
             Simd::float8 multipliers = {
                 1.0f, 
-                1.059463094f, 
-                1.122462048f, 
-                1.189207115f, 
-                1.25992105f, 
-                1.334839854f, 
-                1.414213562f, 
-                1.498307077f
+                2.0f, 
+                4.0f, 
+                8.0f, 
+                16.0f, 
+                32.0f, 
+                64.0f, 
+                128.0f,
             };
             Simd::float8 frequencies = baseFrequency * multipliers;
             
+            auto& osc = oscillators[i];
+            osc.setContext(context);
             osc.setFrequency(frequencies);
+
+            auto& osc2 = oscillators2[i];
+            osc2.setContext(context);
+            osc2.setFrequency(frequencies * 16.0f);
         }
         
         for (auto& smoother : parameterSmootherFluteStops)
         {
             smoother.setContext(context);
             smoother.setTime(0.002f);
+        }
+
+        for (int i = 0; i < KEY_NUMBER; i++)
+        {
+            keyswitches[i].setContext(context);
+            keyswitches[i].init(i);
         }
 
         gateSmoother.setContext(context);
@@ -85,14 +91,39 @@ namespace Ath::Forma
             for (int n = 0; n < OSC_NUMBER; n++)
             {
                 auto sample = oscillators[n].processSample();
+                auto sample2 = oscillators2[n].processSample();
                 oscillatorOutputs[n] = sample;
+                oscillatorOutputs[n + 48] = sample2;
 
-                buffer[i] += sample[1] * Math::DB_MINUS18;
+                oscillatorOutputs[n] = Simd::blend(sample, Simd::permute(sample2, Simd::perm4), Simd::mask4);
+                oscillatorOutputs[n + 12] = Simd::blend(Simd::permute(sample, Simd::perm1), Simd::permute(sample2, Simd::perm5), Simd::mask3);
+                oscillatorOutputs[n + 24] = Simd::blend(Simd::permute(sample, Simd::perm2), Simd::permute(sample2, Simd::perm6), Simd::mask2);
+                oscillatorOutputs[n + 36] = Simd::blend(Simd::permute(sample, Simd::perm3), Simd::permute(sample2, Simd::perm7), Simd::mask1);
+                
+                oscillatorOutputs[n + 60] = Simd::permute(sample2, Simd::perm1);
+            }
+
+            Simd::int8 maskNasat = {0, 0, 0, 0, Simd::m1, 0, 0, 0};
+            Simd::int8 maskTerz = {0, 0, 0, 0, 0, Simd::m1, 0, 0};
+
+
+            buffer[i] = 0.0f;
+
+            for (int n = 0; n < KEY_NUMBER; n++)
+            {
+                auto prinzipal = oscillatorOutputs[n] & Simd::mask4;
+                auto nasat = Simd::permute(oscillatorOutputs[n + 7], Simd::perm5) & maskNasat;
+                auto terz = Simd ::permute(oscillatorOutputs[n + 5], Simd::perm7) & maskTerz;
+
+                keyswitchInputs[n] = prinzipal + nasat + terz;
+                keyswitchOutputs[n] = keyswitchInputs[n] * keyswitches[n].processSample();
+
+                buffer[i] += keyswitchOutputs[n][0] * Math::DB_MINUS18;
             }
 
             //write to buffer:
 
-            buffer[i] = oscillatorOutputs[0][0] * Math::DB_MINUS18;
+            //buffer[i] = oscillatorOutputs[0][5] * Math::DB_MINUS18;
 
             //buffer[i] = sample.sum() * gateSmoother.process(gate);
         }
@@ -119,14 +150,11 @@ namespace Ath::Forma
                 // fire midi events here
                 if (message.isNoteOn())
                 {
-
+                    keyswitches[note].handleNoteOn(static_cast<Midi::MessageNoteOn>(message));
                 }
                 else if (message.isNoteOff())
                 {
-                    for (int i = 0; i < 6; i++)
-                    {
-
-                    }
+                    keyswitches[note].handleNoteOff(static_cast<Midi::MessageNoteOff>(message));
                 }
             }
 

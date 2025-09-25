@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-set (CMAKE_CXX_STANDARD 23)
+set (CMAKE_CXX_STANDARD 20)
 
 add_compile_options(-mavx2 -mfma -O3)
 # This tells cmake we have goodies in the /cmake folder

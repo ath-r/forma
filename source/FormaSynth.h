@@ -21,11 +21,18 @@ namespace Ath::Forma
     {
         Dsp::PhaseCounter phaseCounter;
 
-        static constexpr int OSC_NUMBER = 13;
         static constexpr int KEY_NUMBER = 61;
+        static constexpr int OSC_NUMBER = 12;
+        static constexpr int OSC_OUTPUTS_NUMBER = KEY_NUMBER + 12;
 
         std::array<Dsp::Oscillator::SquareSincIntegral8, OSC_NUMBER> oscillators;
-        std::array<Simd::float8, KEY_NUMBER> oscillatorOutputs;
+        std::array<Dsp::Oscillator::SquareChebyshev8, OSC_NUMBER> oscillators2;
+
+        std::array<Simd::float8, OSC_OUTPUTS_NUMBER> oscillatorOutputs;
+        
+        std::array<FormaKeySwitch, KEY_NUMBER> keyswitches; 
+        std::array<Simd::float8, KEY_NUMBER> keyswitchInputs;
+        std::array<Simd::float8, KEY_NUMBER> keyswitchOutputs;
 
         std::array<Dsp::Cv::LinearSmoother<float>, 6> parameterSmootherFluteStops;
 

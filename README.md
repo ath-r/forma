@@ -4,9 +4,9 @@
 
 Implemented features:
 
-* High-quality bandlimited SIMD oscillators.
+* High-quality bandlimited oscillators. Four low octaves are computed using original Sinc Integral algorithm, and the rest is computed with an optimized additive algorithm.
 
-* Polysynth-style voice allocation with oscillators across voices synced so they won't cancel each other out.
+* Organ-style voice allocation. Like in real thing, $12 × 9$ oscillators are active at all times, then their signals are routed to keyswitches. 
 
 * (Mostly) Accurate *FLUTES II* frequency response voicing from the **Formation 1** model. 5⅓′and 1⅗′ stops are voiced to be a little bit duller. Slightly nonlinear amplifying stage is included.
 
@@ -46,9 +46,12 @@ sudo apt install build-essential gdb
 sudo apt install pkg-config
 sudo apt install clang-tools-14 lld-14 llvm-dev
 ```
-Then configure cmake and compile with Clang.
+Then configure cmake and compile with Clang. Use Clangd for code completion.
 
 ## Windows
 
-On Windows, you will need to use [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) to get MSVC and Windows SDK (installed with "Desktop Development with C++") **and also** MSBuild support for LLVM (clang-cl) toolset **and** C++ Clang Compiler for Windows (can be installed from "Individual Components"). Then compile with Clang (MSVC CLI) amd64.
+On Windows, you will need to use [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) to get MSVC and Windows SDK (installed with "Desktop Development with C++") **and also** MSBuild support for LLVM (clang-cl) toolset **and** C++ Clang Compiler for Windows (can be installed from "Individual Components").
+
 ![](assets/images/buildtoolsinstallation.png)
+
+ Then compile with Clang (MSVC CLI) amd64. Use Intellisense for code completion.

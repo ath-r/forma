@@ -5,6 +5,7 @@
 */
 #include <immintrin.h>
 #include <type_traits>
+#include <xmmintrin.h>
 
 #if (defined(_M_AMD64) || defined(_M_X64) || defined(__amd64)) && !defined(__x86_64__)
     #define __x86_64__ 1
@@ -317,7 +318,13 @@ namespace Simd
     {
         return x - floor(x);
     }
+
+    forceinline float4 recip(float4 x) { return _mm_rcp_ps(x); }
+    forceinline float8 recip(float8 x) { return _mm256_rcp_ps(x); }
     /* #endregion */
+
+    forceinline float4 fma(float4 a, float4 b, float4 c) { return _mm_fmadd_ps(a, b, c); }
+    forceinline float8 fma(float8 a, float8 b, float8 c) { return _mm256_fmadd_ps(a, b, c); }
 
     template<typename T> 
     forceinline T sign(T x) noexcept
@@ -327,9 +334,6 @@ namespace Simd
         return blend(T(1.0f), T(-1.0f), mask);
     }
 
-    forceinline float4 fma(float4 a, float4 b, float4 c) { return _mm_fmadd_ps(a, b, c); }
-    forceinline float8 fma(float8 a, float8 b, float8 c) { return _mm256_fmadd_ps(a, b, c); }
-
     /* #region MIN AND MAX */
     
     forceinline float4 min (float4 a, float4 b) noexcept { return _mm_min_ps(a, b); }
@@ -338,7 +342,16 @@ namespace Simd
     forceinline float4 max (float4 a, float4 b) noexcept { return _mm_max_ps(a, b); }
     forceinline float8 max (float8 a, float8 b) noexcept { return _mm256_max_ps(a, b); }
 
+    forceinline float8 clamp(float8 x, float8 a, float8 b) noexcept
+    {
+        return max(min(x, b), a);
+    }
+
+
     /* #endregion */
+
+    template<typename T>
+    forceinline T lerp(T a, T b, T t) noexcept { return a * (T(1.0f) - t) + b * t; }
 
     /* #region SHUFFLE AND PERMUTATION*/
         
@@ -346,6 +359,35 @@ namespace Simd
         {
             return _mm256_permutevar8x32_ps(v, indices);
         }
+
+        static const int8 perm1 = {1,2,3,4,5,6,7,0};
+        static const int8 perm2 = {2,3,4,5,6,7,0,1};
+        static const int8 perm3 = {3,4,5,6,7,0,1,2};
+        static const int8 perm4 = {4,5,6,7,0,1,2,3};
+        static const int8 perm5 = {5,6,7,0,1,2,3,4};
+        static const int8 perm6 = {6,7,0,1,2,3,4,5};
+        static const int8 perm7 = {7,0,1,2,3,4,5,6};
+    /* #endregion */
+
+    /* #region MASKS */
+    constexpr int m1 = 0xFFFFFFFF;
+    static const int8 mask1 = {m1,0,0,0,0,0,0,0};
+    static const int8 mask2 = {m1,m1,0,0,0,0,0,0};
+    static const int8 mask3 = {m1,m1,m1,0,0,0,0,0};
+    static const int8 mask4 = {m1,m1,m1,m1,0,0,0,0};
+    static const int8 mask5 = {m1,m1,m1,m1,m1,0,0,0};
+    static const int8 mask6 = {m1,m1,m1,m1,m1,m1,0,0};
+    static const int8 mask7 = {m1,m1,m1,m1,m1,m1,m1,0};
+    static const int8 mask8 = {m1,m1,m1,m1,m1,m1,m1,m1};
+    
+    static const int8 mask1n = ~mask1;
+    static const int8 mask2n = ~mask2;
+    static const int8 mask3n = ~mask3;
+    static const int8 mask4n = ~mask4;
+    static const int8 mask5n = ~mask5;
+    static const int8 mask6n = ~mask6;
+    static const int8 mask7n = ~mask7;
+    static const int8 mask8n = ~mask8;
     /* #endregion */
 
 }

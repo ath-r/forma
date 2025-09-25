@@ -9,7 +9,7 @@ namespace Ath::Dsp::Filter
     static inline T normFrequencyToG(T freq)
     {
         const T g = freq * Math::fpi;
-        return g / (g + T(1.0));
+        return g / (g + T(1.0f));
     }
 
     template <typename T>
@@ -21,7 +21,7 @@ namespace Ath::Dsp::Filter
     template <typename T>
     static inline T timeToG(T time, T sampleT)
     {
-        const T freq = T(0.5) * sampleT / time;
+        const T freq = T(0.5f) * sampleT / time;
         return normFrequencyToG(freq);
     }
 
@@ -57,7 +57,8 @@ namespace Ath::Dsp::Filter
         T y;
 
         T frequency;
-        
+
+    public:
         void reset()
         {
             z1 = 0;
@@ -74,7 +75,7 @@ namespace Ath::Dsp::Filter
         {
             frequency = freq;
 
-            G = frequencyToG(freq, c.T);
+            G = frequencyToG(freq, T(c.T));
         }
 
         inline T process(T x)

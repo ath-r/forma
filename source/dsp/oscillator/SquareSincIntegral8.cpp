@@ -50,12 +50,8 @@ namespace Ath::Dsp::Oscillator
         const auto invx2 = invx * invx;
         const auto f1 = Simd::sign(x) - sin2pi9(x + 0.25f) * invx - sin2pi9(x) * invx2;
 
-        const auto w_x = Simd::min(Simd::abs(x), 1.0f) * 4.0f - 3.0f;
-        const auto w_1 = ((w_x - w_x * w_x * w_x) * 2.59807621135f + 1.0f) * 0.5f;
-        const auto w_0 = float8(1.0f) - w_1;
-
         const auto mask = (x < 0.5f) & (x > -0.5f);
-        const auto si = Simd::blend(f0, f1 * w_1 + f0 * w_0, mask);
+        const auto si = Simd::blend(f0, f1, mask);
 
         return si * _inv_corr;
 
