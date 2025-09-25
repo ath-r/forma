@@ -3,8 +3,8 @@
 /*
     This is a cut-down version of https://github.com/devoln/Simd with (supposedly) improved readability and structure
 */
-
-#include <cmath>
+#include <immintrin.h>
+#include <type_traits>
 
 #if (defined(_M_AMD64) || defined(_M_X64) || defined(__amd64)) && !defined(__x86_64__)
     #define __x86_64__ 1
@@ -20,43 +20,7 @@
 #define SIMD_SSE_LEVEL_AVX 7
 #define SIMD_SSE_LEVEL_AVX2 8
 
-#if !defined(SIMD_SSE_LEVEL) && (defined(__i386__) || defined(__i686__) || defined(_M_IX86) || defined(__x86_64__))
-    #ifdef __AVX2__
-        #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_AVX2
-        #include <immintrin.h>
-    #elif defined(__AVX__)
-        #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_AVX
-        #include <immintrin.h>
-    #elif defined(__SSE4_2__)
-        #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_SSE4_2
-        #include <nmmintrin.h>
-    #elif defined(__SSE4_1__)
-        #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_SSE4_1
-        #include <smmintrin.h>
-    #elif defined(__SSSE3__)
-        #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_SSSE3
-        #include <tmmintrin.h>
-    #elif defined(__SSE3__)
-        #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_SSE3
-        #include <pmmintrin.h>
-    #elif defined(__SSE2__) || defined(__x86_64__)
-        #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_SSE2
-        #include <emmintrin.h>
-    #elif defined(__SSE__)
-        #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_SSE
-        #include <xmmintrin.h>
-    #elif defined(_M_IX86_FP)
-        #if (_M_IX86_FP >= 2)
-            #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_SSE2
-            #include <emmintrin.h>
-        #elif (_M_IX86_FP == 1)
-            #define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_SSE
-            #include <xmmintrin.h>
-        #endif
-    #else
-        #define SIMD_SSE_LEVEL 0
-    #endif
-#endif
+#define SIMD_SSE_LEVEL SIMD_SSE_LEVEL_AVX2
 
 #ifdef _MSC_VER
     #define forceinline __forceinline
@@ -72,15 +36,6 @@
     #define forceinline inline
     #define SIMD_VECTORCALL
 #endif
-
-inline void __cpuid (int* cpuinfo, int info)
-{
-    __asm__ __volatile__ ("xchg %%ebx, %%edi;"
-                          "cpuid;"
-                          "xchg %%ebx, %%edi;"
-        : "=a"(cpuinfo[0]), "=D"(cpuinfo[1]), "=c"(cpuinfo[2]), "=d"(cpuinfo[3])
-        : "0"(info));
-}
 
 namespace Simd
 {
@@ -240,7 +195,7 @@ namespace Simd
 
 
         forceinline int8 SIMD_VECTORCALL operator>(int8 rhs) const noexcept {return _mm256_cmpgt_epi32(vec, rhs.vec);}
-        forceinline int8 SIMD_VECTORCALL operator<(int8 rhs) const noexcept {return rhs < *this;}
+        forceinline int8 SIMD_VECTORCALL operator<(int8 rhs) const noexcept {return rhs > *this;}
         forceinline int8 SIMD_VECTORCALL operator>=(int8 rhs) const noexcept {return ~(rhs > *this);}
         forceinline int8 SIMD_VECTORCALL operator<=(int8 rhs) const noexcept {return ~operator>(rhs);}
         forceinline int8 SIMD_VECTORCALL operator==(int8 rhs) const noexcept {return _mm256_cmpeq_epi32(vec, rhs.vec);}
@@ -392,20 +347,5 @@ namespace Simd
             return _mm256_permutevar8x32_ps(v, indices);
         }
     /* #endregion */
-
-    inline bool IsAvxSupported()
-    {
-        int cpuinfo[4];
-        __cpuid (cpuinfo, 1);
-        bool supported = (cpuinfo[2] & (1 << 28)) != 0;
-        bool osxsaveSupported = (cpuinfo[2] & (1 << 27)) != 0;
-        if (osxsaveSupported && supported)
-        {
-            // _XCR_XFEATURE_ENABLED_MASK = 0
-            unsigned long long xcrFeatureMask = _xgetbv (0);
-            supported = (xcrFeatureMask & 0x6) == 0x6;
-        }
-        return supported;
-    }
 
 }

@@ -15,6 +15,11 @@ Builds/*
 !Builds/.gitkeep
 build/
 
+FORMA_artefacts/
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
 # This should never exist
 Install/*
 
@@ -40,5 +45,4 @@ packaging/Output/*
 Tests-b12d07c_include.cmake
 CPM_modules/FindCatch2.cmake
 Benchmarks-b12d07c_include.cmake
-VERONIKA_artefacts/JuceLibraryCode/Defs.txt
-VERONIKA_artefacts/JuceLibraryCode/Info.txt
+FORMA_artefacts/JuceLibraryCode/Info.txt

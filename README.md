@@ -29,3 +29,26 @@ Planned features (high to low priority):
 * Phaser section.
 
 * Spring Reverb.
+
+# Building from source
+
+Tested on Linux Mint and Windows 10 with VSCode.
+
+```
+git clone https://github.com/ath-r/forma.git
+git submodule update --init --recursive
+```
+
+## Linux
+```
+sudo apt update
+sudo apt install build-essential gdb
+sudo apt install pkg-config
+sudo apt install clang-tools-14 lld-14 llvm-dev
+```
+Then configure cmake and compile with Clang.
+
+## Windows
+
+On Windows, you will need to use [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) to get MSVC and Windows SDK (installed with "Desktop Development with C++") **and also** MSBuild support for LLVM (clang-cl) toolset **and** C++ Clang Compiler for Windows (can be installed from "Individual Components"). Then compile with Clang (MSVC CLI) amd64.
+![](assets/images/buildtoolsinstallation.png)
