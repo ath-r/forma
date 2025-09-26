@@ -36,7 +36,6 @@ PluginProcessor::PluginProcessor()
 
         treeState.addParameterListener(id, &observer);
         observer.parameter = treeState.getParameter(id);
-
     }
 
     parameterObservers[ParameterIDs::F16].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute16);
@@ -100,13 +99,20 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         };
 
         midiEvents[i] = metadata;
-
         iterator++;
     }
     midiMessages.clear();
 
     formaSynth.process(ch0, numSamples, midiEvents.data(), midiEventCount);
     buffer.copyFrom(1, 0, buffer.getReadPointer(0), numSamples);
+
+    using namespace Ath::Forma;
+
+    for (int i = 0; i < PARAM_COUNT; i++)
+    {
+        setParameter(ParametersByID[i], formaSynth.getParameter(i));
+    }
+    
 }
 
 //==============================================================================

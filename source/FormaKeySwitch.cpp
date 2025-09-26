@@ -36,7 +36,7 @@ namespace Ath::Forma
     {
         gate = 1.0f;
 
-        const Simd::float8 x = Math::easeOutCubic((message.velocity) / 127.0f);
+        const Simd::float8 x = Math::easeOutCubic(float(message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
         
         delta = Simd::float8(c.T) / time;

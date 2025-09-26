@@ -6,6 +6,8 @@
 #include "dsp/oscillator/SquareChebyshev8.h"
 #include "processor/MidiAudioProcessor.h"
 
+#include "PluginParameters.h"
+
 #include "control/Midi.h"
 
 #include "dsp/Context.h"
@@ -44,6 +46,10 @@ namespace Ath::Forma
 
         const float minVolumeOfStop = Math::DB_MINUS60;
 
+        std::array<float, PARAM_COUNT> parameters;
+
+
+
 public:
     FormaSynth();
 
@@ -64,5 +70,7 @@ public:
     void setParameterFlute5 (float x);
 
     void setParameterFlute1 (float x);
+
+    float getParameter(int id) {return parameters[id]; }
     };
 }

@@ -44,6 +44,13 @@ namespace Ath::Control::Midi
         unsigned char channel;
     };
 
+    struct MessageCC
+    {
+        unsigned char channel;
+        unsigned char cc;
+        unsigned char value;
+    };
+
     struct Message
     {
         unsigned char status = 0;
@@ -91,6 +98,16 @@ namespace Ath::Control::Midi
             return MessageAllNotesOff
             {
                 .channel = channel()
+            };
+        }
+
+        explicit operator MessageCC() const
+        {
+            return MessageCC
+            {
+                .channel = channel(),
+                .cc = data1,
+                .value = data2
             };
         }
     };

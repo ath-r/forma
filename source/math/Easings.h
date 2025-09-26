@@ -6,6 +6,8 @@ namespace Ath::Math
     static inline T easeQuad(T t) { return t * t; }
     template<typename T>
     static inline T easeCubic(T t) { return t * t * t; }
+    template<typename T>
+    static inline T easeQuint(T t) { return t * t * t * t * t; }
 
     template<typename T>
     static inline T easeOutQuad(T t)
@@ -23,6 +25,13 @@ namespace Ath::Math
         T x3 = x1 * x1 * x1;
 
         return T(1.0f) - x3;
+    }
+
+    template<typename T>
+    static inline T easeOutQuint(T t)
+    {
+        T x1 = T(1.0f) - t;
+        return T(1.0f) - easeQuint(x1);
     }
 
     template<typename F, typename T>

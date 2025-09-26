@@ -19,7 +19,7 @@ namespace Ath::Forma
 
         Simd::float8 actionThreshold;
 
-        const Simd::float8 minVelocityGateAttack = 0.0001f;
+        const Simd::float8 minVelocityGateAttack = 0.00001f;
         const Simd::float8 maxVelocityGateAttack = 0.1f;
 
         float gate = 0.0f;

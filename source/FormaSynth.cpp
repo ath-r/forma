@@ -120,19 +120,37 @@ namespace Ath::Forma
             }
 
             buffer[i] = (sum * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
-            //write to buffer:
-
-            //buffer[i] = oscillatorOutputs[0][5] * Math::DB_MINUS18;
-
-            //buffer[i] = sample.sum() * gateSmoother.process(gate);
         }
     }
 
     void FormaSynth::handleMidiEvent (Control::Midi::Message message)
     {
+        if (message.isControlChange())
+        {
+            auto cc = static_cast<Midi::MessageCC>(message);
+            float value = float(cc.value) / 127.0f;
+            
+            switch (cc.cc)
+            {
+                case 0x0c: setParameterFlute16(value); break;
+                case 0x0d: setParameterFlute8(value); break;
+                case 0x0e: setParameterFlute5(value); break;
+                case 0x0f: setParameterFlute4(value); break;
+                case 0x10: setParameterFlute2(value); break;
+                case 0x11: setParameterFlute1(value); break;
+                default: break;
+            }
+
+            return;
+        }
+
         if (message.isAllNotesOff())
         {
-            return;
+            for (auto& keyswitch : keyswitches)
+            {
+                keyswitch.handleNoteOff(Midi::MessageNoteOff());
+            }
+            return; 
         }
 
         if (message.isNoteOnOrOff())
@@ -163,36 +181,42 @@ namespace Ath::Forma
 
     void FormaSynth::setParameterFlute16 (float x) 
     { 
+        parameters[F16] = x;
         parameterFluteStopsInputs[0] = std::lerp (Math::DB_MINUS60, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterFlute8 (float x) 
     { 
+        parameters[F8] = x;
         parameterFluteStopsInputs[1] = std::lerp (Math::DB_MINUS60, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterFlute4 (float x) 
     { 
+        parameters[F4] = x;
         parameterFluteStopsInputs[2] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data(); 
     }
     
     void FormaSynth::setParameterFlute2 (float x) 
     { 
+        parameters[F2] = x;
         parameterFluteStopsInputs[3] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data(); 
     }
 
     void FormaSynth::setParameterFlute5 (float x) 
     { 
+        parameters[F5] = x;
         parameterFluteStopsInputs[4] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     };
 
     void FormaSynth::setParameterFlute1 (float x) 
     {
+        parameters[F1] = x;
         parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS30, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     };
