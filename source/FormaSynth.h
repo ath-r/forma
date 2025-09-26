@@ -36,6 +36,9 @@ namespace Ath::Forma
 
         std::array<Dsp::Cv::LinearSmoother<float>, 6> parameterSmootherFluteStops;
 
+        std::array<float, 8> parameterFluteStopsInputs;
+        Simd::float8 parameterFluteStops;
+
         float gate = 0.0f;
         Dsp::Cv::LinearSmoother<float> gateSmoother;
 

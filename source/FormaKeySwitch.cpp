@@ -2,6 +2,7 @@
 
 #include "FormaKeySwitch.h"
 #include "math/Clamp.h"
+#include "math/Easings.h"
 #include <cmath>
 
 namespace Ath::Forma
@@ -15,7 +16,7 @@ namespace Ath::Forma
 
     void FormaKeySwitch::init (int keyNumber) 
     {
-        Math::Random::LCG rng;
+        Math::Random::Mersenne rng;
         rng.setSeed(keyNumber);
         actionThreshold = {
             rng.getFloat(), 
@@ -24,8 +25,8 @@ namespace Ath::Forma
             rng.getFloat(),
             rng.getFloat(),
             rng.getFloat(),
-            0.0f,
-            0.0f
+            2.0f,
+            2.0f
         };
     };
 
@@ -35,7 +36,7 @@ namespace Ath::Forma
     {
         gate = 1.0f;
 
-        const Simd::float8 x = float(message.velocity) / 127.0f;
+        const Simd::float8 x = Math::easeOutCubic((message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
         
         delta = Simd::float8(c.T) / time;

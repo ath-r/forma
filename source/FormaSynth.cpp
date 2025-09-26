@@ -85,9 +85,9 @@ namespace Ath::Forma
                 smoother.process();
             }
 
-            buffer[i] = 0.0f;
-
             //process oscillators:
+
+            buffer[i] = 0.0f;
             for (int n = 0; n < OSC_NUMBER; n++)
             {
                 auto sample = oscillators[n].processSample();
@@ -105,22 +105,21 @@ namespace Ath::Forma
 
             Simd::int8 maskNasat = {0, 0, 0, 0, Simd::m1, 0, 0, 0};
             Simd::int8 maskTerz = {0, 0, 0, 0, 0, Simd::m1, 0, 0};
-
-
-            buffer[i] = 0.0f;
+            Simd::float8 sum = 0.0f;
 
             for (int n = 0; n < KEY_NUMBER; n++)
             {
                 auto prinzipal = oscillatorOutputs[n] & Simd::mask4;
                 auto nasat = Simd::permute(oscillatorOutputs[n + 7], Simd::perm5) & maskNasat;
-                auto terz = Simd ::permute(oscillatorOutputs[n + 5], Simd::perm7) & maskTerz;
+                auto terz = Simd ::permute(oscillatorOutputs[n + 4], Simd::perm7) & maskTerz;
 
                 keyswitchInputs[n] = prinzipal + nasat + terz;
                 keyswitchOutputs[n] = keyswitchInputs[n] * keyswitches[n].processSample();
 
-                buffer[i] += keyswitchOutputs[n][0] * Math::DB_MINUS18;
+                sum += keyswitchOutputs[n];
             }
 
+            buffer[i] = (sum * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
             //write to buffer:
 
             //buffer[i] = oscillatorOutputs[0][5] * Math::DB_MINUS18;
@@ -164,32 +163,38 @@ namespace Ath::Forma
 
     void FormaSynth::setParameterFlute16 (float x) 
     { 
-        parameterSmootherFluteStops[0].setTargetValue(std::lerp (Math::DB_MINUS60, 1.0f, x)); 
+        parameterFluteStopsInputs[0] = std::lerp (Math::DB_MINUS60, 1.0f, x);
+        parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterFlute8 (float x) 
     { 
-        parameterSmootherFluteStops[1].setTargetValue(std::lerp (Math::DB_MINUS60, 1.0f, x)); 
+        parameterFluteStopsInputs[1] = std::lerp (Math::DB_MINUS60, 1.0f, x);
+        parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterFlute4 (float x) 
     { 
-        parameterSmootherFluteStops[2].setTargetValue(std::lerp (Math::DB_MINUS48, 1.0f, x)); 
+        parameterFluteStopsInputs[2] = std::lerp (Math::DB_MINUS48, 1.0f, x);
+        parameterFluteStops = parameterFluteStopsInputs.data(); 
     }
     
     void FormaSynth::setParameterFlute2 (float x) 
     { 
-        parameterSmootherFluteStops[3].setTargetValue(std::lerp (Math::DB_MINUS48, 1.0f, x)); 
+        parameterFluteStopsInputs[3] = std::lerp (Math::DB_MINUS48, 1.0f, x);
+        parameterFluteStops = parameterFluteStopsInputs.data(); 
     }
 
     void FormaSynth::setParameterFlute5 (float x) 
     { 
-        parameterSmootherFluteStops[4].setTargetValue(std::lerp (Math::DB_MINUS48, 1.0f, x));
+        parameterFluteStopsInputs[4] = std::lerp (Math::DB_MINUS48, 1.0f, x);
+        parameterFluteStops = parameterFluteStopsInputs.data();
     };
 
     void FormaSynth::setParameterFlute1 (float x) 
-    { 
-        parameterSmootherFluteStops[5].setTargetValue(std::lerp (Math::DB_MINUS30, 1.0f, x));
+    {
+        parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS30, 1.0f, x);
+        parameterFluteStops = parameterFluteStopsInputs.data();
     };
 
 }

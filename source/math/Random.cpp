@@ -2,7 +2,7 @@
 
 namespace Ath::Math::Random
 {
-    float RNG::getFloat() { return float (getInt()) * 4.6566129e-10f; }
+    float RNG::getFloat() { return std::abs(float (getInt()) * 4.6566129e-10f); }
     float RNG::getFloatBipolar() { return getFloat() * 2.0f - 1.0f; }
     float RNG::getFloatNormal() { return standardNormalDistributionCDF.evaluate (getFloat()); }
 
