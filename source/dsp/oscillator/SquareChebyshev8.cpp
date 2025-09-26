@@ -42,7 +42,7 @@ namespace Ath::Dsp::Oscillator
         float8 cheb_i = x3 * 4.0f - x * 3.0f;
         float8 cheb_iplus2;
 
-        float8 sum = cheb_iminus2 - cheb_i * 0.333333333f;
+        
 
         constexpr float falloff_start_frequency = 14500.0;
         constexpr float falloff_end_frequency = 15000.0;
@@ -53,6 +53,8 @@ namespace Ath::Dsp::Oscillator
         float8 falloff;
 
         const float8 mult[4] = {0.0f, 1.0f, 0.0f, -1.0f};
+
+        float8 sum = cheb_iminus2 * Simd::clamp(falloff_freq + falloff_b, 0.0f, 1.0f) - cheb_i * 0.333333333f * Simd::clamp(Simd::fma(falloff_freq, 3.0f, falloff_b), 0.0f, 1.0f);
         
         float8 i_f = 5.0f;
         for (int i = 5; i < n; i += 2)
@@ -62,9 +64,9 @@ namespace Ath::Dsp::Oscillator
             cheb_iminus2 = cheb_i;
             cheb_i = cheb_iplus2;
 
-            falloff = Simd::max(Simd::min(fma(falloff_freq, i_f, falloff_b), 1.0f), 0.0f);
+            falloff = Simd::clamp(Simd::fma(falloff_freq, i_f, falloff_b), 0.0f, 1.0f);
 
-            sum += cheb_i * Simd::recip(i_f) * mult[i % 4];
+            sum += cheb_i * Simd::recip(i_f) * falloff * mult[i % 4] ;
             i_f += 2.0f;
         }
 
