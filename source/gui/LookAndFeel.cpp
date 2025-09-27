@@ -218,9 +218,10 @@ namespace Ath::Gui
         const auto thumbY = sliderPosProportional;
 
         g.setColour(juce::Colours::black);
-        g.drawLine(centreX, bounds.getY(), centreX, bounds.getBottom(),8);
+        g.drawLine(centreX, bounds.getY(), centreX, bounds.getBottom(), 8);
 
-        //g.fillRect(-32, -4, 64, 8);
+        g.setColour(juce::Colours::darkgrey);
+        g.drawLine(centreX, thumbY, centreX, bounds.getBottom(), 4);
 
         const float positionRatio = (float)sliderPosProportional / (float)maxSliderPos;
         const float maxAngle = juce::degreesToRadians(20.0);
@@ -243,12 +244,13 @@ namespace Ath::Gui
         const float ticksTo = bounds.getBottom() - 16.0f * juce::dsp::FastMathApproximations::sin(maxAngle);
         const float ticksSpan = std::abs(ticksTo - ticksFrom);
 
-        g.setColour(juce::Colours::ivory);
+        g.setColour(juce::Colours::darkgrey);
         for(int i = 0; i < 10; i++)
         {
             const float y = ticksFrom + ticksSpan / 9.0f * i;
-
-            //g.drawLine(centreX + 12, y, centreX + 48, y, 4);
+            if (y > thumbY) g.setColour(juce::Colours::lightgrey);
+            g.drawLine(centreX + 8, y, centreX + 24, y, 2);
+            g.drawLine(centreX - 8, y, centreX - 24, y, 2);
         }
 
         g.setOrigin(centreX, thumbY);
