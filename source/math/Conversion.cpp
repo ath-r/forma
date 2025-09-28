@@ -4,9 +4,14 @@
 
 namespace Ath::Math
 {
-    float noteToFrequency (const int p, float referenceFrequency)
+    float noteToFrequency (int p, float referenceFrequency)
     {
         return referenceFrequency * std::pow (2.0f, static_cast<float> (p - A4_MIDI_NOTE_NUMBER) / 12.0);
+    }
+
+    float noteToFrequency (float p, float referenceFrequency)
+    {
+        return referenceFrequency * std::pow (2.0f, (p - static_cast<float>(A4_MIDI_NOTE_NUMBER)) / 12.0f);
     }
 
     float frequencyToNote (float freq, float referenceFrequency)

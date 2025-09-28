@@ -9,6 +9,8 @@ namespace Ath::Math
 
     float noteToFrequency (int p, float referenceFrequency = 440.0f);
 
+    float noteToFrequency (float p, float referenceFrequency = 440.0f);
+
     float frequencyToNote (float freq, float referenceFrequency = 440.0f);
 
     float semitonesToFrequencyRatio (float semitones);

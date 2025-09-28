@@ -31,6 +31,24 @@ namespace Ath::Forma
         std::array<Dsp::Oscillator::SquareSincIntegral8, OSC_NUMBER> oscillators;
         std::array<Dsp::Oscillator::SquareChebyshev8, OSC_NUMBER> oscillators2;
 
+        // Tuning error (in cents) as described in MM5555/MM5556 Chromatic Frequency Generators datasheet
+        // Error is normalized based on the average
+        std::array<float, 12> oscillatorTuningError = 
+        {
+            -0.44408f,
+            -0.15808f,
+            -0.16008f,
+            0.24592f,
+            0.38892f,
+            -0.13508f,
+            0.53992f,
+            -0.20008f,
+            -0.33908f,
+            -0.11808f,
+            0.17692f,
+            0.20292f
+        };
+
         std::array<Simd::float8, OSC_OUTPUTS_NUMBER> oscillatorOutputs;
         
         std::array<FormaKeySwitch, KEY_NUMBER> keyswitches; 

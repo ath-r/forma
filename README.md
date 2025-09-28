@@ -1,18 +1,18 @@
 ![](assets/images/logobg.svg)
 
-**FORMA** is a digital emulation of a transistor combo organ manufactured in the GDR during the 1980s. It focuses on a specific single-manual model, though voicings from other models may be added in the future.
+# Decsription
+
+**FORMA** is a digital emulation of a transistor combo organ manufactured in the GDR during the 1980s. It focuses on a specific single-manual **Formation 1** model, though voicings from other models may be added in the future.
 
 Implemented features:
 
-* High-quality bandlimited oscillators. Four low octaves are computed using original Sinc Integral algorithm, and the rest is computed with an optimized additive algorithm.
+* High-quality bandlimited oscillators. Four low octaves are computed using original Sinc Integral algorithm, and the rest is computed with an optimized additive algorithm. Deviation $(\pm0.5¢)$ from 12EDO tuning is preserved based on data from MM5555/MM5556 Chromatic Frequency Generators datasheet. 
 
-* Organ-style voice allocation. Like in real thing, $12 × 9$ oscillators are active at all times, then their signals are routed to keyswitches. 
+* Organ-style voice allocation. Like in the real thing, $12 \times 9$ oscillators are active at all times, then their signals are routed to keyswitches.
 
-* (Mostly) Accurate *FLUTES II* frequency response voicing from the **Formation 1** model. 5⅓′and 1⅗′ stops are voiced to be a little bit duller. Slightly nonlinear amplifying stage is included.
+* (Mostly) Accurate *FLUTES II* frequency response voicing from the **Formation 1** model with nonlinear behaviour per filter bank.
 
-* Realistic janky keyboard action in which stops are not activated simultaneously. Velocity-sensitive.
-
-* Noise floor and hum (gated).
+* Janky keyboard action like in the original organ: six switches under each key close non-simultaneously. Velocity-sensitive.
 
 Planned features (high to low priority):
 
@@ -20,15 +20,15 @@ Planned features (high to low priority):
 
 * *SOLO* stops from the **Formation 1**: *Clarinet, Oboe, and Nasal*. Including the non-linear behaviour of the formant filters.
 
-* Voicings from the **Formation 2** model.
+* Percussion section, phaser section, spring reverb.
 
-* Voicings from the **ET 6-1** model.
+# Описание
+FORMA $-$ цифровая имитация транзисторного органа, который производился в ГДР в 80х. За основу взята модель **Formation 1** с одним мануалом.
+* Качественные тон-генераторы без цифровых артефактов. Сохранены отклонения микросхем хроматических генераторов от стандартного строя.
+* Как в настоящем органе, все генераторы и делители работают непрерывно, и их сигналы распределяются по контактным группам.
+* Имитация механики оригинального органа: шесть контактов под каждой клавишей могли замыкаться не одновременно, из-за чего шесть регистров вступали вразнобой.
+* Фильтры флейтовых регистров настроены как в оригинале и сохраняют нелинейность транзисторной схемы.
 
-* Percussion section.
-
-* Phaser section.
-
-* Spring Reverb.
 
 # Building from source
 

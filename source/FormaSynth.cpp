@@ -17,7 +17,7 @@ namespace Ath::Forma
 
         for (int i = 0; i < OSC_NUMBER; i++)
         {
-            Simd::float8 baseFrequency = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER + i);
+            Simd::float8 baseFrequency = Math::noteToFrequency(float(Math::C1_MIDI_NOTE_NUMBER + i) + oscillatorTuningError[i % 12] * 0.01f);
             Simd::float8 multipliers = {
                 1.0f, 
                 2.0f, 
