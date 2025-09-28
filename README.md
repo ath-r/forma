@@ -1,10 +1,19 @@
 ![](assets/images/logobg.svg)
 
-# Decsription
+# Table of Contents <!-- omit from toc -->
+- [Description](#description)
+  - [Implemented features](#implemented-features)
+  - [Signal Flow](#signal-flow)
+- [Описание](#описание)
+- [Building from source](#building-from-source)
+  - [Linux](#linux)
+  - [Windows](#windows)
+
+# Description
 
 **FORMA** is a digital emulation of a transistor combo organ manufactured in the GDR during the 1980s. It focuses on a specific single-manual **Formation 1** model, though voicings from other models may be added in the future.
 
-## Implemented features:
+## Implemented features
 
 * High-quality bandlimited oscillators. Four low octaves are computed using original Sinc Integral algorithm, and the rest is computed with an optimized additive algorithm. Deviation $(\pm0.5¢)$ from 12EDO tuning is preserved based on data from MM5555/MM5556 Chromatic Frequency Generators datasheet. 
 
