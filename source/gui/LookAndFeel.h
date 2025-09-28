@@ -22,18 +22,6 @@ namespace Ath::Gui
                             juce::Slider & slider
                             ) override;
 
-        void drawLinearSlider (juce::Graphics & graphics,
-                            int x,
-                            int y,
-                            int width,
-                            int height,
-                            float sliderPosProportional,
-                            float minSliderPos,
-                            float maxSliderPos,
-                            juce::Slider::SliderStyle style,
-                            juce::Slider & slider
-                            ) override;
-
         juce::Font getLabelFont(juce::Label & label) override;
 
     private:

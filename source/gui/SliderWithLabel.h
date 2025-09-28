@@ -4,6 +4,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Slider.h"
+#include "juce_graphics/juce_graphics.h"
 
 namespace Ath::Gui
 {
@@ -24,6 +25,8 @@ namespace Ath::Gui
         void resized() override;
 
         void lookAndFeelChanged() override;
+
+        void paint (juce::Graphics& g) override;
 
         ParameterSlider slider;
         juce::Label label;
