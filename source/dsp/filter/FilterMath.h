@@ -2,6 +2,7 @@
 
 #include "../Context.h"
 #include "../../math/Trigonometry.h"
+#include "../../math/Complex.h"
 
 namespace Ath::Dsp::Filter
 {
@@ -47,6 +48,14 @@ namespace Ath::Dsp::Filter
         z1 = z1 + y * g2;
         return y;
     }
+
+    using namespace Math;
+    template<typename T>
+    static complex<T> transferLP1(complex<T> wc, complex<T> s)
+    {
+        return wc / (wc + s);
+    }
+
 
     template <typename T>
     class LowPass1

@@ -3,6 +3,7 @@
 #include <array>
 
 #include "FormaKeySwitch.h"
+#include "FormaFilterBank.h"
 #include "dsp/oscillator/SquareChebyshev8.h"
 #include "processor/MidiAudioProcessor.h"
 
@@ -37,6 +38,9 @@ namespace Ath::Forma
         std::array<Simd::float8, KEY_NUMBER> keyswitchOutputs;
 
         std::array<Dsp::Cv::LinearSmoother<float>, 6> parameterSmootherFluteStops;
+
+        std::array<Simd::float8, 6> filterBankInputs;
+        std::array<FormaFilterBank, 6> filterBanks;
 
         std::array<float, 8> parameterFluteStopsInputs;
         Simd::float8 parameterFluteStops;

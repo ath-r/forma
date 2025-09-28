@@ -51,6 +51,21 @@ namespace Ath::Forma
             keyswitches[i].init(i);
         }
 
+        for (auto& filterBank : filterBanks) filterBank.setContext(context);
+        
+        float freq = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER);
+        filterBanks[0].setFrequency(freq);
+        filterBanks[1].vmul = {1.0f, 2.0f, 2.828f, 4.0f, 5.656f, 8.0};
+        filterBanks[1].setFrequency(freq *= 1.4142f);
+        filterBanks[2].vmul = {1.0f, 1.4142f, 2.0f, 2.828f, 4.0f, 5.656f};
+        filterBanks[2].setFrequency(freq *= 2.0f);
+        filterBanks[3].vmul = filterBanks[2].vmul;
+        filterBanks[3].setFrequency(freq *= 2.0f);
+        filterBanks[4].vmul = filterBanks[2].vmul;
+        filterBanks[4].setFrequency(freq *= 2.0f);
+        filterBanks[5].vmul = filterBanks[2].vmul;
+        filterBanks[5].setFrequency(freq *= 2.0f);
+
         gateSmoother.setContext(context);
         gateSmoother.setTime(0.001f);
     }
@@ -87,6 +102,11 @@ namespace Ath::Forma
 
             //process oscillators:
 
+            //this generates all octaves for each key
+            //oscillatorOutputs[0] = {C1, C2, C3, C4, C5, C6, C7, C8}
+            //...
+            //oscillatorOutputs[12] = {C2, C3, C4, C5, C6, C7, C8, C9}
+            //...
             buffer[i] = 0.0f;
             for (int n = 0; n < OSC_NUMBER; n++)
             {
@@ -103,10 +123,12 @@ namespace Ath::Forma
                 oscillatorOutputs[n + 60] = Simd::permute(sample2, Simd::perm1);
             }
 
+            //this permutes the cells so the input to each keyswitch gets the signals it needs
+            //first 4 cells are octaves, 5th and 6th are mutations
+            //keyswitchInputs[n] = {16′, 8′, 4′, 2′, 5⅓′, 1⅗′, 0, 0}
+            //e.g. keyswitchInputs[0] = {C1, C2, C3, C4, G2, E4, 0, 0}
             Simd::int8 maskNasat = {0, 0, 0, 0, Simd::m1, 0, 0, 0};
             Simd::int8 maskTerz = {0, 0, 0, 0, 0, Simd::m1, 0, 0};
-            Simd::float8 sum = 0.0f;
-
             for (int n = 0; n < KEY_NUMBER; n++)
             {
                 auto prinzipal = oscillatorOutputs[n] & Simd::mask4;
@@ -115,10 +137,22 @@ namespace Ath::Forma
 
                 keyswitchInputs[n] = prinzipal + nasat + terz;
                 keyswitchOutputs[n] = keyswitchInputs[n] * keyswitches[n].processSample();
-
-                sum += keyswitchOutputs[n];
             }
 
+            //each filterbank gets the portion of keyboard it's responsible for
+            for (auto& x : filterBankInputs) x = 0.0f;
+            for (int n = 0; n < 6; n++) filterBankInputs[0] += keyswitchOutputs[n];
+            for (int n = 6; n < 18; n++) filterBankInputs[1] += keyswitchOutputs[n];
+            for (int n = 18; n < 30; n++) filterBankInputs[2] += keyswitchOutputs[n];
+            for (int n = 30; n < 42; n++) filterBankInputs[3] += keyswitchOutputs[n];
+            for (int n = 42; n < 54; n++) filterBankInputs[4] += keyswitchOutputs[n];
+            for (int n = 54; n < 61; n++) filterBankInputs[5] += keyswitchOutputs[n];
+
+            Simd::float8 sum = 0.0f;
+            for (int n = 0; n < 6; n++)
+            {
+                sum += filterBanks[n].process(filterBankInputs[n]);
+            }            
             buffer[i] = (sum * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
         }
     }
