@@ -45,7 +45,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     addAndMakeVisible(flute4);
     addAndMakeVisible(flute2);
     addAndMakeVisible(flute1);
-
     //addAndMakeVisible (inspectButton);
 
     // this chunk of code instantiates and opens the melatonin inspector
@@ -62,6 +61,8 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (600, 450);
+
+    setScaleFactor(1.5);
 }
 
 PluginEditor::~PluginEditor()
@@ -92,6 +93,12 @@ void PluginEditor::paint (juce::Graphics& g)
 
 void PluginEditor::resized()
 {
+    //setSize(getWidth(), getWidth() * 0.75);
+    //auto ratio = float(getWidth()) / 600;
+
+    //setSize(600, 450);
+    //setScaleFactor(ratio);
+
     // layout the positions of your child components here
     auto area = getLocalBounds();
     area.removeFromBottom(20);
@@ -111,4 +118,7 @@ void PluginEditor::resized()
     flute4.setBounds(area2.removeFromLeft(sliderWidth));
     flute2.setBounds(area2.removeFromLeft(sliderWidth));
     flute1.setBounds(area2);
+}
+bool PluginEditor::keyPressed (const juce::KeyPress& key) 
+{
 }
