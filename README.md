@@ -1,4 +1,5 @@
 ![](assets/images/logobg.svg)
+Font: Cantarell.
 
 # Table of Contents <!-- omit from toc -->
 - [Description](#description)
