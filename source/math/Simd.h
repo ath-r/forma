@@ -358,6 +358,18 @@ namespace Simd
         return blend(T(1.0f), T(-1.0f), mask);
     }
 
+    forceinline float4 sqrt(float4 x) { return _mm_sqrt_ps(x); }
+    forceinline float8 sqrt(float8 x) { return _mm256_sqrt_ps(x); }
+
+    forceinline float4 rsqrt(float4 x) { return _mm_rsqrt_ps(x); }
+    forceinline float8 rsqrt(float8 x) { return _mm256_rsqrt_ps(x); }
+
+    template<typename T>
+    forceinline T mag(T x, T y) { return sqrt(x * x + y * y); }
+
+    template<typename T>
+    forceinline T rmag(T x, T y) { return rsqrt(x * x + y * y); }
+
     /* #region MIN AND MAX */
     
     forceinline float4 min (float4 a, float4 b) noexcept { return _mm_min_ps(a, b); }

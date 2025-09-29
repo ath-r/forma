@@ -15,8 +15,8 @@ namespace Ath::Math
 
     float semitonesToFrequencyRatio (float semitones);
 
-    static constexpr float DB_PLUS3 = 1.412537545f;
-
+    static constexpr float DB_MINUS1 = 0.891250938;
+    static constexpr float DB_MINUS2 = 0.794328235;
     static constexpr float DB_MINUS3 = 0.707945784f;
     static constexpr float DB_MINUS6 = 0.501187234f;
     static constexpr float DB_MINUS9 = DB_MINUS3 * DB_MINUS6;
@@ -26,12 +26,15 @@ namespace Ath::Math
     static constexpr float DB_MINUS30 = DB_MINUS24 * DB_MINUS6;
     static constexpr float DB_MINUS48 = DB_MINUS30 * DB_MINUS18;
 
-
     static constexpr float DB_MINUS60 = DB_MINUS30 * DB_MINUS30;
     static constexpr float DB_MINUS72 = DB_MINUS60 * DB_MINUS12;
     static constexpr float DB_MINUS84 = DB_MINUS60 * DB_MINUS30;
 
     static constexpr float DB_MINUS50 = 0.003162278f;
+
+    static constexpr float DB_PLUS1 = 1.0f / DB_MINUS1;
+    static constexpr float DB_PLUS2 = 1.0f / DB_MINUS2;
+    static constexpr float DB_PLUS3 = 1.0f / DB_MINUS3;
 
 
 

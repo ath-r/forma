@@ -66,6 +66,20 @@ namespace Ath::Forma
         filterBanks[5].vmul = filterBanks[2].vmul;
         filterBanks[5].setFrequency(freq *= 2.0f);
 
+        for (int i = 0; i < KEY_NUMBER; i++)
+        {
+            const float basefreq = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER + i);
+            Simd::float8 freqs = { 1.0f, 2.0f, 4.0f, 8.0f, 3.0f, 10.0f, 1.0f, 1.0f };
+            freqs *= basefreq;
+
+            if (i < 6) prefilterGains[i] = filterBanks[0].getAttenutation(freqs) * Math::DB_PLUS1;
+            else if (i < 18) prefilterGains[i] = filterBanks[1].getAttenutation(freqs);
+            else if (i < 30) prefilterGains[i] = filterBanks[2].getAttenutation(freqs);
+            else if (i < 42) prefilterGains[i] = filterBanks[3].getAttenutation(freqs) * Math::DB_MINUS2;
+            else if (i < 54) prefilterGains[i] = filterBanks[4].getAttenutation(freqs) * Math::DB_MINUS2;
+            else prefilterGains[i] = filterBanks[5].getAttenutation(freqs) * Math::DB_MINUS3;
+        }
+
         gateSmoother.setContext(context);
         gateSmoother.setTime(0.001f);
     }
@@ -141,12 +155,12 @@ namespace Ath::Forma
 
             //each filterbank gets the portion of keyboard it's responsible for
             for (auto& x : filterBankInputs) x = 0.0f;
-            for (int n = 0; n < 6; n++) filterBankInputs[0] += keyswitchOutputs[n];
-            for (int n = 6; n < 18; n++) filterBankInputs[1] += keyswitchOutputs[n];
-            for (int n = 18; n < 30; n++) filterBankInputs[2] += keyswitchOutputs[n];
-            for (int n = 30; n < 42; n++) filterBankInputs[3] += keyswitchOutputs[n];
-            for (int n = 42; n < 54; n++) filterBankInputs[4] += keyswitchOutputs[n];
-            for (int n = 54; n < 61; n++) filterBankInputs[5] += keyswitchOutputs[n];
+            for (int n = 0; n < 6; n++) filterBankInputs[0] += keyswitchOutputs[n] * prefilterGains[n];
+            for (int n = 6; n < 18; n++) filterBankInputs[1] += keyswitchOutputs[n] * prefilterGains[n];
+            for (int n = 18; n < 30; n++) filterBankInputs[2] += keyswitchOutputs[n] * prefilterGains[n];
+            for (int n = 30; n < 42; n++) filterBankInputs[3] += keyswitchOutputs[n] * prefilterGains[n];
+            for (int n = 42; n < 54; n++) filterBankInputs[4] += keyswitchOutputs[n] * prefilterGains[n];
+            for (int n = 54; n < 61; n++) filterBankInputs[5] += keyswitchOutputs[n] * prefilterGains[n];
 
             Simd::float8 sum = 0.0f;
             for (int n = 0; n < 6; n++)

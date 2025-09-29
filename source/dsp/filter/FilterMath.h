@@ -87,6 +87,14 @@ namespace Ath::Dsp::Filter
             G = frequencyToG(freq, T(c.T));
         }
 
+        Math::complex<T> getTransfer(T freq)
+        {
+            Math::complex<T> wc = { frequency * Math::ftau, 0.0f };
+            Math::complex<T> s = { 0.0f, freq * Math::ftau };
+
+            return transferLP1(wc, s);
+        }
+
         inline T process(T x)
         {
             y = processLP(x, z1, G);

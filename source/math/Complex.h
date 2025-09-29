@@ -8,16 +8,20 @@ namespace Ath::Math
         T re = 0.0f;
         T im = 0.0f;
 
-        inline T operator+(complex rhs) const noexcept {return { re + rhs.re, im + rhs.im};}
-        inline T operator-(complex rhs) const noexcept {return { re - rhs.re, im + rhs.im}; }
-        inline T operator*(complex rhs) const noexcept 
+        complex<T>(T r = 0.0f, T i = 0.0f) : re(r), im(i) {}
+        complex<T>(const complex<T>&) = default;
+        complex<T>& operator=(const complex<T> rhs) { re = rhs.re; im = rhs.im; return *this; };
+
+        inline complex<T> operator + (const complex<T>& rhs) const noexcept { return { re + rhs.re, im + rhs.im}; }
+        inline complex<T> operator - (const complex<T>& rhs) const noexcept { return { re - rhs.re, im - rhs.im}; }
+        inline complex<T> operator * (const complex<T>& rhs) const noexcept 
         {
             return { 
                 re * rhs.re - im * rhs.im, 
                 re * rhs.im + im * rhs.re 
             };
         }
-        inline T operator/(complex rhs) const noexcept 
+        inline complex<T> operator/(const complex<T>& rhs) const noexcept 
         {
             T denom = rhs.re * rhs.re + rhs.im * rhs.im;
 
@@ -27,5 +31,10 @@ namespace Ath::Math
                 (im * rhs.re - re * rhs.im) / denom
             };
         }
+
+        inline complex<T> operator += (const complex<T>& rhs) noexcept { *this = *this + rhs; return *this; }
+        inline complex<T> operator -= (const complex<T>& rhs) noexcept { *this = *this - rhs; return *this; }
+        inline complex<T> operator *= (const complex<T>& rhs) noexcept { *this = *this * rhs; return *this; }
+        inline complex<T> operator /= (const complex<T>& rhs) noexcept { *this = *this / rhs; return *this; }
     };
 }

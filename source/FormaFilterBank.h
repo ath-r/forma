@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include "math/Complex.h"
 #include "math/Simd.h"
 #include "dsp/Context.h"
 #include "dsp/filter/FilterMath.h"
@@ -46,6 +47,18 @@ namespace Ath::Forma
 
                 filter.setCutoffFrequency(frequency * hmul * vmul[i]);
             }
+        }
+
+        Simd::float8 getAttenutation(Simd::float8 frequency)
+        {
+            Math::complex<Simd::float8> transfer = { 1.0f, 0.0f };
+
+            for (int i = 0; i < stages; i++)
+            {
+                transfer *= filters[i].getTransfer(frequency);
+            }
+
+            return Simd::rmag(transfer.re, transfer.im);
         }
 
         Simd::float8 process(Simd::float8 x)

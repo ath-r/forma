@@ -5,6 +5,7 @@
 #include "FormaKeySwitch.h"
 #include "FormaFilterBank.h"
 #include "dsp/oscillator/SquareChebyshev8.h"
+#include "math/Simd.h"
 #include "processor/MidiAudioProcessor.h"
 
 #include "PluginParameters.h"
@@ -54,6 +55,7 @@ namespace Ath::Forma
         std::array<FormaKeySwitch, KEY_NUMBER> keyswitches; 
         std::array<Simd::float8, KEY_NUMBER> keyswitchInputs;
         std::array<Simd::float8, KEY_NUMBER> keyswitchOutputs;
+        std::array<Simd::float8, KEY_NUMBER> prefilterGains;
 
         std::array<Dsp::Cv::LinearSmoother<float>, 6> parameterSmootherFluteStops;
 
