@@ -143,7 +143,7 @@ namespace Ath::Forma
 
                 keyswitchInputs[n] = prinzipal + nasat + terz;
                 bleed += keyswitchInputs[n];
-                keyswitchOutputs[n] = keyswitchInputs[n] * (keyswitches[n].processSample() + Math::DB_MINUS72);
+                keyswitchOutputs[n] = keyswitchInputs[n] * (keyswitches[n].processSample() + Math::DB_MINUS66);
             }
 
             //each filterbank gets the portion of keyboard it's responsible for
@@ -161,9 +161,11 @@ namespace Ath::Forma
                 sum += filterBanks[n].process(filterBankInputs[n]);
             }            
 
-            Simd::float8 sum_nonlin = filterClipper.process((sum + bleed * Math::DB_MINUS72) * 0.5f) * 2.0f;
+            auto x = (sum + bleed * Math::DB_MINUS66) * 0.0625f;
+            auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
+            auto sumCurved = filterNonlinearity.process(sumClipped) * 16.0f;
 
-            buffer[i] = (sum_nonlin * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
+            buffer[i] = (sumCurved * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
         }
     }
 
@@ -182,6 +184,7 @@ namespace Ath::Forma
                 case 0x0f: setParameterFlute4(value); break;
                 case 0x10: setParameterFlute2(value); break;
                 case 0x11: setParameterFlute1(value); break;
+                case 0x4c: setParameterDrive(value); break;
                 default: break;
             }
 
@@ -263,6 +266,11 @@ namespace Ath::Forma
         parameters[F1] = x;
         parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
-    };
+    }
 
+    void FormaSynth::setParameterDrive (float x) 
+    {
+        parameters[DRIVE] = x;
+        parameterDriveGain = 1.0f + x * 16.0f;
+    };
 }

@@ -70,6 +70,15 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
+    static const Control::Parameter Drive
+    {
+        .name = "DRIVE",
+        .id = "drive",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
     enum ParameterIDs
     {
         TEST_ID,
@@ -79,6 +88,7 @@ namespace Ath::Forma
         F4,
         F2,
         F1,
+        DRIVE,
         PARAM_COUNT
     };
 
@@ -90,7 +100,8 @@ namespace Ath::Forma
         [F5] = Flute5,
         [F4] = Flute4,
         [F2] = Flute2,
-        [F1] = Flute1
+        [F1] = Flute1,
+        [DRIVE] = Drive
     };
 
 

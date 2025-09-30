@@ -68,6 +68,8 @@ namespace Ath::Forma
         std::array<float, 8> parameterFluteStopsInputs;
         Simd::float8 parameterFluteStops;
 
+        Simd::float8 parameterDriveGain;
+
         float gate = 0.0f;
         Dsp::Cv::LinearSmoother<float> gateSmoother;
 
@@ -97,6 +99,8 @@ public:
     void setParameterFlute5 (float x);
 
     void setParameterFlute1 (float x);
+
+    void setParameterDrive (float x);
 
     float getParameter(int id) {return parameters[id]; }
     };

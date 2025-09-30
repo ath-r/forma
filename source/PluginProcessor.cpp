@@ -45,6 +45,7 @@ PluginProcessor::PluginProcessor()
 
     parameterObservers[ParameterIDs::F5].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute5);
     parameterObservers[ParameterIDs::F1].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute1);
+    parameterObservers[ParameterIDs::DRIVE].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterDrive);
 }
 
 PluginProcessor::~PluginProcessor()
