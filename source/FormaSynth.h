@@ -2,22 +2,23 @@
 
 #include <array>
 
-#include "FormaKeySwitch.h"
-#include "FormaFilterBank.h"
-#include "dsp/oscillator/SquareChebyshev8.h"
-#include "math/Simd.h"
 #include "processor/MidiAudioProcessor.h"
 
+#include "FormaKeySwitch.h"
+#include "FormaFilterBank.h"
+#include "FormaFilterNonlinearity.h"
 #include "PluginParameters.h"
 
-#include "control/Midi.h"
+#include "math/Simd.h"
+#include "math/Conversion.h"
 
 #include "dsp/Context.h"
 #include "dsp/PhaseCounter.h"
 #include "dsp/oscillator/SquareSincIntegral8.h"
+#include "dsp/oscillator/SquareChebyshev8.h"
 #include "dsp/cv/LinearSmoother.h"
 
-#include "math/Conversion.h"
+#include "control/Midi.h"
 
 namespace Ath::Forma
 {
@@ -57,10 +58,10 @@ namespace Ath::Forma
         std::array<Simd::float8, KEY_NUMBER> keyswitchOutputs;
         std::array<Simd::float8, KEY_NUMBER> prefilterGains;
 
-        std::array<Dsp::Cv::LinearSmoother<float>, 6> parameterSmootherFluteStops;
-
         std::array<Simd::float8, 6> filterBankInputs;
         std::array<FormaFilterBank, 6> filterBanks;
+
+        FormaFilterNonlinearity filterNonlinearity;
 
         std::array<float, 8> parameterFluteStopsInputs;
         Simd::float8 parameterFluteStops;

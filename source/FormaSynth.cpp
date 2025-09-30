@@ -38,12 +38,6 @@ namespace Ath::Forma
             osc2.setContext(context);
             osc2.setFrequency(frequencies * 16.0f);
         }
-        
-        for (auto& smoother : parameterSmootherFluteStops)
-        {
-            smoother.setContext(context);
-            smoother.setTime(0.002f);
-        }
 
         for (int i = 0; i < KEY_NUMBER; i++)
         {
@@ -109,10 +103,6 @@ namespace Ath::Forma
             phaseCounter.processSample(); 
 
             //process parameter smoothers:
-            for (auto& smoother : parameterSmootherFluteStops)
-            {
-                smoother.process();
-            }
 
             //process oscillators:
 
@@ -129,10 +119,10 @@ namespace Ath::Forma
                 oscillatorOutputs[n] = sample;
                 oscillatorOutputs[n + 48] = sample2;
 
-                oscillatorOutputs[n] = Simd::blend(sample, Simd::permute(sample2, Simd::perm4), Simd::mask4);
-                oscillatorOutputs[n + 12] = Simd::blend(Simd::permute(sample, Simd::perm1), Simd::permute(sample2, Simd::perm5), Simd::mask3);
-                oscillatorOutputs[n + 24] = Simd::blend(Simd::permute(sample, Simd::perm2), Simd::permute(sample2, Simd::perm6), Simd::mask2);
-                oscillatorOutputs[n + 36] = Simd::blend(Simd::permute(sample, Simd::perm3), Simd::permute(sample2, Simd::perm7), Simd::mask1);
+                oscillatorOutputs[n] = Simd::ternary(sample, Simd::permute(sample2, Simd::perm4), Simd::mask4);
+                oscillatorOutputs[n + 12] = Simd::ternary(Simd::permute(sample, Simd::perm1), Simd::permute(sample2, Simd::perm5), Simd::mask3);
+                oscillatorOutputs[n + 24] = Simd::ternary(Simd::permute(sample, Simd::perm2), Simd::permute(sample2, Simd::perm6), Simd::mask2);
+                oscillatorOutputs[n + 36] = Simd::ternary(Simd::permute(sample, Simd::perm3), Simd::permute(sample2, Simd::perm7), Simd::mask1);
                 
                 oscillatorOutputs[n + 60] = Simd::permute(sample2, Simd::perm1);
             }
@@ -170,7 +160,10 @@ namespace Ath::Forma
             {
                 sum += filterBanks[n].process(filterBankInputs[n]);
             }            
-            buffer[i] = (sum * parameterFluteStops + bleed * Math::DB_MINUS72).sum() * Math::DB_MINUS18 / 6.0f;
+
+            Simd::float8 sum_nonlin = filterNonlinearity.process((sum + bleed * Math::DB_MINUS72) * 0.5f) * 2.0f;
+
+            buffer[i] = (sum_nonlin * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
         }
     }
 

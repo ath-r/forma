@@ -51,7 +51,7 @@ namespace Ath::Dsp::Oscillator
         const auto f1 = Simd::sign(x) - sin2pi9(x + 0.25f) * invx - sin2pi9(x) * invx2;
 
         const auto mask = (x < 0.5f) & (x > -0.5f);
-        const auto si = Simd::blend(f0, f1, mask);
+        const auto si = Simd::ternary(f0, f1, mask);
 
         return si * _inv_corr;
 

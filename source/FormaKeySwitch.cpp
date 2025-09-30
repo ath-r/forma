@@ -53,7 +53,7 @@ namespace Ath::Forma
         value += delta;
         value = Simd::clamp(value, 0.0f, 1.0f);
 
-        auto logic = Simd::blend(Simd::float8(1.0f), Simd::float8(0.0f), value > actionThreshold);
+        auto logic = Simd::ternary(Simd::float8(1.0f), Simd::float8(0.0f), value > actionThreshold);
 
         return filter.process(logic);
     }

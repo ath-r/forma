@@ -194,7 +194,6 @@ namespace Simd
         forceinline int8 SIMD_VECTORCALL operator<<(int8 rhs) const noexcept {return _mm256_srlv_epi32(vec, rhs.vec);}
         forceinline int8 SIMD_VECTORCALL operator>>(int8 rhs) const noexcept {return _mm256_srav_epi32(vec, rhs.vec);}
 
-
         forceinline int8 SIMD_VECTORCALL operator>(int8 rhs) const noexcept {return _mm256_cmpgt_epi32(vec, rhs.vec);}
         forceinline int8 SIMD_VECTORCALL operator<(int8 rhs) const noexcept {return rhs > *this;}
         forceinline int8 SIMD_VECTORCALL operator>=(int8 rhs) const noexcept {return ~(rhs > *this);}
@@ -305,7 +304,7 @@ namespace Simd
     /* #region BLEND */
 
     template<typename T>
-    static forceinline T blend(T a, T b, intAnalogOf<T> mask)
+    static forceinline T ternary(T a, T b, intAnalogOf<T> mask)
     {
         return (a & mask) + (b & ~mask);
     }
@@ -355,7 +354,7 @@ namespace Simd
     {
         intAnalogOf<T> mask = x >= T(0.0f);
         
-        return blend(T(1.0f), T(-1.0f), mask);
+        return ternary(T(1.0f), T(-1.0f), mask);
     }
 
     forceinline float4 sqrt(float4 x) { return _mm_sqrt_ps(x); }
