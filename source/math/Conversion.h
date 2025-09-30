@@ -22,13 +22,17 @@ namespace Ath::Math
     static constexpr float DB_MINUS9 = DB_MINUS3 * DB_MINUS6;
     static constexpr float DB_MINUS12 = DB_MINUS6 * DB_MINUS6;
     static constexpr float DB_MINUS18 = DB_MINUS12 * DB_MINUS6;
-    static constexpr float DB_MINUS24 = DB_MINUS12 * DB_MINUS12;
+    static constexpr float DB_MINUS24 = DB_MINUS18 * DB_MINUS6;
     static constexpr float DB_MINUS30 = DB_MINUS24 * DB_MINUS6;
-    static constexpr float DB_MINUS48 = DB_MINUS30 * DB_MINUS18;
-
-    static constexpr float DB_MINUS60 = DB_MINUS30 * DB_MINUS30;
-    static constexpr float DB_MINUS72 = DB_MINUS60 * DB_MINUS12;
-    static constexpr float DB_MINUS84 = DB_MINUS60 * DB_MINUS30;
+    static constexpr float DB_MINUS36 = DB_MINUS30 * DB_MINUS6;
+    static constexpr float DB_MINUS42 = DB_MINUS36 * DB_MINUS6;
+    static constexpr float DB_MINUS48 = DB_MINUS42 * DB_MINUS6;
+    static constexpr float DB_MINUS54 = DB_MINUS48 * DB_MINUS6;
+    static constexpr float DB_MINUS60 = DB_MINUS54 * DB_MINUS6;
+    static constexpr float DB_MINUS66 = DB_MINUS60 * DB_MINUS6;
+    static constexpr float DB_MINUS72 = DB_MINUS66 * DB_MINUS6;
+    static constexpr float DB_MINUS78 = DB_MINUS72 * DB_MINUS6;
+    static constexpr float DB_MINUS84 = DB_MINUS78 * DB_MINUS6;
 
     static constexpr float DB_MINUS50 = 0.003162278f;
 

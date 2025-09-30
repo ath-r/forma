@@ -143,6 +143,8 @@ namespace Ath::Forma
             //e.g. keyswitchInputs[0] = {C1, C2, C3, C4, G2, E4, 0, 0}
             Simd::int8 maskNasat = {0, 0, 0, 0, Simd::m1, 0, 0, 0};
             Simd::int8 maskTerz = {0, 0, 0, 0, 0, Simd::m1, 0, 0};
+
+            Simd::float8 bleed = 0.0f;
             for (int n = 0; n < KEY_NUMBER; n++)
             {
                 auto prinzipal = oscillatorOutputs[n] & Simd::mask4;
@@ -150,7 +152,8 @@ namespace Ath::Forma
                 auto terz = Simd ::permute(oscillatorOutputs[n + 4], Simd::perm7) & maskTerz;
 
                 keyswitchInputs[n] = prinzipal + nasat + terz;
-                keyswitchOutputs[n] = keyswitchInputs[n] * keyswitches[n].processSample();
+                bleed += keyswitchInputs[n];
+                keyswitchOutputs[n] = keyswitchInputs[n] * (keyswitches[n].processSample() + Math::DB_MINUS72);
             }
 
             //each filterbank gets the portion of keyboard it's responsible for
@@ -167,7 +170,7 @@ namespace Ath::Forma
             {
                 sum += filterBanks[n].process(filterBankInputs[n]);
             }            
-            buffer[i] = (sum * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
+            buffer[i] = (sum * parameterFluteStops + bleed * Math::DB_MINUS72).sum() * Math::DB_MINUS18 / 6.0f;
         }
     }
 
@@ -230,21 +233,21 @@ namespace Ath::Forma
     void FormaSynth::setParameterFlute16 (float x) 
     { 
         parameters[F16] = x;
-        parameterFluteStopsInputs[0] = std::lerp (Math::DB_MINUS60, 1.0f, x);
+        parameterFluteStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterFlute8 (float x) 
     { 
         parameters[F8] = x;
-        parameterFluteStopsInputs[1] = std::lerp (Math::DB_MINUS60, 1.0f, x);
+        parameterFluteStopsInputs[1] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterFlute4 (float x) 
     { 
         parameters[F4] = x;
-        parameterFluteStopsInputs[2] = std::lerp (Math::DB_MINUS48, 1.0f, x);
+        parameterFluteStopsInputs[2] = std::lerp (Math::DB_MINUS42, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data(); 
     }
     
@@ -258,14 +261,14 @@ namespace Ath::Forma
     void FormaSynth::setParameterFlute5 (float x) 
     { 
         parameters[F5] = x;
-        parameterFluteStopsInputs[4] = std::lerp (Math::DB_MINUS48, 1.0f, x);
+        parameterFluteStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     };
 
     void FormaSynth::setParameterFlute1 (float x) 
     {
         parameters[F1] = x;
-        parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS30, 1.0f, x);
+        parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     };
 

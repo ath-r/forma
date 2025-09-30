@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include "math/Complex.h"
+#include "math/Conversion.h"
 #include "math/Simd.h"
 #include "dsp/Context.h"
 #include "dsp/filter/FilterMath.h"
@@ -63,11 +64,13 @@ namespace Ath::Forma
 
         Simd::float8 process(Simd::float8 x)
         {
+            auto y = x;
+
             for (int i = 0; i < stages; i++)
             {
-                x = filters[i].process(x);
+                y = filters[i].process(y);
             }
-            return x;
+            return y + x * Math::DB_MINUS54;
         }
 
 

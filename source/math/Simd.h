@@ -406,24 +406,24 @@ namespace Simd
     /* #endregion */
 
     /* #region MASKS */
-    constexpr int m1 = 0xFFFFFFFF;
-    static const int8 mask1 = {m1,0,0,0,0,0,0,0};
-    static const int8 mask2 = {m1,m1,0,0,0,0,0,0};
-    static const int8 mask3 = {m1,m1,m1,0,0,0,0,0};
-    static const int8 mask4 = {m1,m1,m1,m1,0,0,0,0};
-    static const int8 mask5 = {m1,m1,m1,m1,m1,0,0,0};
-    static const int8 mask6 = {m1,m1,m1,m1,m1,m1,0,0};
-    static const int8 mask7 = {m1,m1,m1,m1,m1,m1,m1,0};
-    static const int8 mask8 = {m1,m1,m1,m1,m1,m1,m1,m1};
-    
-    static const int8 mask1n = ~mask1;
-    static const int8 mask2n = ~mask2;
-    static const int8 mask3n = ~mask3;
-    static const int8 mask4n = ~mask4;
-    static const int8 mask5n = ~mask5;
-    static const int8 mask6n = ~mask6;
-    static const int8 mask7n = ~mask7;
-    static const int8 mask8n = ~mask8;
+        constexpr int m1 = 0xFFFFFFFF;
+        static const int8 mask1 = {m1,0,0,0,0,0,0,0};
+        static const int8 mask2 = {m1,m1,0,0,0,0,0,0};
+        static const int8 mask3 = {m1,m1,m1,0,0,0,0,0};
+        static const int8 mask4 = {m1,m1,m1,m1,0,0,0,0};
+        static const int8 mask5 = {m1,m1,m1,m1,m1,0,0,0};
+        static const int8 mask6 = {m1,m1,m1,m1,m1,m1,0,0};
+        static const int8 mask7 = {m1,m1,m1,m1,m1,m1,m1,0};
+        static const int8 mask8 = {m1,m1,m1,m1,m1,m1,m1,m1};
+        
+        static const int8 mask1n = ~mask1;
+        static const int8 mask2n = ~mask2;
+        static const int8 mask3n = ~mask3;
+        static const int8 mask4n = ~mask4;
+        static const int8 mask5n = ~mask5;
+        static const int8 mask6n = ~mask6;
+        static const int8 mask7n = ~mask7;
+        static const int8 mask8n = ~mask8;
     /* #endregion */
 
 }
