@@ -6,7 +6,7 @@
 
 namespace Ath::Forma
 {
-    class FormaFilterNonlinearity : public Waveshaper::ADAA1simd
+    class FormaFilterNonlinearity : public Dsp::Waveshaper::ADAA1simd<Simd::float8>
     {
         Math::Polynomial<Simd::float8, 14> polynomial =
         {

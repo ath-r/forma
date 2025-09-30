@@ -7,6 +7,7 @@
 #include "FormaKeySwitch.h"
 #include "FormaFilterBank.h"
 #include "FormaFilterNonlinearity.h"
+#include "dsp/waveshaping/SoftClipper.h"
 #include "PluginParameters.h"
 
 #include "math/Simd.h"
@@ -61,6 +62,7 @@ namespace Ath::Forma
         std::array<Simd::float8, 6> filterBankInputs;
         std::array<FormaFilterBank, 6> filterBanks;
 
+        Dsp::Waveshaper::SoftClipperSimd<15, Simd::float8> filterClipper;
         FormaFilterNonlinearity filterNonlinearity;
 
         std::array<float, 8> parameterFluteStopsInputs;

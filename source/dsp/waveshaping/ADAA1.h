@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-namespace Ath::Waveshaper
+namespace Ath::Dsp::Waveshaper
 {
     class ADAA1
     {

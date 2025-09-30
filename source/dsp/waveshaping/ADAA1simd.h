@@ -4,12 +4,13 @@
 
 #include "../../math/Simd.h"
 
-namespace Ath::Waveshaper
+namespace Ath::Dsp::Waveshaper
 {
+    template<typename T>
     class ADAA1simd
     {
     public:
-        const Simd::float8 TOL = 1.0e-8;
+        const T TOL = 1.0e-8;
 
         void reset()
         {
@@ -17,14 +18,14 @@ namespace Ath::Waveshaper
             ad1_x1 = 0.0;
         }
 
-        inline Simd::float8 process (Simd::float8 x) noexcept
+        inline T process (T x) noexcept
         {
-            Simd::float8 ad1_x = nonlinearityAntiderivative (x);
+            T ad1_x = nonlinearityAntiderivative (x);
 
-            Simd::float8 branch1 = (ad1_x - ad1_x1) / (x - x1);
-            Simd::float8 branch2 = nonlinearity ((x + x1) * 0.5f);
+            T branch1 = (ad1_x - ad1_x1) / (x - x1);
+            T branch2 = nonlinearity ((x + x1) * 0.5f);
 
-            Simd::float8 y = Simd::ternary(branch2, branch1, Simd::abs(x - x1) < TOL);
+            T y = Simd::ternary(branch2, branch1, Simd::abs(x - x1) < TOL);
 
             ad1_x1 = ad1_x;
             x1 = x;
@@ -33,10 +34,10 @@ namespace Ath::Waveshaper
         }
 
     protected:
-        virtual inline Simd::float8 nonlinearity (Simd::float8 x) const noexcept = 0;
-        virtual inline Simd::float8 nonlinearityAntiderivative (Simd::float8 x) const noexcept = 0;
+        virtual inline T nonlinearity (T x) const noexcept = 0;
+        virtual inline T nonlinearityAntiderivative (T x) const noexcept = 0;
 
-        Simd::float8 x1 = 0.0;
-        Simd::float8 ad1_x1 = 0.0;
+        T x1 = 0.0;
+        T ad1_x1 = 0.0;
     };
 }

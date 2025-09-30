@@ -161,7 +161,7 @@ namespace Ath::Forma
                 sum += filterBanks[n].process(filterBankInputs[n]);
             }            
 
-            Simd::float8 sum_nonlin = filterNonlinearity.process((sum + bleed * Math::DB_MINUS72) * 0.5f) * 2.0f;
+            Simd::float8 sum_nonlin = filterClipper.process((sum + bleed * Math::DB_MINUS72) * 0.5f) * 2.0f;
 
             buffer[i] = (sum_nonlin * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
         }
