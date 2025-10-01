@@ -74,6 +74,8 @@ namespace Ath::Forma
             else prefilterGains[i] = filterBanks[5].getAttenutation(freqs) * Math::DB_MINUS3;
         }
 
+        hum.setContext(context);
+
         gateSmoother.setContext(context);
         gateSmoother.setTime(0.001f);
     }
@@ -143,7 +145,7 @@ namespace Ath::Forma
 
                 keyswitchInputs[n] = prinzipal + nasat + terz;
                 bleed += keyswitchInputs[n];
-                keyswitchOutputs[n] = keyswitchInputs[n] * (keyswitches[n].processSample() + Math::DB_MINUS66);
+                keyswitchOutputs[n] = keyswitchInputs[n] * (keyswitches[n].processSample() + Math::DB_MINUS72);
             }
 
             //each filterbank gets the portion of keyboard it's responsible for
@@ -160,12 +162,11 @@ namespace Ath::Forma
             {
                 sum += filterBanks[n].process(filterBankInputs[n]);
             }            
-
-            auto x = (sum + bleed * Math::DB_MINUS66) * 0.0625f;
+            auto x = (sum + bleed * Math::DB_MINUS72) * 0.0625f;
             auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
             auto sumCurved = filterNonlinearity.process(sumClipped) * 16.0f;
 
-            buffer[i] = (sumCurved * parameterFluteStops).sum() * Math::DB_MINUS18 / 6.0f;
+            buffer[i] = (sumCurved * parameterFluteStops + hum.process() * Math::DB_MINUS48).sum() * Math::DB_MINUS18 / 6.0f;
         }
     }
 

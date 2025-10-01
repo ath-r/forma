@@ -7,6 +7,7 @@
 #include "FormaKeySwitch.h"
 #include "FormaFilterBank.h"
 #include "FormaFilterNonlinearity.h"
+#include "FormaHum.h"
 #include "dsp/waveshaping/SoftClipper.h"
 #include "PluginParameters.h"
 
@@ -65,15 +66,15 @@ namespace Ath::Forma
         Dsp::Waveshaper::SoftClipperSimd<15, Simd::float8> filterClipper;
         FormaFilterNonlinearity filterNonlinearity;
 
-        std::array<float, 8> parameterFluteStopsInputs;
-        Simd::float8 parameterFluteStops;
+        FormaHum hum;
+        
+        alignas(32) std::array<float, 8> parameterFluteStopsInputs;
+        Simd::float8 parameterFluteStops = 0.0f;
 
-        Simd::float8 parameterDriveGain;
+        Simd::float8 parameterDriveGain = 1.0f;
 
         float gate = 0.0f;
         Dsp::Cv::LinearSmoother<float> gateSmoother;
-
-        const float minVolumeOfStop = Math::DB_MINUS60;
 
         std::array<float, PARAM_COUNT> parameters;
 

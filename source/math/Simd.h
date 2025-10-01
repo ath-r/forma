@@ -214,6 +214,7 @@ namespace Simd
 
     struct float8
     {
+        alignas(32)
         __m256 vec;
 
         enum {VectorSize = 8};

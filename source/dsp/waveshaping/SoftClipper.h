@@ -2,6 +2,7 @@
 
 #include "ADAA1simd.h"
 #include "../../math/Simd.h"
+#include <cmath>
 
 namespace Ath::Dsp::Waveshaper
 {

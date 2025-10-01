@@ -10,7 +10,7 @@ namespace Ath::Dsp::Waveshaper
     class ADAA1simd
     {
     public:
-        const T TOL = 1.0e-8;
+        const T TOL = 1.0e-8f;
 
         void reset()
         {
