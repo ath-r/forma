@@ -75,6 +75,7 @@ namespace Ath::Forma
         }
 
         hum.setContext(context);
+        filterTone.setContext(context);
 
         gateSmoother.setContext(context);
         gateSmoother.setTime(0.001f);
@@ -169,7 +170,7 @@ namespace Ath::Forma
             auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
             auto sumCurved = filterNonlinearity.process(sumClipped) * 64.0f;
 
-            buffer[i] = (sumCurved * parameterFluteStops + hum.process() * Math::DB_MINUS48 + bleedTerz * Math::DB_MINUS36).sum() * Math::DB_MINUS18 / 6.0f;
+            buffer[i] = filterTone.process((sumCurved * parameterFluteStops + hum.process() * Math::DB_MINUS48 + bleedTerz * Math::DB_MINUS36).sum() * Math::DB_MINUS18 / 6.0f);
         }
     }
 
@@ -188,6 +189,7 @@ namespace Ath::Forma
                 case 0x0f: setParameterFlute4(value); break;
                 case 0x10: setParameterFlute2(value); break;
                 case 0x11: setParameterFlute1(value); break;
+                case 0x14: setParameterTone(value); break;
                 case 0x4c: setParameterDrive(value); break;
                 default: break;
             }
@@ -276,5 +278,11 @@ namespace Ath::Forma
     {
         parameters[DRIVE] = x;
         parameterDriveGain = 1.0f + x * 16.0f;
+    };
+
+    void FormaSynth::setParameterTone (float x) 
+    {
+        parameters[TONE] = x;
+        filterTone.setCutoffFrequency(std::lerp(1000, 15000, x));
     };
 }

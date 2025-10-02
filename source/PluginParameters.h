@@ -79,6 +79,15 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
+    static const Control::Parameter Tone
+    {
+        .name = "TONE",
+        .id = "tone",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
     enum ParameterIDs
     {
         TEST_ID,
@@ -88,6 +97,7 @@ namespace Ath::Forma
         F4,
         F2,
         F1,
+        TONE,
         DRIVE,
         PARAM_COUNT
     };
@@ -101,6 +111,7 @@ namespace Ath::Forma
         [F4] = Flute4,
         [F2] = Flute2,
         [F1] = Flute1,
+        [TONE] = Tone,
         [DRIVE] = Drive
     };
 

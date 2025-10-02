@@ -65,6 +65,7 @@ namespace Ath::Forma
 
         Dsp::Waveshaper::SoftClipperSimd<15, Simd::float8> filterClipper;
         FormaFilterNonlinearity filterNonlinearity;
+        Dsp::Filter::LowPass1<float> filterTone;
 
         FormaHum hum;
         
@@ -102,6 +103,8 @@ public:
     void setParameterFlute1 (float x);
 
     void setParameterDrive (float x);
+
+    void setParameterTone (float x);
 
     float getParameter(int id) {return parameters[id]; }
     };
