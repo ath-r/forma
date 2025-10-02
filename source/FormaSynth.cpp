@@ -137,15 +137,18 @@ namespace Ath::Forma
             Simd::int8 maskTerz = {0, 0, 0, 0, 0, Simd::m1, 0, 0};
 
             Simd::float8 bleed = 0.0f;
+            Simd::float8 bleedTerz = 0.0f;
             for (int n = 0; n < KEY_NUMBER; n++)
             {
                 auto prinzipal = oscillatorOutputs[n] & Simd::mask4;
                 auto nasat = Simd::permute(oscillatorOutputs[n + 7], Simd::perm5) & maskNasat;
-                auto terz = Simd ::permute(oscillatorOutputs[n + 4], Simd::perm7) & maskTerz;
+                auto terz = Simd ::permute(oscillatorOutputs[n + 4], Simd::perm6) & maskTerz;
 
                 keyswitchInputs[n] = prinzipal + nasat + terz;
-                bleed += keyswitchInputs[n];
                 keyswitchOutputs[n] = keyswitchInputs[n] * (keyswitches[n].processSample() + Math::DB_MINUS72);
+
+                bleed += keyswitchInputs[n];
+                bleedTerz += (keyswitchOutputs[n] & maskTerz) * (float(n) / KEY_NUMBER);
             }
 
             //each filterbank gets the portion of keyboard it's responsible for
@@ -162,11 +165,11 @@ namespace Ath::Forma
             {
                 sum += filterBanks[n].process(filterBankInputs[n]);
             }            
-            auto x = (sum + bleed * Math::DB_MINUS72) * 0.0625f;
+            auto x = (sum + bleed * Math::dB(-72)) * 0.015625f;
             auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
-            auto sumCurved = filterNonlinearity.process(sumClipped) * 16.0f;
+            auto sumCurved = filterNonlinearity.process(sumClipped) * 64.0f;
 
-            buffer[i] = (sumCurved * parameterFluteStops + hum.process() * Math::DB_MINUS48).sum() * Math::DB_MINUS18 / 6.0f;
+            buffer[i] = (sumCurved * parameterFluteStops + hum.process() * Math::DB_MINUS48 + bleedTerz * Math::DB_MINUS36).sum() * Math::DB_MINUS18 / 6.0f;
         }
     }
 

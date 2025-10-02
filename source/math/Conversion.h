@@ -15,6 +15,23 @@ namespace Ath::Math
 
     float semitonesToFrequencyRatio (float semitones);
 
+    constexpr double ipow(double a, int n) 
+    {
+        if (n == 0) return 1.0;
+        if (n < 0) return 1.0 / ipow(a, -n);
+        if (n % 2 == 0) {
+            double half = ipow(a, n / 2);
+            return half * half;
+        }
+        return a * ipow(a, n - 1);
+    }   
+
+    constexpr float dB(int dB)
+    {
+        constexpr float base = 1.1220184543019633; // 10^(1/20)
+        return ipow(base, dB);
+    }
+
     static constexpr float DB_MINUS1 = 0.891250938;
     static constexpr float DB_MINUS2 = 0.794328235;
     static constexpr float DB_MINUS3 = 0.707945784f;
@@ -39,8 +56,6 @@ namespace Ath::Math
     static constexpr float DB_PLUS1 = 1.0f / DB_MINUS1;
     static constexpr float DB_PLUS2 = 1.0f / DB_MINUS2;
     static constexpr float DB_PLUS3 = 1.0f / DB_MINUS3;
-
-
 
     float amplitudeToDecibels (float gain);
 

@@ -60,6 +60,7 @@ namespace Ath::Dsp::Filter
     template <typename T>
     class LowPass1
     {
+    protected:
         Context c;
         T G = 0.0f;
         T z1 = 0.0f;
@@ -95,7 +96,7 @@ namespace Ath::Dsp::Filter
             return transferLP1(wc, s);
         }
 
-        inline T process(T x)
+        virtual inline T process(T x)
         {
             y = processLP(x, z1, G);
             return y;
@@ -103,6 +104,17 @@ namespace Ath::Dsp::Filter
 
         inline T last()
         {
+            return y;
+        }
+    };
+
+    template <typename T>
+    class HighPass1 : public LowPass1<T>
+    {
+    public:
+        inline T process(T x) override
+        {
+            y = processHP(x, z1, G);
             return y;
         }
     };

@@ -20,6 +20,7 @@ namespace Ath::Forma
         Simd::float8 frequency = 30.0f;
 
         std::array<Dsp::Filter::LowPass1<Simd::float8>, STAGE_NUM> filters;
+        Dsp::Filter::HighPass1<Simd::float8> highpass;
 
         public:
         Simd::float8 hmul = { 1.0, 2.0, 4.0, 8.0, 3.0, 10.0, 1.0, 1.0 };
@@ -30,6 +31,8 @@ namespace Ath::Forma
             c = context;
 
             for (auto& filter : filters) filter.setContext(c);
+            highpass.setContext(c);
+
             setFrequency(frequency);
         }
 
@@ -48,6 +51,7 @@ namespace Ath::Forma
 
                 filter.setCutoffFrequency(frequency * hmul * vmul[i]);
             }
+            highpass.setCutoffFrequency(freq);
         }
 
         Simd::float8 getAttenutation(Simd::float8 frequency)
@@ -64,13 +68,14 @@ namespace Ath::Forma
 
         Simd::float8 process(Simd::float8 x)
         {
+            x = highpass.process(x);
             auto y = x;
 
             for (int i = 0; i < stages; i++)
             {
                 y = filters[i].process(y);
             }
-            return y + x * Math::DB_MINUS54;
+            return y + x * Math::DB_MINUS48;
         }
 
 
