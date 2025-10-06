@@ -114,8 +114,8 @@ namespace Ath::Dsp::Filter
     public:
         inline T process(T x) override
         {
-            y = processHP(x, z1, G);
-            return y;
+            LowPass1<T>::y = processHP(x, LowPass1<T>::z1, LowPass1<T>::G);
+            return LowPass1<T>::y;
         }
     };
 }

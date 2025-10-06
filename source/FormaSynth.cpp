@@ -143,12 +143,14 @@ namespace Ath::Forma
             {
                 auto prinzipal = oscillatorOutputs[n] & Simd::mask4;
                 auto nasat = Simd::permute(oscillatorOutputs[n + 7], Simd::perm5) & maskNasat;
-                auto terz = Simd ::permute(oscillatorOutputs[n + 4], Simd::perm6) & maskTerz;
+                auto terz = Simd::permute(oscillatorOutputs[n + 4], Simd::perm6) & maskTerz;
 
                 keyswitchInputs[n] = prinzipal + nasat + terz;
                 keyswitchOutputs[n] = keyswitchInputs[n] * (keyswitches[n].processSample() + Math::DB_MINUS72);
 
+                // bleed from ungated oscillators i.e. it's present even when no keys are pressed
                 bleed += keyswitchInputs[n];
+                // in the real organ unfiltered 5'1/3 stop bleeds through, the higher the key the more bleed there is
                 bleedTerz += (keyswitchOutputs[n] & maskTerz) * (float(n) / KEY_NUMBER);
             }
 
@@ -161,16 +163,36 @@ namespace Ath::Forma
             for (int n = 42; n < 54; n++) filterBankInputs[4] += keyswitchOutputs[n] * prefilterGains[n];
             for (int n = 54; n < 61; n++) filterBankInputs[5] += keyswitchOutputs[n] * prefilterGains[n];
 
+            //process filterbanks
             Simd::float8 sum = 0.0f;
             for (int n = 0; n < 6; n++)
             {
                 sum += filterBanks[n].process(filterBankInputs[n]);
             }            
-            auto x = (sum + bleed * Math::dB(-72)) * 0.015625f;
-            auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
-            auto sumCurved = filterNonlinearity.process(sumClipped) * 64.0f;
 
-            buffer[i] = filterTone.process((sumCurved * parameterFluteStops + hum.process() * Math::DB_MINUS48 + bleedTerz * Math::DB_MINUS36).sum() * Math::DB_MINUS18 / 6.0f);
+            //filter nonlinearity:
+            auto filterAmpIn = (sum + bleed * Math::dB(-66));
+
+            //hard clipper (usually won't be reached):
+            //auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
+
+            //soft clipper:
+    //real clipping won't occur in normal circumstances, because we attenuate the signal by a factor of 64
+    //so it doesn't clip even with all keys pressed
+    //since the transfer curve is very nonlinear, intermodulation harmonics will be present
+    //even with a low input signal amplitude
+            auto filterAmpOut = filterNonlinearity.process(filterAmpIn * 0.015625f) * 64.0f;
+
+            //white noise, 50hz hum and its harmonics:
+            auto outHum = hum.process() * Math::DB_MINUS48;
+            auto outBleed = bleedTerz * Math::DB_MINUS36 + bleed * Math::DB_MINUS66;
+
+            //tone knob filter:
+            auto toneIn = filterAmpOut * parameterFluteStops + outHum + outBleed;
+            auto toneOut = filterTone.process(toneIn.sum());
+
+            //lastly, attenuate output signal by 18dB and a factor of 6 (because there are 6 stops)
+            buffer[i] = toneOut * Math::DB_MINUS18 / 6.0f;
         }
     }
 
@@ -283,6 +305,6 @@ namespace Ath::Forma
     void FormaSynth::setParameterTone (float x) 
     {
         parameters[TONE] = x;
-        filterTone.setCutoffFrequency(std::lerp(1000, 15000, x));
+        filterTone.setCutoffFrequency(std::lerp(1000.0f, 15000.0f, x));
     };
 }

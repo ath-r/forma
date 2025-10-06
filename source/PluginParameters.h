@@ -83,7 +83,7 @@ namespace Ath::Forma
     {
         .name = "TONE",
         .id = "tone",
-        .def = 0.0f,
+        .def = 1.0f,
         .min = 0.0f,
         .max = 1.0f
     };
