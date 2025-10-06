@@ -28,7 +28,7 @@ namespace Ath::Gui
         //setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::black);
         setColour(juce::Slider::textBoxOutlineColourId, juce::Colour());
 
-        setDefaultSansSerifTypeface(getTypeface(fontsIds::standardReadoutFontId));
+        setDefaultSansSerifTypeface(getTypeface(fontsIds::standardLabelFontId));
         setDefaultLookAndFeel(this);
     }
 
@@ -195,6 +195,6 @@ namespace Ath::Gui
             return juce::Font(getTypeface(fontsIds::standardReadoutFontId)).withHeight(height);
         }
 
-        return juce::Font(getTypeface(fontsIds::standardReadoutFontId)).withHeight(height);
+        return juce::Font(getTypeface(fontsIds::standardLabelFontId)).withHeight(height);
     }
 }

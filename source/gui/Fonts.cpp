@@ -8,8 +8,8 @@ namespace Ath::Gui
     {
         static juce::Typeface::Ptr fontArray[FONT_COUNT]
         {
-            [standardLabelFontId] = juce::Typeface::createSystemTypefaceFor(BinaryData::RussoOneCustom_otf,
-                                                                          BinaryData::RussoOneCustom_otfSize),
+            [standardLabelFontId] = juce::Typeface::createSystemTypefaceFor(BinaryData::OxaniumBold_ttf,
+                                                                          BinaryData::OxaniumBold_ttfSize),
             [standardReadoutFontId] = juce::Typeface::createSystemTypefaceFor(BinaryData::OxaniumBold_ttf,
                                                                                 BinaryData::OxaniumBold_ttfSize)
         };
