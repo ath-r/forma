@@ -29,5 +29,6 @@ private:
     Ath::Forma::MainComponent mainComponent;
 
     Ath::Gui::LookAndFeel lookAndFeel;
+    juce::ComponentBoundsConstrainer constrainer;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

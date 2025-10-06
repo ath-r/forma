@@ -28,6 +28,10 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     setResizable(true, true);
 
     addAndMakeVisible(mainComponent);
+    constrainer.setFixedAspectRatio(4.0f / 3.0f);
+    constrainer.setMinimumHeight(200);
+    setConstrainer(&constrainer);
+
     mainComponent.setBounds(0,0,600,450);
 }
 
@@ -43,9 +47,6 @@ void PluginEditor::paint (juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    float ratio = 600.0f / 450.0f;
-    setSize(getHeight() * ratio, getHeight());
-
     float scale = getHeight() / 450.0f;
     
     mainComponent.setTransform(juce::AffineTransform::scale(scale));
