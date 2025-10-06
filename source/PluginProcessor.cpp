@@ -5,11 +5,13 @@
 #include "PluginParameters.h"
 #include <array>
 #include <cmath>
+#include <memory>
 
 #include "FormaSynth.h"
 #include "control/Parameter.h"
 #include "juce_audio_basics/juce_audio_basics.h"
 #include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_core/juce_core.h"
 #include "juce_data_structures/juce_data_structures.h"
 
 #include "control/Midi.h"
@@ -24,7 +26,8 @@ PluginProcessor::PluginProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-    treeState(*this, nullptr, "PARAMETER", createParameterLayout())
+    treeState(*this, nullptr, "PARAMETER", createParameterLayout()),
+    pluginInstanceSettings("pluginInstanceSettings")
 {
     using namespace Ath::Forma;
 
@@ -125,16 +128,23 @@ bool PluginProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* PluginProcessor::createEditor()
 {
-    return new PluginEditor (*this);
+    auto editor = new PluginEditor (*this);
+    return editor;
 }
 
 //==============================================================================
 void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     auto state = treeState.copyState();
-    std::unique_ptr<juce::XmlElement> xml (state.createXml());
-    copyXmlToBinary (*xml, destData);
 
+    auto xml = std::make_unique<juce::XmlElement>("pluginInstanceTree");
+    auto xmlSettings = std::make_unique<juce::XmlElement>(pluginInstanceSettings);
+
+    std::unique_ptr<juce::XmlElement> pluginValueTree (state.createXml());
+
+    xml->addChildElement(xmlSettings.release());
+    xml->addChildElement(pluginValueTree.release());
+    copyXmlToBinary (*xml, destData);
 }
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -142,10 +152,14 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
     std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
     if (xmlState.get() != nullptr)
     {
-        if (xmlState->hasTagName (treeState.state.getType()))
+        if (xmlState->hasTagName("pluginInstanceTree"))
         {
-            treeState.replaceState (juce::ValueTree::fromXml (*xmlState));
-        }
+            auto state = xmlState->getChildByName(treeState.state.getType());
+            if (state != nullptr) treeState.replaceState (juce::ValueTree::fromXml (*state));
+
+            auto settings = xmlState->getChildByName("pluginInstanceSettings");
+            if (settings != nullptr) pluginInstanceSettings = *settings;
+        }        
     }
 }
 

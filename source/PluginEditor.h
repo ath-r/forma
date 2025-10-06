@@ -21,6 +21,8 @@ public:
 
     bool keyPressed (const juce::KeyPress &key) override;
 
+    void readSettings();
+
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
