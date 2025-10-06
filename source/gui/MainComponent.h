@@ -23,7 +23,7 @@ namespace Ath::Forma
     private:
     juce::AudioProcessorValueTreeState& vts;
 
-    Ath::Gui::SliderWithLabel flute16, flute8, flute5, flute4, flute2, flute1;
+    Ath::Gui::SliderWithLabel flute16, flute8, flute5, flute4, flute2, flute1, tone;
 
     Ath::Gui::LookAndFeel lookAndFeel;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

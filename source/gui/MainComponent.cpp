@@ -10,7 +10,8 @@ namespace Ath::Forma
           flute5 (ParametersByID[F5].id, vts),
           flute4 (ParametersByID[F4].id, vts),
           flute2 (ParametersByID[F2].id, vts),
-          flute1 (ParametersByID[F1].id, vts)
+          flute1 (ParametersByID[F1].id, vts),
+          tone (ParametersByID[TONE].id, vts)
     {
         addAndMakeVisible (flute16);
         addAndMakeVisible (flute8);
@@ -18,6 +19,7 @@ namespace Ath::Forma
         addAndMakeVisible (flute4);
         addAndMakeVisible (flute2);
         addAndMakeVisible (flute1);
+        addAndMakeVisible (tone);
     }
 
     void MainComponent::paint (juce::Graphics& g)
@@ -53,13 +55,14 @@ namespace Ath::Forma
         area2.reduce (20, 20);
         area2.removeFromTop (area2.getHeight() * 0.33f);
 
-        auto sliderWidth = area2.getWidth() / 6;
+        auto sliderWidth = area2.getWidth() / 7;
 
         flute16.setBounds (area2.removeFromLeft (sliderWidth));
         flute8.setBounds (area2.removeFromLeft (sliderWidth));
         flute5.setBounds (area2.removeFromLeft (sliderWidth));
         flute4.setBounds (area2.removeFromLeft (sliderWidth));
         flute2.setBounds (area2.removeFromLeft (sliderWidth));
-        flute1.setBounds (area2);
+        flute1.setBounds (area2.removeFromLeft (sliderWidth));
+        tone.setBounds (area2);
     }
 }
