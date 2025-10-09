@@ -51,7 +51,7 @@ namespace Ath::Forma
 
                 filter.setCutoffFrequency(frequency * hmul * vmul[i]);
             }
-            highpass.setCutoffFrequency(freq);
+            highpass.setCutoffFrequency(freq * hmul);
         }
 
         Simd::float8 getAttenutation(Simd::float8 frequency)
