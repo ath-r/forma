@@ -3,6 +3,7 @@
 #include "FormaKeySwitch.h"
 #include "math/Clamp.h"
 #include "math/Easings.h"
+#include "math/Simd.h"
 #include <cmath>
 
 namespace Ath::Forma
@@ -11,7 +12,7 @@ namespace Ath::Forma
     {
         c = context;
         filter.setContext(context);
-        filter.setCutoffFrequency(5000.0f);
+        filter.setCutoffFrequency(50.0f);
     }
 
     void FormaKeySwitch::init (int keyNumber) 
@@ -34,27 +35,34 @@ namespace Ath::Forma
 
     void FormaKeySwitch::handleNoteOn (Midi::MessageNoteOn message)
     {
-        gate = 1.0f;
-
-        const Simd::float8 x = Math::easeOutCubic(float(message.velocity) / 127.0f);
+        const Simd::float8 x = Math::easeOutQuad(float(message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
-        
+
+        filter.setCutoffFrequency(10000.0f);
         delta = Simd::float8(c.T) / time;
     }
 
     void FormaKeySwitch::handleNoteOff (Midi::MessageNoteOff message) 
-    { 
-        gate = 0.0f;
+    {
+        filter.setCutoffFrequency(50.0f);
         delta = Simd::float8(-c.T) / time;
     }
 
-    Simd::float8 FormaKeySwitch::processSample()
+    Simd::float8 FormaKeySwitch::processSample(Simd::float8 x)
     {
         value += delta;
         value = Simd::clamp(value, 0.0f, 1.0f);
 
-        auto logic = Simd::ternary(Simd::float8(1.0f), Simd::float8(0.0f), value > actionThreshold);
+        auto inputSign = Simd::sign(x);
+        auto zeroCrossing = inputSign != inputSign1;
 
-        return filter.process(logic);
+        auto logic = value > actionThreshold;
+        auto shouldChange = logic != gate;
+
+        gate = gate ^ (shouldChange & zeroCrossing);
+
+        inputSign1 = inputSign;
+
+        return x * filter.process(Simd::float8(1.0f) & logic);
     }
 }

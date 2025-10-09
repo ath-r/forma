@@ -146,7 +146,7 @@ namespace Ath::Forma
                 auto terz = Simd::permute(oscillatorOutputs[n + 4], Simd::perm6) & maskTerz;
 
                 keyswitchInputs[n] = prinzipal + nasat + terz;
-                keyswitchOutputs[n] = keyswitchInputs[n] * (keyswitches[n].processSample() + Math::DB_MINUS72);
+                keyswitchOutputs[n] = keyswitches[n].processSample(keyswitchInputs[n]);
 
                 // bleed from ungated oscillators i.e. it's present even when no keys are pressed
                 bleed += keyswitchInputs[n];

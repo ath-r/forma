@@ -22,10 +22,13 @@ namespace Ath::Forma
         const Simd::float8 minVelocityGateAttack = 0.00001f;
         const Simd::float8 maxVelocityGateAttack = 0.1f;
 
-        float gate = 0.0f;
+        
         Simd::float8 time = 0.00001f;
         Simd::float8 delta = 0.0f;
         Simd::float8 value = 0.0f;
+
+        Simd::int8 gate = 0.0f;
+        Simd::float8 inputSign1 = 0.0f;
 
         Filter::LowPass1<Simd::float8> filter;
 
@@ -40,6 +43,6 @@ namespace Ath::Forma
 
         void handleNoteOff (Midi::MessageNoteOff message);
 
-        Simd::float8 processSample();
+        Simd::float8 processSample(Simd::float8 x);
     };
 }
