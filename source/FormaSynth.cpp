@@ -148,10 +148,11 @@ namespace Ath::Forma
                 keyswitchInputs[n] = prinzipal + nasat + terz;
                 keyswitchOutputs[n] = keyswitches[n].processSample(keyswitchInputs[n]);
 
+                auto bleedAttenuation = (float(n) / float(KEY_NUMBER));
                 // bleed from ungated oscillators i.e. it's present even when no keys are pressed
-                bleed += keyswitchInputs[n];
+                bleed += keyswitchInputs[n] * bleedAttenuation;
                 // in the real organ unfiltered 5'1/3 stop bleeds through, the higher the key the more bleed there is
-                bleedTerz += (keyswitchOutputs[n] & maskTerz) * (float(n) / KEY_NUMBER);
+                bleedTerz += (keyswitchOutputs[n] & maskTerz) * bleedAttenuation;
             }
 
             //each filterbank gets the portion of keyboard it's responsible for
