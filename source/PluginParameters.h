@@ -103,7 +103,7 @@ namespace Ath::Forma
         .name = "Terz Bleed",
         .id = "terzBleed",
         .unit = "dB",
-        .def = -36.0f,
+        .def = -30.0f,
         .min = -120.0f,
         .max = 0.0f
     };
@@ -113,7 +113,7 @@ namespace Ath::Forma
         .name = "Noise Floor",
         .id = "noiseFloor",
         .unit = "dB",
-        .def = -48.0f,
+        .def = -40.0f,
         .min = -120.0f,
         .max = -30.0f
     };
