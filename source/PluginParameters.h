@@ -88,6 +88,36 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
+    static const Control::Parameter keyswitchBleed
+    {
+        .name = "Keyswitch Bleed",
+        .id = "keyswitchBleed",
+        .unit = "dB",
+        .def = -70.0f,
+        .min = -120.0f,
+        .max = -30.0f
+    };
+
+    static const Control::Parameter terzBleed
+    {
+        .name = "Terz Bleed",
+        .id = "terzBleed",
+        .unit = "dB",
+        .def = -36.0f,
+        .min = -120.0f,
+        .max = 0.0f
+    };
+
+    static const Control::Parameter noiseFloor
+    {
+        .name = "Noise Floor",
+        .id = "noiseFloor",
+        .unit = "dB",
+        .def = -48.0f,
+        .min = -120.0f,
+        .max = -30.0f
+    };
+
     enum ParameterIDs
     {
         TEST_ID,
@@ -99,6 +129,9 @@ namespace Ath::Forma
         F1,
         TONE,
         DRIVE,
+        BLEED_KEYSWITCH,
+        BLEED_TERZ,
+        NOISE_FLOOR,
         PARAM_COUNT
     };
 
@@ -112,7 +145,10 @@ namespace Ath::Forma
         [F2] = Flute2,
         [F1] = Flute1,
         [TONE] = Tone,
-        [DRIVE] = Drive
+        [DRIVE] = Drive,
+        [BLEED_KEYSWITCH] = keyswitchBleed,
+        [BLEED_TERZ] = terzBleed,
+        [NOISE_FLOOR] = noiseFloor
     };
 
 

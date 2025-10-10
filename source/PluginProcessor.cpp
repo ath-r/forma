@@ -50,6 +50,10 @@ PluginProcessor::PluginProcessor()
     parameterObservers[ParameterIDs::F1].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute1);
     parameterObservers[ParameterIDs::TONE].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterTone);
     parameterObservers[ParameterIDs::DRIVE].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterDrive);
+
+    parameterObservers[ParameterIDs::BLEED_KEYSWITCH].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterKeyswitchBleed);
+    parameterObservers[ParameterIDs::BLEED_TERZ].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterTerzBleed);
+    parameterObservers[ParameterIDs::NOISE_FLOOR].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterNoiseFloor);
 }
 
 PluginProcessor::~PluginProcessor()

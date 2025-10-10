@@ -59,15 +59,18 @@ private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     std::array<ParameterObserver, Ath::Forma::PARAM_COUNT> parameterObservers;
 
-    void setParameter(Ath::Control::Parameter p, float value)
+    void setParameter(Ath::Control::Parameter p, Ath::Forma::FormaSynth::ParameterValueData parameterValueData)
     {
+        if (!parameterValueData.touched) return;
+        auto value = parameterValueData.value;
+
         auto param = treeState.getParameter(p.id);
         auto valueToCompare = param->getValue();
 
         auto diff = std::abs(value - valueToCompare);
         auto diffth = 1.0 / 256.0f;
 
-        if (diff > diffth)
+        if (diff > diffth && parameterValueData.touched)
         {
             param->setValueNotifyingHost(value);
         }

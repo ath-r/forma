@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 
 #include "processor/MidiAudioProcessor.h"
 
@@ -26,6 +27,36 @@ namespace Ath::Forma
 {
     class FormaSynth : public Processor::MidiAudioProcessor
     {
+public:
+        // Some parameters can be updated with MIDI CC
+        // This class handles CC commands by itself, to make them sample-accurate
+        // If some parameter is CCed, synth needs to notify the plugin
+        // that this parameter was changed, to propagate the change to the plugin's state
+        struct ParameterValueData
+        {
+            float value = 0;
+            bool touched = false;
+
+            void touch(float x)
+            {
+                auto diff = std::abs(x - value);
+                value = x;
+                if (diff > 0.001f) touched = true;
+            }
+
+            void touchSilently(float x)
+            {
+                value = x;
+            }
+
+            ParameterValueData untouch()
+            {
+                auto copy = *this;
+                touched = false;
+                return copy;
+            }
+        };
+private:
         Dsp::PhaseCounter phaseCounter;
 
         static constexpr int KEY_NUMBER = 61;
@@ -72,12 +103,16 @@ namespace Ath::Forma
         alignas(32) std::array<float, 8> parameterFluteStopsInputs;
         Simd::float8 parameterFluteStops = 0.0f;
 
+        Simd::float8 keyswitchBleedGain;
+        Simd::float8 terzBleedGain;
+        Simd::float8 noiseFloorGain;
+
         Simd::float8 parameterDriveGain = 1.0f;
 
         float gate = 0.0f;
         Dsp::Cv::LinearSmoother<float> gateSmoother;
 
-        std::array<float, PARAM_COUNT> parameters;
+        std::array<ParameterValueData, PARAM_COUNT> parameters;
 
 
 
@@ -106,6 +141,13 @@ public:
 
     void setParameterTone (float x);
 
-    float getParameter(int id) {return parameters[id]; }
+    void setParameterKeyswitchBleed (float x);
+
+    void setParameterTerzBleed (float x);
+
+    void setParameterNoiseFloor (float x);
+
+    ParameterValueData getParameter(size_t id) { return parameters[id].untouch(); }
+    
     };
 }

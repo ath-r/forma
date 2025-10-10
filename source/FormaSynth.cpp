@@ -1,4 +1,5 @@
 #include "FormaSynth.h"
+#include "PluginParameters.h"
 #include "control/Midi.h"
 #include "math/Conversion.h"
 #include "math/Random.h"
@@ -13,6 +14,12 @@ namespace Ath::Forma
 
     void FormaSynth::setContext (Dsp::Context context)
     {
+        //initialize to default parameters' values
+        for (int i = 0; i < PARAM_COUNT; i++)
+        {
+            parameters[i].touchSilently(ParametersByID[i].def);
+        }
+
         phaseCounter.setContext (context);
 
         for (int i = 0; i < OSC_NUMBER; i++)
@@ -172,7 +179,7 @@ namespace Ath::Forma
             }            
 
             //filter nonlinearity:
-            auto filterAmpIn = (sum + bleed * Math::dB(-66));
+            auto filterAmpIn = (sum + bleed * keyswitchBleedGain);
 
             //hard clipper (usually won't be reached):
             //auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
@@ -185,8 +192,8 @@ namespace Ath::Forma
             auto filterAmpOut = filterNonlinearity.process(filterAmpIn * 0.015625f) * 64.0f;
 
             //white noise, 50hz hum and its harmonics:
-            auto outHum = hum.process() * Math::DB_MINUS48;
-            auto outBleed = bleedTerz * Math::DB_MINUS36 + bleed * Math::DB_MINUS66;
+            auto outHum = hum.process() * noiseFloorGain;
+            auto outBleed = bleedTerz * terzBleedGain + bleed * keyswitchBleedGain;
 
             //tone knob filter:
             auto toneIn = filterAmpOut * parameterFluteStops + outHum + outBleed;
@@ -257,55 +264,73 @@ namespace Ath::Forma
 
     void FormaSynth::setParameterFlute16 (float x) 
     { 
-        parameters[F16] = x;
+        parameters[F16].touch(x);
         parameterFluteStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterFlute8 (float x) 
     { 
-        parameters[F8] = x;
+        parameters[F8].touch(x);
         parameterFluteStopsInputs[1] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterFlute4 (float x) 
     { 
-        parameters[F4] = x;
+        parameters[F4].touch(x);
         parameterFluteStopsInputs[2] = std::lerp (Math::DB_MINUS42, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data(); 
     }
     
     void FormaSynth::setParameterFlute2 (float x) 
     { 
-        parameters[F2] = x;
+        parameters[F2].touch(x);
         parameterFluteStopsInputs[3] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data(); 
     }
 
     void FormaSynth::setParameterFlute5 (float x) 
     { 
-        parameters[F5] = x;
+        parameters[F5].touch(x);
         parameterFluteStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
-    };
+    }
 
     void FormaSynth::setParameterFlute1 (float x) 
     {
-        parameters[F1] = x;
+        parameters[F1].touch(x);
         parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS48, 1.0f, x);
         parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
     void FormaSynth::setParameterDrive (float x) 
     {
-        parameters[DRIVE] = x;
+        parameters[DRIVE].touch(x);
         parameterDriveGain = 1.0f + x * 16.0f;
-    };
+    }
 
     void FormaSynth::setParameterTone (float x) 
     {
-        parameters[TONE] = x;
+        parameters[TONE].touch(x);
         filterTone.setCutoffFrequency(std::lerp(1000.0f, 15000.0f, x));
-    };
+    }
+
+    void FormaSynth::setParameterKeyswitchBleed (float x) 
+    {
+        parameters[BLEED_KEYSWITCH].touchSilently(x);
+        keyswitchBleedGain = Math::decibelsToAmplitude(x);
+    }
+
+    void FormaSynth::setParameterTerzBleed (float x) 
+    {
+        parameters[BLEED_TERZ].touchSilently(x);
+        terzBleedGain = Math::decibelsToAmplitude(x);
+    }
+
+    void FormaSynth::setParameterNoiseFloor (float x) 
+    {
+        parameters[NOISE_FLOOR].touchSilently(x);
+        noiseFloorGain = Math::decibelsToAmplitude(x);
+    }
 }
