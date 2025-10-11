@@ -156,8 +156,9 @@ namespace Ath::Forma
                 keyswitchOutputs[n] = keyswitches[n].processSample(keyswitchInputs[n]);
 
                 auto bleedAttenuation = (float(n) / float(KEY_NUMBER));
+                bleedAttenuation = Math::ipow(bleedAttenuation, 4);
                 // bleed from ungated oscillators i.e. it's present even when no keys are pressed
-                bleed += keyswitchInputs[n] * bleedAttenuation * bleedAttenuation * bleedAttenuation;
+                bleed += keyswitchInputs[n] * bleedAttenuation;
                 // in the real organ unfiltered 5'1/3 stop bleeds through, the higher the key the more bleed there is
                 bleedTerz += (keyswitchOutputs[n] & maskTerz) * bleedAttenuation;
             }

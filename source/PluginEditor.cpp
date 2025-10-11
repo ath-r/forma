@@ -8,8 +8,6 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 #include <BinaryData.h>
-#include <unistd.h>
-
 using namespace Ath::Forma;
 
 using namespace Ath::Gui;

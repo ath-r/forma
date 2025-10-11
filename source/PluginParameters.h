@@ -103,7 +103,7 @@ namespace Ath::Forma
         .name = "Terz Bleed",
         .id = "terzBleed",
         .unit = "dB",
-        .def = -30.0f,
+        .def = -10.0f,
         .min = -120.0f,
         .max = 0.0f
     };

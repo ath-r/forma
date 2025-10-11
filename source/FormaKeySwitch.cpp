@@ -35,7 +35,7 @@ namespace Ath::Forma
 
     void FormaKeySwitch::handleNoteOn (Midi::MessageNoteOn message)
     {
-        const Simd::float8 x = Math::easeOutQuad(float(message.velocity) / 127.0f);
+        const Simd::float8 x = Math::easeOutCubic(float(message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
 
         filter.setCutoffFrequency(10000.0f);
@@ -44,7 +44,7 @@ namespace Ath::Forma
 
     void FormaKeySwitch::handleNoteOff (Midi::MessageNoteOff message) 
     {
-        filter.setCutoffFrequency(50.0f);
+        filter.setCutoffFrequency(100.0f);
         delta = Simd::float8(-c.T) / time;
     }
 
