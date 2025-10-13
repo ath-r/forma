@@ -220,6 +220,7 @@ namespace Ath::Forma
                 case 0x0f: setParameterFlute4(value); break;
                 case 0x10: setParameterFlute2(value); break;
                 case 0x11: setParameterFlute1(value); break;
+                case 0x0b:
                 case 0x14: setParameterTone(value); break;
                 case 0x4c: setParameterDrive(value); break;
                 default: break;
@@ -287,7 +288,7 @@ namespace Ath::Forma
     void FormaSynth::setParameterFlute2 (float x) 
     { 
         parameters[F2].touch(x);
-        parameterFluteStopsInputs[3] = std::lerp (Math::DB_MINUS48, 1.0f, x);
+        parameterFluteStopsInputs[3] = std::lerp (Math::DB_MINUS48, 1.0f, x) * Math::DB_MINUS3;
         parameterFluteStops = parameterFluteStopsInputs.data(); 
     }
 
@@ -301,7 +302,7 @@ namespace Ath::Forma
     void FormaSynth::setParameterFlute1 (float x) 
     {
         parameters[F1].touch(x);
-        parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS48, 1.0f, x);
+        parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS48, 1.0f, x) * Math::DB_MINUS3;
         parameterFluteStops = parameterFluteStopsInputs.data();
     }
 
@@ -314,7 +315,7 @@ namespace Ath::Forma
     void FormaSynth::setParameterTone (float x) 
     {
         parameters[TONE].touch(x);
-        filterTone.setCutoffFrequency(std::lerp(1000.0f, 15000.0f, x));
+        filterTone.setCutoffFrequency(Math::logerp2(500.0f, 15000.0f, x));
     }
 
     void FormaSynth::setParameterKeyswitchBleed (float x) 

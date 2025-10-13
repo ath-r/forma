@@ -41,7 +41,7 @@ namespace Ath::Math
     {
         const float log = std::log2 (b / a);
 
-        return a * std::pow (10, log * x);
+        return a * std::pow (2, log * x);
     }
 
     float logerp10 (float a, float b, float x)
