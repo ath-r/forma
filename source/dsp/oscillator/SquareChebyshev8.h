@@ -5,7 +5,6 @@
 
 namespace Ath::Dsp::Oscillator
 {
-
     using float8 = Simd::float8;
 
     class SquareChebyshev8
