@@ -7,7 +7,7 @@
 
 #include "FormaKeySwitch.h"
 #include "FormaFilterBank.h"
-#include "FormaFilterNonlinearity.h"
+#include "FormaTransistorNonlinearity.h"
 #include "FormaHum.h"
 #include "dsp/waveshaping/SoftClipper.h"
 #include "PluginParameters.h"
@@ -95,8 +95,9 @@ private:
         std::array<FormaFilterBank, 6> filterBanks;
 
         Dsp::Waveshaper::SoftClipperSimd<15, Simd::float8> filterClipper;
-        FormaFilterNonlinearity filterNonlinearity;
+        FormaTransistorNonlinearity8 filterNonlinearity;
         Dsp::Filter::LowPass1<float> filterTone;
+        FormaTransistorNonlinearity outputNonlinearity;
 
         FormaHum hum;
         

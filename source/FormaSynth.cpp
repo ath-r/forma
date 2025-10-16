@@ -180,7 +180,7 @@ namespace Ath::Forma
             }            
 
             //filter nonlinearity:
-            auto filterAmpIn = (sum + bleed * keyswitchBleedGain);
+            auto filterAmpIn = (sum + bleed * keyswitchBleedGain) * 0.015625f;
 
             //hard clipper (usually won't be reached):
             //auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
@@ -190,7 +190,7 @@ namespace Ath::Forma
     //so it doesn't clip even with all keys pressed
     //since the transfer curve is very nonlinear, intermodulation harmonics will be present
     //even with a low input signal amplitude
-            auto filterAmpOut = filterNonlinearity.process(filterAmpIn * 0.015625f) * 64.0f;
+            auto filterAmpOut = filterNonlinearity.process(filterAmpIn) * 64.0f;
 
             //white noise, 50hz hum and its harmonics:
             auto outHum = hum.process() * noiseFloorGain;
@@ -200,8 +200,12 @@ namespace Ath::Forma
             auto toneIn = filterAmpOut * parameterFluteStops + outHum + outBleed;
             auto toneOut = filterTone.process(toneIn.sum());
 
+            //output nonlinearity
+            auto ampIn = toneOut  * (0.015625f / 6.0f);
+            auto ampOut = outputNonlinearity.process(ampIn) * (64.0f * 6.0f);
+
             //lastly, attenuate output signal by 18dB and a factor of 6 (because there are 6 stops)
-            buffer[i] = toneOut * Math::DB_MINUS18 / 6.0f;
+            buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f;
         }
     }
 
