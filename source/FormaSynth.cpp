@@ -198,7 +198,13 @@ namespace Ath::Forma
 
             //tone knob filter:
             auto toneIn = filterAmpOut * parameterFluteStops + outHum + outBleed;
-            auto toneOut = filterTone.process(toneIn.sum());
+            buffer[i] = toneIn.sum();
+        }
+
+        // second loop for effects that come after flattening the SIMD into float
+        for (int i = 0; i < numberOfSamples; i++)
+        {
+            auto toneOut = filterTone.process(buffer[i]);
 
             //output nonlinearity
             auto ampIn = toneOut  * (0.015625f / 6.0f);
