@@ -13,7 +13,7 @@ namespace Ath::Forma
     using namespace Ath::Dsp;
     using namespace Ath::Control;
 
-    class FormaKeySwitch
+    class FormaNeedleContacts
     {
         Context c = Context(48000.0f);
 

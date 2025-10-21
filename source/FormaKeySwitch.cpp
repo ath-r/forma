@@ -8,14 +8,14 @@
 
 namespace Ath::Forma
 {
-    void FormaKeySwitch::setContext (Context context)
+    void FormaNeedleContacts::setContext (Context context)
     {
         c = context;
         filter.setContext(context);
         filter.setCutoffFrequency(50.0f);
     }
 
-    void FormaKeySwitch::init (int keyNumber) 
+    void FormaNeedleContacts::init (int keyNumber) 
     {
         Math::Random::Mersenne rng;
         rng.setSeed(keyNumber);
@@ -31,9 +31,9 @@ namespace Ath::Forma
         };
     };
 
-    bool FormaKeySwitch::isActive() { return true; }
+    bool FormaNeedleContacts::isActive() { return true; }
 
-    void FormaKeySwitch::handleNoteOn (Midi::MessageNoteOn message)
+    void FormaNeedleContacts::handleNoteOn (Midi::MessageNoteOn message)
     {
         const Simd::float8 x = Math::easeOutCubic(float(message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
@@ -42,13 +42,13 @@ namespace Ath::Forma
         delta = Simd::float8(c.T) / time;
     }
 
-    void FormaKeySwitch::handleNoteOff (Midi::MessageNoteOff message) 
+    void FormaNeedleContacts::handleNoteOff (Midi::MessageNoteOff message) 
     {
         filter.setCutoffFrequency(100.0f);
         delta = Simd::float8(-c.T) / time;
     }
 
-    Simd::float8 FormaKeySwitch::processSample(Simd::float8 x)
+    Simd::float8 FormaNeedleContacts::processSample(Simd::float8 x)
     {
         value += delta;
         value = Simd::clamp(value, 0.0f, 1.0f);

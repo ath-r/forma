@@ -42,7 +42,7 @@ namespace Ath::Forma
         // initialize keyswitches
         for (int i = 0; i < KEY_NUMBER; i++)
         {
-            keyswitches[i].init(i);
+            needleContacts[i].init(i);
         }
 
         // initialize filterbanks
@@ -87,7 +87,7 @@ namespace Ath::Forma
 
         for (int i = 0; i < KEY_NUMBER; i++)
         {
-            keyswitches[i].setContext(context);
+            needleContacts[i].setContext(context);
         }
 
         for (auto& filterBank : filterBanks) filterBank.setContext(context);
@@ -149,8 +149,8 @@ namespace Ath::Forma
 
             //this permutes the cells so the input to each keyswitch gets the signals it needs
             //first 4 cells are octaves, 5th and 6th are mutations
-            //keyswitchInputs[n] = {16′, 8′, 4′, 2′, 5⅓′, 1⅗′, 0, 0}
-            //e.g. keyswitchInputs[0] = {C1, C2, C3, C4, G2, E4, 0, 0}
+            //needleContactInputs[n] = {16′, 8′, 4′, 2′, 5⅓′, 1⅗′, 0, 0}
+            //e.g. needleContactInputs[0] = {C1, C2, C3, C4, G2, E4, 0, 0}
             Simd::int8 maskNasat = {0, 0, 0, 0, Simd::m1, 0, 0, 0};
             Simd::int8 maskTerz = {0, 0, 0, 0, 0, Simd::m1, 0, 0};
 
@@ -162,25 +162,25 @@ namespace Ath::Forma
                 auto nasat = Simd::permute(oscillatorOutputs[n + 7], Simd::perm5) & maskNasat;
                 auto terz = Simd::permute(oscillatorOutputs[n + 4], Simd::perm6) & maskTerz;
 
-                keyswitchInputs[n] = prinzipal + nasat + terz;
-                keyswitchOutputs[n] = keyswitches[n].processSample(keyswitchInputs[n]);
+                needleContactInputs[n] = prinzipal + nasat + terz;
+                needleContactOutputs[n] = needleContacts[n].processSample(needleContactInputs[n]);
 
                 auto bleedAttenuation = (float(n) / float(KEY_NUMBER));
                 bleedAttenuation = Math::ipow(bleedAttenuation, 4);
                 // bleed from ungated oscillators i.e. it's present even when no keys are pressed
-                bleed += keyswitchInputs[n] * bleedAttenuation;
+                bleed += needleContactInputs[n] * bleedAttenuation;
                 // in the real organ unfiltered 5'1/3 stop bleeds through, the higher the key the more bleed there is
-                bleedTerz += (keyswitchOutputs[n] & maskTerz) * bleedAttenuation;
+                bleedTerz += (needleContactOutputs[n] & maskTerz) * bleedAttenuation;
             }
 
             //each filterbank gets the portion of keyboard it's responsible for
             for (auto& x : filterBankInputs) x = 0.0f;
-            for (int n = 0; n < 6; n++) filterBankInputs[0] += keyswitchOutputs[n] * prefilterGains[n];
-            for (int n = 6; n < 18; n++) filterBankInputs[1] += keyswitchOutputs[n] * prefilterGains[n];
-            for (int n = 18; n < 30; n++) filterBankInputs[2] += keyswitchOutputs[n] * prefilterGains[n];
-            for (int n = 30; n < 42; n++) filterBankInputs[3] += keyswitchOutputs[n] * prefilterGains[n];
-            for (int n = 42; n < 54; n++) filterBankInputs[4] += keyswitchOutputs[n] * prefilterGains[n];
-            for (int n = 54; n < 61; n++) filterBankInputs[5] += keyswitchOutputs[n] * prefilterGains[n];
+            for (int n = 0; n < 6; n++) filterBankInputs[0] += needleContactOutputs[n] * prefilterGains[n];
+            for (int n = 6; n < 18; n++) filterBankInputs[1] += needleContactOutputs[n] * prefilterGains[n];
+            for (int n = 18; n < 30; n++) filterBankInputs[2] += needleContactOutputs[n] * prefilterGains[n];
+            for (int n = 30; n < 42; n++) filterBankInputs[3] += needleContactOutputs[n] * prefilterGains[n];
+            for (int n = 42; n < 54; n++) filterBankInputs[4] += needleContactOutputs[n] * prefilterGains[n];
+            for (int n = 54; n < 61; n++) filterBankInputs[5] += needleContactOutputs[n] * prefilterGains[n];
 
             //process filterbanks
             Simd::float8 sum = 0.0f;
@@ -190,7 +190,7 @@ namespace Ath::Forma
             }            
 
             //filter nonlinearity:
-            auto filterAmpIn = (sum + bleed * keyswitchBleedGain) * 0.015625f;
+            auto filterAmpIn = (sum + bleed * keyboardBleedGain) * 0.015625f;
 
             //hard clipper (usually won't be reached):
             //auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
@@ -204,7 +204,7 @@ namespace Ath::Forma
 
             //white noise, 50hz hum and its harmonics:
             auto outHum = hum.process() * noiseFloorGain;
-            auto outBleed = bleedTerz * terzBleedGain + bleed * keyswitchBleedGain;
+            auto outBleed = bleedTerz * terzBleedGain + bleed * keyboardBleedGain;
 
             //tone knob filter:
             auto toneIn = filterAmpOut * parameterFluteStops + outHum + outBleed;
@@ -251,9 +251,9 @@ namespace Ath::Forma
 
         if (message.isAllNotesOff())
         {
-            for (auto& keyswitch : keyswitches)
+            for (auto& contact : needleContacts)
             {
-                keyswitch.handleNoteOff(Midi::MessageNoteOff());
+                contact.handleNoteOff(Midi::MessageNoteOff());
             }
             return; 
         }
@@ -272,11 +272,11 @@ namespace Ath::Forma
                 // fire midi events here
                 if (message.isNoteOn())
                 {
-                    keyswitches[note].handleNoteOn(static_cast<Midi::MessageNoteOn>(message));
+                    needleContacts[note].handleNoteOn(static_cast<Midi::MessageNoteOn>(message));
                 }
                 else if (message.isNoteOff())
                 {
-                    keyswitches[note].handleNoteOff(static_cast<Midi::MessageNoteOff>(message));
+                    needleContacts[note].handleNoteOff(static_cast<Midi::MessageNoteOff>(message));
                 }
             }
 
@@ -338,10 +338,10 @@ namespace Ath::Forma
         filterTone.setCutoffFrequency(Math::logerp2(500.0f, 15000.0f, x));
     }
 
-    void FormaSynth::setParameterKeyswitchBleed (float x) 
+    void FormaSynth::setParameterKeyboardBleed (float x) 
     {
-        parameters[BLEED_KEYSWITCH].touchSilently(x);
-        keyswitchBleedGain = Math::decibelsToAmplitude(x);
+        parameters[BLEED_KEYBOARD].touchSilently(x);
+        keyboardBleedGain = Math::decibelsToAmplitude(x);
     }
 
     void FormaSynth::setParameterTerzBleed (float x) 

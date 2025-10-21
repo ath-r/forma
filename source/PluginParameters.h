@@ -88,7 +88,7 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
-    static const Control::Parameter keyswitchBleed
+    static const Control::Parameter keyboardBleed
     {
         .name = "Keyswitch Bleed",
         .id = "keyswitchBleed",
@@ -129,7 +129,7 @@ namespace Ath::Forma
         F1,
         TONE,
         DRIVE,
-        BLEED_KEYSWITCH,
+        BLEED_KEYBOARD,
         BLEED_TERZ,
         NOISE_FLOOR,
         PARAM_COUNT
@@ -146,7 +146,7 @@ namespace Ath::Forma
         [F1] = Flute1,
         [TONE] = Tone,
         [DRIVE] = Drive,
-        [BLEED_KEYSWITCH] = keyswitchBleed,
+        [BLEED_KEYBOARD] = keyboardBleed,
         [BLEED_TERZ] = terzBleed,
         [NOISE_FLOOR] = noiseFloor
     };

@@ -86,9 +86,9 @@ private:
 
         std::array<Simd::float8, OSC_OUTPUTS_NUMBER> oscillatorOutputs;
         
-        std::array<FormaKeySwitch, KEY_NUMBER> keyswitches; 
-        std::array<Simd::float8, KEY_NUMBER> keyswitchInputs;
-        std::array<Simd::float8, KEY_NUMBER> keyswitchOutputs;
+        std::array<FormaNeedleContacts, KEY_NUMBER> needleContacts; 
+        std::array<Simd::float8, KEY_NUMBER> needleContactInputs;
+        std::array<Simd::float8, KEY_NUMBER> needleContactOutputs;
         std::array<Simd::float8, KEY_NUMBER> prefilterGains;
 
         std::array<Simd::float8, 6> filterBankInputs;
@@ -104,7 +104,7 @@ private:
         alignas(32) std::array<float, 8> parameterFluteStopsInputs;
         Simd::float8 parameterFluteStops = 0.0f;
 
-        Simd::float8 keyswitchBleedGain;
+        Simd::float8 keyboardBleedGain;
         Simd::float8 terzBleedGain;
         Simd::float8 noiseFloorGain;
 
@@ -142,7 +142,7 @@ public:
 
     void setParameterTone (float x);
 
-    void setParameterKeyswitchBleed (float x);
+    void setParameterKeyboardBleed (float x);
 
     void setParameterTerzBleed (float x);
 
