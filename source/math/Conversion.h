@@ -19,7 +19,8 @@ namespace Ath::Math
     {
         if (n == 0) return 1.0;
         if (n < 0) return 1.0 / ipow(a, -n);
-        if (n % 2 == 0) {
+        if (n % 2 == 0) 
+        {
             double half = ipow(a, n / 2);
             return half * half;
         }
@@ -28,12 +29,12 @@ namespace Ath::Math
 
     constexpr float dB(int dB)
     {
-        constexpr float base = 1.1220184543019633; // 10^(1/20)
+        constexpr float base = 1.1220184543019633f; // 10^(1/20)
         return ipow(base, dB);
     }
 
-    static constexpr float DB_MINUS1 = 0.891250938;
-    static constexpr float DB_MINUS2 = 0.794328235;
+    static constexpr float DB_MINUS1 = 0.891250938f;
+    static constexpr float DB_MINUS2 = 0.794328235f;
     static constexpr float DB_MINUS3 = 0.707945784f;
     static constexpr float DB_MINUS6 = 0.501187234f;
     static constexpr float DB_MINUS9 = DB_MINUS3 * DB_MINUS6;
