@@ -10,6 +10,8 @@ namespace Ath::Math
 
         complex<T>(T r = 0.0f, T i = 0.0f) : re(r), im(i) {}
         complex<T>(const complex<T>&) = default;
+        complex<T>(T x) : re(x), im(0.0f) {}
+
         complex<T>& operator=(const complex<T> rhs) { re = rhs.re; im = rhs.im; return *this; };
 
         inline complex<T> operator + (const complex<T>& rhs) const noexcept { return { re + rhs.re, im + rhs.im}; }

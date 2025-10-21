@@ -1,6 +1,7 @@
 #include "FormaSynth.h"
 #include "PluginParameters.h"
 #include "control/Midi.h"
+#include "math/Complex.h"
 #include "math/Conversion.h"
 #include "math/Random.h"
 #include "math/Simd.h"
@@ -66,13 +67,36 @@ namespace Ath::Forma
             Simd::float8 freqs = { 1.0f, 2.0f, 4.0f, 8.0f, 3.0f, 10.0f, 1.0f, 1.0f };
             freqs *= basefreq;
 
-            if (i < 6) prefilterGains[i] = filterBanks[0].getAttenutation(freqs) * Math::dB(5);
-            else if (i < 18) prefilterGains[i] = filterBanks[1].getAttenutation(freqs) * Math::dB(2);
-            else if (i < 30) prefilterGains[i] = filterBanks[2].getAttenutation(freqs); 
-            else if (i < 42) prefilterGains[i] = filterBanks[3].getAttenutation(freqs) * Math::DB_MINUS2;
-            else if (i < 54) prefilterGains[i] = filterBanks[4].getAttenutation(freqs) * Math::DB_MINUS2;
-            else prefilterGains[i] = filterBanks[5].getAttenutation(freqs) * Math::DB_MINUS3;
+            // I KNOW that this can be expressed with a very simple formula, but let's keep it like that
+            // since it's more readable and can be flexibly changed in case filter bank distribution changes
+            int filterBankIndex;
+            if (i < 6) filterBankIndex = 0;
+            else if (i < 18) filterBankIndex = 1;
+            else if (i < 30) filterBankIndex = 2; 
+            else if (i < 42) filterBankIndex = 3;
+            else if (i < 54) filterBankIndex = 4;
+            else filterBankIndex = 5;
+
+            auto& filterBank = filterBanks[filterBankIndex];
+            Math::complex<Simd::float8> transfer = { 0.0f, 0.0f };
+            
+            // This algorithm samples the transfer function of a given filterbank 
+            // for the first OVERTONES_TO_SAMPLE overtones of a given tone
+            // Sum of these TFs is then used to determine how much this tone needs to be amplified
+            // to compensate for filters' attenuation
+            constexpr int OVERTONES_TO_SAMPLE = 10;
+            for (int n = 1; n < OVERTONES_TO_SAMPLE; n += 2)
+            {
+                //TODO: normal division/multiplication by scalar for complex numbers
+                auto t = filterBank.getTransfer(freqs * float(n));
+                t.re /= float(n);
+                t.im /= float(n);
+
+                transfer += t;
+            }
+            prefilterGains[i] = Simd::rmag(transfer.re, transfer.im);
         }
+        
 
         gateSmoother.setTime(0.001f);
     }

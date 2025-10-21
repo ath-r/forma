@@ -54,7 +54,7 @@ namespace Ath::Forma
             highpass.setCutoffFrequency(freq * hmul);
         }
 
-        Simd::float8 getAttenutation(Simd::float8 frequency)
+        Math::complex<Simd::float8> getTransfer(Simd::float8 frequency)
         {
             Math::complex<Simd::float8> transfer = { 1.0f, 0.0f };
 
@@ -63,7 +63,7 @@ namespace Ath::Forma
                 transfer *= filters[i].getTransfer(frequency);
             }
 
-            return Simd::rmag(transfer.re, transfer.im);
+            return transfer;
         }
 
         Simd::float8 process(Simd::float8 x)
