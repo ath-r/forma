@@ -10,18 +10,13 @@ namespace Ath::Forma
 
     FormaSynth::FormaSynth()
     {
-    }
-
-    void FormaSynth::setContext (Dsp::Context context)
-    {
         //initialize to default parameters' values
         for (int i = 0; i < PARAM_COUNT; i++)
         {
             parameters[i].touchSilently(ParametersByID[i].def);
         }
 
-        phaseCounter.setContext (context);
-
+        //initialize oscillators
         for (int i = 0; i < OSC_NUMBER; i++)
         {
             Simd::float8 baseFrequency = Math::noteToFrequency(float(Math::C1_MIDI_NOTE_NUMBER + i) + oscillatorTuningError[i % 12] * 0.01f);
@@ -38,22 +33,19 @@ namespace Ath::Forma
             Simd::float8 frequencies = baseFrequency * multipliers;
             
             auto& osc = oscillators[i];
-            osc.setContext(context);
             osc.setFrequency(frequencies);
 
             auto& osc2 = oscillators2[i];
-            osc2.setContext(context);
             osc2.setFrequency(frequencies * 16.0f);
         }
 
+        // initialize keyswitches
         for (int i = 0; i < KEY_NUMBER; i++)
         {
-            keyswitches[i].setContext(context);
             keyswitches[i].init(i);
         }
 
-        for (auto& filterBank : filterBanks) filterBank.setContext(context);
-        
+        // initialize filterbanks
         float freq = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER);
         filterBanks[0].setFrequency(freq);
         filterBanks[1].vmul = {1.0f, 2.0f, 2.828f, 4.0f, 5.656f, 8.0};
@@ -67,25 +59,43 @@ namespace Ath::Forma
         filterBanks[5].vmul = filterBanks[2].vmul;
         filterBanks[5].setFrequency(freq *= 2.0f);
 
+        // initialize voicing to even out filter attenuation
         for (int i = 0; i < KEY_NUMBER; i++)
         {
             const float basefreq = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER + i);
             Simd::float8 freqs = { 1.0f, 2.0f, 4.0f, 8.0f, 3.0f, 10.0f, 1.0f, 1.0f };
             freqs *= basefreq;
 
-            if (i < 6) prefilterGains[i] = filterBanks[0].getAttenutation(freqs) * Math::DB_PLUS1;
-            else if (i < 18) prefilterGains[i] = filterBanks[1].getAttenutation(freqs);
-            else if (i < 30) prefilterGains[i] = filterBanks[2].getAttenutation(freqs);
+            if (i < 6) prefilterGains[i] = filterBanks[0].getAttenutation(freqs) * Math::dB(5);
+            else if (i < 18) prefilterGains[i] = filterBanks[1].getAttenutation(freqs) * Math::dB(2);
+            else if (i < 30) prefilterGains[i] = filterBanks[2].getAttenutation(freqs); 
             else if (i < 42) prefilterGains[i] = filterBanks[3].getAttenutation(freqs) * Math::DB_MINUS2;
             else if (i < 54) prefilterGains[i] = filterBanks[4].getAttenutation(freqs) * Math::DB_MINUS2;
             else prefilterGains[i] = filterBanks[5].getAttenutation(freqs) * Math::DB_MINUS3;
         }
 
+        gateSmoother.setTime(0.001f);
+    }
+
+    void FormaSynth::setContext (Dsp::Context context)
+    {
+        for (int i = 0; i < OSC_NUMBER; i++)
+        {
+            oscillators[i].setContext(context);
+            oscillators2[i].setContext(context);
+        }
+
+        for (int i = 0; i < KEY_NUMBER; i++)
+        {
+            keyswitches[i].setContext(context);
+        }
+
+        for (auto& filterBank : filterBanks) filterBank.setContext(context);
+
         hum.setContext(context);
         filterTone.setContext(context);
 
         gateSmoother.setContext(context);
-        gateSmoother.setTime(0.001f);
     }
 
     void FormaSynth::processBlock (float* buffer, int numberOfSamples)
