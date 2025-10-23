@@ -45,7 +45,7 @@ namespace Ath::Gui
     {
         auto area = getLocalBounds();
 
-        label.setBounds(area.removeFromBottom(area.getHeight() / 6));
+        label.setBounds(area.removeFromBottom(40));
         slider.setBounds(area);
 
         slider.setTextBoxStyle (juce::Slider::TextEntryBoxPosition::NoTextBox,

@@ -1,6 +1,7 @@
 
 #include "Slider.h"
 #include "juce_events/juce_events.h"
+#include "juce_graphics/juce_graphics.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_dsp/maths/juce_FastMathApproximations.h"
 
@@ -104,7 +105,7 @@ void ParameterSlider::paint (juce::Graphics& g)
     line.lineTo(32, sinY);
 
     thumbBase.expand(3, 3);
-    g.setColour(findColour(juce::ResizableWindow::backgroundColourId));
+    g.setColour(juce::Colours::black);
     g.fillRect(thumbBase);
 
     g.setColour(juce::Colours::grey);
@@ -120,6 +121,6 @@ void ParameterSlider::paint (juce::Graphics& g)
     g.setColour(juce::Colours::ivory);
     g.fillRect(thumbTop);
 
-    g.setColour(findColour(juce::ResizableWindow::backgroundColourId));
+    g.setColour(juce::Colours::black);
     g.strokePath(line, {4, juce::PathStrokeType::JointStyle::beveled, juce::PathStrokeType::EndCapStyle::rounded});
 }

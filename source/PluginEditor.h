@@ -24,8 +24,10 @@ public:
     void readSettings();
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
+
+    float initialWidth = 800.0f;
+    float initialHeight = 400.0f; 
+
     PluginProcessor& processorRef;
 
     Ath::Forma::MainComponent mainComponent;
