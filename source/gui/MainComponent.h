@@ -7,6 +7,7 @@
 #include "LookAndFeel.h"
 #include "LogoComponent.h"
 #include "FlutesComponent.h"
+#include "PercussionComponent.h"
 
 namespace Ath::Forma 
 {
@@ -24,6 +25,7 @@ namespace Ath::Forma
 
     LogoComponent logo;
     FlutesComponent flutes;
+    PercussionComponent percussion;
 
     Ath::Gui::LookAndFeel lookAndFeel;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

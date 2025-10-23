@@ -1,14 +1,17 @@
 #include "MainComponent.h"
+#include "PercussionComponent.h"
 
 namespace Ath::Forma 
 {
 
     MainComponent::MainComponent (juce::AudioProcessorValueTreeState& vtsRef)
         : vts (vtsRef),
-        flutes(vts)
+        flutes(vts),
+        percussion(vts)
     {
         addAndMakeVisible(logo);
         addAndMakeVisible(flutes);
+        addAndMakeVisible(percussion);
     }
 
     void MainComponent::paint (juce::Graphics& g)
@@ -20,15 +23,10 @@ namespace Ath::Forma
     void MainComponent::resized()
     {
         auto area = getLocalBounds();
-        //area.removeFromBottom (20);
-        auto area2 = area;
 
-        area.removeFromBottom (area.getHeight() * 0.66f);
-        logo.setBounds(area);
+        logo.setBounds(area.removeFromTop (area.getHeight() * 0.333f));
 
-        //area2.reduce (20, 20);
-        area2.removeFromTop (area2.getHeight() * 0.33f);
-
-        flutes.setBounds(area2);
+        flutes.setBounds(area.removeFromLeft(area.getWidth() * 0.7f));
+        percussion.setBounds(area);
     }
 }
