@@ -58,6 +58,7 @@ namespace Ath::Forma
         {
             Math::complex<Simd::float8> transfer = { 1.0f, 0.0f };
 
+            transfer *= highpass.getTransfer(frequency);
             for (int i = 0; i < stages; i++)
             {
                 transfer *= filters[i].getTransfer(frequency);

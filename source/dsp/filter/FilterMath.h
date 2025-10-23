@@ -49,18 +49,22 @@ namespace Ath::Dsp::Filter
         return y;
     }
 
-    using namespace Math;
     template<typename T>
-    static complex<T> transferLP1(complex<T> wc, complex<T> s)
+    static Math::complex<T> transferLP1(Math::complex<T> wc, Math::complex<T> s)
     {
         return wc / (wc + s);
     }
 
+    template<typename T>
+    static Math::complex<T> transferHP1(Math::complex<T> wc, Math::complex<T> s)
+    {
+        return s / (wc + s);
+    }
 
     template <typename T>
     class LowPass1
     {
-    protected:
+    private:
         Context c;
         T G = 0.0f;
         T z1 = 0.0f;
@@ -109,13 +113,47 @@ namespace Ath::Dsp::Filter
     };
 
     template <typename T>
-    class HighPass1 : public LowPass1<T>
+    class HighPass1
     {
+        Context c;
+        T G = 0.0f;
+        T z1 = 0.0f;
+        T y;
+
+        T frequency;
+
     public:
-        inline T process(T x) override
+        void reset()
         {
-            LowPass1<T>::y = processHP(x, LowPass1<T>::z1, LowPass1<T>::G);
-            return LowPass1<T>::y;
+            z1 = 0;
+        }
+
+        void setContext(const Context context)
+        {
+            c = context;
+
+            setCutoffFrequency(frequency);
+        }
+
+        void setCutoffFrequency(T freq)
+        {
+            frequency = freq;
+
+            G = frequencyToG(freq, T(c.T));
+        }
+
+        Math::complex<T> getTransfer(T freq)
+        {
+            Math::complex<T> wc = { frequency * Math::ftau, 0.0f };
+            Math::complex<T> s = { 0.0f, freq * Math::ftau };
+
+            return transferHP1(wc, s);
+        }
+
+        inline T process(T x)
+        {
+            y = processHP(x, z1, G);
+            return y;
         }
     };
 }
