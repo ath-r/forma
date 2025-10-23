@@ -17,11 +17,10 @@ namespace Ath::Forma
     {
         Context c = Context(48000.0f);
 
-        Simd::float8 actionThreshold;
+        Simd::float8 actionThreshold = 0.0f;
 
         const Simd::float8 minVelocityGateAttack = 0.00001f;
         const Simd::float8 maxVelocityGateAttack = 0.05f;
-
         
         Simd::float8 time = 0.00001f;
         Simd::float8 delta = 0.0f;

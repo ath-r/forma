@@ -18,7 +18,10 @@ public:
 
     void forceCheck()
     {
-        parameter->sendValueChangedMessageToListeners(parameter->getValue());
+        if (parameter != nullptr)
+        {
+            parameter->sendValueChangedMessageToListeners(parameter->getValue());
+        }
         //eventOut.fire(parameter->convertTo0to1(parameter->getValue()));
     }
 };

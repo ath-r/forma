@@ -68,7 +68,7 @@ namespace Ath::Dsp::Filter
         Context c;
         T G = 0.0f;
         T z1 = 0.0f;
-        T y;
+        T y = 0.0f;
 
         T frequency;
 
@@ -118,7 +118,7 @@ namespace Ath::Dsp::Filter
         Context c;
         T G = 0.0f;
         T z1 = 0.0f;
-        T y;
+        T y = 0.0f;
 
         T frequency;
 

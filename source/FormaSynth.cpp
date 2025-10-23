@@ -11,6 +11,14 @@ namespace Ath::Forma
 
     FormaSynth::FormaSynth()
     {
+        //initialize arrays
+        oscillatorOutputs.fill(0.0f);
+        needleContactInputs.fill(0.0f);
+        needleContactOutputs.fill(0.0f);
+        prefilterGains.fill(1.0f);
+        filterBankInputs.fill(0.0f);
+        parameterFluteStopsInputs.fill(0.0f);
+
         //initialize to default parameters' values
         for (int i = 0; i < PARAM_COUNT; i++)
         {

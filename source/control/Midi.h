@@ -115,6 +115,6 @@ namespace Ath::Control::Midi
     struct MessageMeta
     {
         Message message;
-        int samplePosition;
+        int samplePosition = 0;
     };
 }

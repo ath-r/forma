@@ -12,7 +12,7 @@ namespace Ath::Dsp::Oscillator
 
         Context c = Context(48000.0f);
 
-        float n;
+        float n = 1.0f;
 
         float8 phase = 0.0;
         float8 frequency = 0.0f;

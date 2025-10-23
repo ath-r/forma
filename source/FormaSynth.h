@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 
@@ -104,9 +105,9 @@ private:
         alignas(32) std::array<float, 8> parameterFluteStopsInputs;
         Simd::float8 parameterFluteStops = 0.0f;
 
-        Simd::float8 keyboardBleedGain;
-        Simd::float8 terzBleedGain;
-        Simd::float8 noiseFloorGain;
+        Simd::float8 keyboardBleedGain = Math::dB(-70);
+        Simd::float8 terzBleedGain = Math::dB(-10);
+        Simd::float8 noiseFloorGain = Math::dB(-40);
 
         Simd::float8 parameterDriveGain = 1.0f;
 

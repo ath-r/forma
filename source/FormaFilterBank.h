@@ -78,7 +78,5 @@ namespace Ath::Forma
             }
             return y + x * Math::DB_MINUS48;
         }
-
-
     };
 }

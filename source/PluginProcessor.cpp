@@ -58,6 +58,15 @@ PluginProcessor::PluginProcessor()
 
 PluginProcessor::~PluginProcessor()
 {
+    using namespace Ath::Forma;
+    for (int i = 0; i < PARAM_COUNT; ++i)
+    {
+        auto& paramData = ParametersByID[i];
+        auto& id = paramData.id;
+        auto& observer = parameterObservers[i];
+
+        treeState.removeParameterListener(id, &observer);
+    }
 }
 
 //==============================================================================
