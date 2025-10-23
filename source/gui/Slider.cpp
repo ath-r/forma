@@ -4,6 +4,7 @@
 #include "juce_graphics/juce_graphics.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_dsp/maths/juce_FastMathApproximations.h"
+#include <cmath>
 
 ParameterSlider::ParameterSlider (const juce::String& parameterId,
                                   juce::AudioProcessorValueTreeState& stateToControl)
@@ -65,8 +66,14 @@ void ParameterSlider::paint (juce::Graphics& g)
 
     const float sinY = positionSin * 16.0f;
 
+    const float globalX = getTopLevelComponent()->getLocalPoint(this, juce::Point<int>{int(centreX), int(centreY)}).x;
+    const float globalWidth = getTopLevelComponent()->getWidth();
+    const float globalRatio = globalX / globalWidth;
+    const float maxHorizontalOffset = 3.0f;
+    const float horizontalOffset = std::pow(globalRatio * 2.0f - 1.0f, 1.0f) * maxHorizontalOffset;
+
     juce::Rectangle<float> thumbBase(-32, -16 * positionCos + sinY, 64, 32 * positionCos);
-    juce::Rectangle<float> thumbTop(-28, -8 * positionCos, 56, 16 * positionCos);
+    juce::Rectangle<float> thumbTop(-28 + horizontalOffset, -8 * positionCos, 56, 16 * positionCos);
 
     const float reduction = (1 - positionCos) * 0.2f;
 
@@ -79,30 +86,39 @@ void ParameterSlider::paint (juce::Graphics& g)
     left.lineTo(thumbBase.getBottomLeft());
     left.lineTo(thumbTop.getBottomLeft());
     left.lineTo(thumbTop.getTopLeft());
-    left.lineTo(thumbBase.getTopLeft());
+    left.closeSubPath();
 
-    right = left;    
-    right.applyTransform(juce::AffineTransform::scale(-1.0, 1.0));
+    right.clear();
+    right.startNewSubPath(thumbBase.getTopRight());
+    right.lineTo(thumbBase.getBottomRight());
+    right.lineTo(thumbTop.getBottomRight());
+    right.lineTo(thumbTop.getTopRight());
+    right.closeSubPath();
 
     top.clear();
     top.startNewSubPath(thumbBase.getTopLeft());
     top.lineTo(thumbBase.getTopRight());
     top.lineTo(thumbTop.getTopRight());
     top.lineTo(thumbTop.getTopLeft());
-    top.lineTo(thumbBase.getTopLeft());
+    top.closeSubPath();
 
     bottom.clear();
     bottom.startNewSubPath(thumbBase.getBottomLeft());
     bottom.lineTo(thumbBase.getBottomRight());
     bottom.lineTo(thumbTop.getBottomRight());
     bottom.lineTo(thumbTop.getBottomLeft());
-    bottom.lineTo(thumbBase.getBottomLeft());
+    bottom.closeSubPath();
 
     line.clear();
-    line.startNewSubPath(-32, sinY);
-    line.lineTo(-28, 0);
-    line.lineTo(28, 0);
-    line.lineTo(32, sinY);
+    line.startNewSubPath(thumbBase.getX(), sinY -2.25);
+    line.lineTo(thumbTop.getX(), -2);
+    line.lineTo(thumbTop.getRight(), -2);
+    line.lineTo(thumbBase.getRight(), sinY -2.25);
+    line.lineTo(thumbBase.getRight(), sinY +2.25);
+    line.lineTo(thumbTop.getRight(), +2);
+    line.lineTo(thumbTop.getX(), +2);
+    line.lineTo(thumbBase.getX(), sinY +2.25);
+    line.closeSubPath();
 
     thumbBase.expand(3, 3);
     g.setColour(juce::Colours::black);
@@ -122,5 +138,5 @@ void ParameterSlider::paint (juce::Graphics& g)
     g.fillRect(thumbTop);
 
     g.setColour(juce::Colours::black);
-    g.strokePath(line, {4, juce::PathStrokeType::JointStyle::beveled, juce::PathStrokeType::EndCapStyle::rounded});
+    g.fillPath(line);
 }
