@@ -25,7 +25,9 @@ namespace Ath::Forma
         perc4 (ParametersByID[P4].id, vts),
         perc2 (ParametersByID[P2].id, vts),
         perc1 (ParametersByID[P1].id, vts),
-        time (ParametersByID[TIME].id, vts)
+        time (ParametersByID[TIME].id, vts),
+        poly(ParametersByID[POLY].id, vts),
+        perc(ParametersByID[CRESC].id, vts)
         {
             addAndMakeVisible(frame);
             addAndMakeVisible (perc16);
@@ -35,7 +37,14 @@ namespace Ath::Forma
             addAndMakeVisible (perc2);
             addAndMakeVisible (perc1);
             addAndMakeVisible (time);
-            //addAndMakeVisible(tumblerPoly);
+            addAndMakeVisible(poly);
+            addAndMakeVisible(perc);
+
+            poly.topLabel.setText("POLY", juce::dontSendNotification);
+            poly.bottomLabel.setText("MONO", juce::dontSendNotification);
+
+            perc.topLabel.setText("CRESC.", juce::dontSendNotification);
+            perc.bottomLabel.setText("PERC.", juce::dontSendNotification);
 
             perc16.slider.setColor(ParameterSlider::ColorScheme::Blue);
             perc8.slider.setColor(ParameterSlider::ColorScheme::Blue);
@@ -58,7 +67,7 @@ namespace Ath::Forma
             area.reduce(20, 20);
             area.removeFromBottom(20);
 
-            auto sliderWidth = area.getWidth() / 7;
+            auto sliderWidth = area.getWidth() / 9;
 
             perc16.setBounds (area.removeFromLeft (sliderWidth));
             perc8.setBounds (area.removeFromLeft (sliderWidth));
@@ -67,7 +76,8 @@ namespace Ath::Forma
             perc2.setBounds (area.removeFromLeft (sliderWidth));
             perc1.setBounds (area.removeFromLeft (sliderWidth));
             time.setBounds (area.removeFromLeft (sliderWidth));
-            //tumblerPoly.setBounds(area.removeFromLeft (sliderWidth).withHeight(128));
+            poly.setBounds(area.removeFromLeft (sliderWidth));
+            perc.setBounds(area.removeFromLeft (sliderWidth));
         }
 
         private:
@@ -75,6 +85,6 @@ namespace Ath::Forma
 
         FrameComponent frame;
         Gui::SliderWithLabel perc16, perc8, perc5, perc4, perc2, perc1, time;
-        Gui::Tumbler tumblerPoly;
+        Gui::Tumbler poly, perc;
     };
 }

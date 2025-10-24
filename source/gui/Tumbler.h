@@ -1,5 +1,6 @@
 #pragma once
 
+#include "juce_core/juce_core.h"
 #include "juce_graphics/juce_graphics.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -7,94 +8,33 @@
 
 namespace Ath::Gui
 {
-    class Tumbler : public juce::Component
+    class Tumbler : public juce::Component, juce::AudioProcessorValueTreeState::Listener, juce::AsyncUpdater
     {
+        juce::AudioProcessorValueTreeState& vts;
         bool switchedOn = true;
+
+        juce::String paramId;
+        juce::RangedAudioParameter* parameter;
+
+        juce::Path line, top, bottom;
+        juce::Rectangle<float> switchArea;
 
     public:
 
-        Tumbler()
-        {
-        }
+        juce::Label topLabel, bottomLabel;
 
-        void mouseDown(const juce::MouseEvent& event) override
-        {
-            auto buttonArea = getLocalBounds();
-            buttonArea.reduce(3 + 4 * 2, 3);
-            
-            if (buttonArea.contains(event.getMouseDownPosition()))
-            {
-                switchedOn = !switchedOn;
-                repaint();
-            }
-            
-        }
+        Tumbler (const juce::String& parameterId, juce::AudioProcessorValueTreeState& stateToControl);
 
-        void paint (juce::Graphics& g) override
-        {
-            auto centreX = float(getWidth()) / 2.0f;
-            auto centreY = float(getHeight()) / 2.0f;
+        ~Tumbler();
 
-            const float globalX = getTopLevelComponent()->getLocalPoint(this, juce::Point<int>{int(centreX), int(centreY)}).x;
-            const float globalWidth = getTopLevelComponent()->getWidth();
-            const float globalRatio = globalX / globalWidth;
-            const float maxHorizontalOffset = 4.0f;
-            const float horizontalOffset = (globalRatio * 2.0f - 1.0f) * maxHorizontalOffset;
-            
-            juce::Rectangle<float> buttonArea = {-centreX, -centreY, float(getWidth()), float(getHeight()) };
-            buttonArea.reduce(3 + maxHorizontalOffset * 2, 3);
+        void parameterChanged (const juce::String& parameterID, float newValue) override;
 
-            auto lineArea = buttonArea.expanded(3, 3);
+        void mouseDown (const juce::MouseEvent& event) override;
 
-            juce::Point<float> corner1, corner2;
-            if (switchedOn)
-            {
-                corner1 = buttonArea.getBottomLeft().translated(-1 + horizontalOffset, -8);
-                corner2 = buttonArea.getBottomRight().translated(1 + horizontalOffset, -8);
-            }
-            else 
-            {
-                corner1 = buttonArea.getTopLeft().translated(-1 + horizontalOffset, 8);
-                corner2 = buttonArea.getTopRight().translated(1 + horizontalOffset, 8);
-            }
+        void handleAsyncUpdate() override;
 
-            juce::Path line;
-            line.startNewSubPath(lineArea.getTopLeft());
-            line.lineTo(lineArea.getTopRight());
-            line.lineTo(corner2.translated(4, 0));
-            line.lineTo(lineArea.getBottomRight());
-            line.lineTo(lineArea.getBottomLeft());
-            line.lineTo(corner1.translated(-4, 0));
-            line.closeSubPath();  
+        void resized() override;
 
-            juce::Path top;
-            top.startNewSubPath(buttonArea.getTopLeft());
-            top.lineTo(buttonArea.getTopRight());
-            top.lineTo(corner2);
-            top.lineTo(corner1);
-            top.closeSubPath();
-
-            juce::Path bottom;
-            bottom.startNewSubPath(buttonArea.getBottomLeft());
-            bottom.lineTo(buttonArea.getBottomRight());
-            bottom.lineTo(corner2);
-            bottom.lineTo(corner1);
-            bottom.closeSubPath();  
-
-            g.setOrigin(centreX, centreY);
-
-            g.setColour(juce::Colours::black);
-            g.fillRect(lineArea);
-            g.fillPath(line);
-
-            g.setColour(juce::Colours::darkgrey);
-            g.fillRect(buttonArea);
-            
-            g.setColour(switchedOn ? juce::Colours::lightgrey : juce::Colours::grey);
-            g.fillPath(top);
-
-            g.setColour(switchedOn ? juce::Colours::grey : juce::Colours::darkgrey);
-            g.fillPath(bottom);
-        }
+        void paint (juce::Graphics& g) override;
     };
 }

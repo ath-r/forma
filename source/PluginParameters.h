@@ -132,6 +132,24 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
+    static const Control::Parameter PercussionPoly
+    {
+        .name = "POLY",
+        .id = "poly",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
+    static const Control::Parameter PercussionCresc
+    {
+        .name = "CRESC",
+        .id = "cresc",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
     static const Control::Parameter keyboardBleed
     {
         .name = "Keyswitch Bleed",
@@ -178,6 +196,8 @@ namespace Ath::Forma
         P2,
         P1,
         TIME,
+        POLY,
+        CRESC,
         BLEED_KEYBOARD,
         BLEED_TERZ,
         NOISE_FLOOR,
@@ -200,6 +220,8 @@ namespace Ath::Forma
         [P2] = Percussion2,
         [P1] = Percussion1,
         [TIME] = PercussionTime,
+        [POLY] = PercussionPoly,
+        [CRESC] = PercussionCresc,
         [BLEED_KEYBOARD] = keyboardBleed,
         [BLEED_TERZ] = terzBleed,
         [NOISE_FLOOR] = noiseFloor
