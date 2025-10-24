@@ -144,3 +144,29 @@ void ParameterSlider::paint (juce::Graphics& g)
     g.setColour(lineColor);
     g.fillPath(line);
 }
+
+void ParameterSlider::setColor (ColorScheme color)
+{
+    switch (color)
+    {
+        case ColorScheme::Ivory:
+        {
+            lineColor = juce::Colours::black;
+            thumbMainColor = juce::Colours::ivory;
+            thumbTopColor = juce::Colours::lightgrey;
+            thumbLeftColor = juce::Colours::grey;
+            thumbBottomColor = juce::Colours::darkgrey;
+            break;
+        }
+        case ColorScheme::Blue:
+        {
+            lineColor = juce::Colours::lightgrey;
+            thumbMainColor = juce::Colour (0xff147bd5);
+            thumbTopColor = juce::Colour (0xff005aba);
+            thumbLeftColor = juce::Colour (0xff1c488a);
+            thumbBottomColor = juce::Colour (0xff173460);
+            break;
+        }
+    }
+    repaint();
+}
