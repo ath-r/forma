@@ -6,16 +6,6 @@
 namespace Ath::Forma
 {
 
-    static const Control::Parameter TestParameter
-    {
-        .name = "Frequency",
-        .id = "test",
-        .unit = "hz",
-        .def = 16.0f,
-        .min = 0.0625f,
-        .max = 16.0f
-    };
-
     static const Control::Parameter Flute16
     {
         .name = "16′",
@@ -70,20 +60,74 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
-    static const Control::Parameter Drive
+    static const Control::Parameter Tone
     {
-        .name = "DRIVE",
-        .id = "drive",
+        .name = "TONE",
+        .id = "tone",
         .def = 0.0f,
         .min = 0.0f,
         .max = 1.0f
     };
 
-    static const Control::Parameter Tone
+    static const Control::Parameter Percussion16
     {
-        .name = "TONE",
-        .id = "tone",
-        .def = 1.0f,
+        .name = "P16′",
+        .id = "p16",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
+    static const Control::Parameter Percussion8
+    {
+        .name = "P8′",
+        .id = "p8",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
+    static const Control::Parameter Percussion5
+    {
+        .name = "P5⅓′",
+        .id = "p5",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
+    static const Control::Parameter Percussion4
+    {
+        .name = "P4′",
+        .id = "p4",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
+    static const Control::Parameter Percussion2
+    {
+        .name = "P2′",
+        .id = "p2",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
+    static const Control::Parameter Percussion1
+    {
+        .name = "P1⅗′",
+        .id = "p1",
+        .def = 0.0f,
+        .min = 0.0f,
+        .max = 1.0f
+    };
+
+    static const Control::Parameter PercussionTime
+    {
+        .name = "TIME",
+        .id = "time",
+        .def = 0.1f,
         .min = 0.0f,
         .max = 1.0f
     };
@@ -120,7 +164,6 @@ namespace Ath::Forma
 
     enum ParameterIDs
     {
-        TEST_ID,
         F16,
         F8,
         F5,
@@ -128,7 +171,13 @@ namespace Ath::Forma
         F2,
         F1,
         TONE,
-        DRIVE,
+        P16,
+        P8,
+        P5,
+        P4,
+        P2,
+        P1,
+        TIME,
         BLEED_KEYBOARD,
         BLEED_TERZ,
         NOISE_FLOOR,
@@ -137,7 +186,6 @@ namespace Ath::Forma
 
     static const Control::Parameter ParametersByID[PARAM_COUNT]
     {
-        [TEST_ID] = TestParameter,
         [F16] = Flute16,
         [F8] = Flute8,
         [F5] = Flute5,
@@ -145,7 +193,13 @@ namespace Ath::Forma
         [F2] = Flute2,
         [F1] = Flute1,
         [TONE] = Tone,
-        [DRIVE] = Drive,
+        [P16] = Percussion16,
+        [P8] = Percussion8,
+        [P5] = Percussion5,
+        [P4] = Percussion4,
+        [P2] = Percussion2,
+        [P1] = Percussion1,
+        [TIME] = PercussionTime,
         [BLEED_KEYBOARD] = keyboardBleed,
         [BLEED_TERZ] = terzBleed,
         [NOISE_FLOOR] = noiseFloor

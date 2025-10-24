@@ -125,22 +125,22 @@ void ParameterSlider::paint (juce::Graphics& g)
     g.setColour(juce::Colours::black);
     g.fillRect(lineArea);
 
-    g.setColour(juce::Colours::grey);
+    g.setColour(thumbLeftColor);
     g.fillRect(thumbBase);
 
-    g.setColour(juce::Colours::grey);
+    g.setColour(thumbLeftColor);
     g.fillPath(left);
 
-    g.setColour(juce::Colours::lightgrey);
+    g.setColour(thumbTopColor);
     g.fillPath(top);
 
-    g.setColour(juce::Colours::darkgrey);
+    g.setColour(thumbBottomColor);
     g.fillPath(right);
     g.fillPath(bottom);
 
-    g.setColour(juce::Colours::ivory);
+    g.setColour(thumbMainColor);
     g.fillRect(thumbTop);
 
-    g.setColour(juce::Colours::black);
+    g.setColour(lineColor);
     g.fillPath(line);
 }

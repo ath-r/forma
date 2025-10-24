@@ -26,7 +26,7 @@ namespace Ath::Forma
 
         logo.setBounds(area.removeFromTop (area.getHeight() * 0.333f));
 
-        flutes.setBounds(area.removeFromLeft(area.getWidth() * 0.7f));
+        flutes.setBounds(area.removeFromLeft(area.getWidth() * 0.5f));
         percussion.setBounds(area);
     }
 }

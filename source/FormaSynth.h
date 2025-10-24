@@ -139,8 +139,6 @@ public:
 
     void setParameterFlute1 (float x);
 
-    void setParameterDrive (float x);
-
     void setParameterTone (float x);
 
     void setParameterKeyboardBleed (float x);

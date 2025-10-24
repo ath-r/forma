@@ -274,7 +274,6 @@ namespace Ath::Forma
                 case 0x11: setParameterFlute1(value); break;
                 case 0x0b:
                 case 0x14: setParameterTone(value); break;
-                case 0x4c: setParameterDrive(value); break;
                 default: break;
             }
 
@@ -356,12 +355,6 @@ namespace Ath::Forma
         parameters[F1].touch(x);
         parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS48, 1.0f, x) * Math::DB_MINUS3;
         parameterFluteStops = parameterFluteStopsInputs.data();
-    }
-
-    void FormaSynth::setParameterDrive (float x) 
-    {
-        parameters[DRIVE].touch(x);
-        parameterDriveGain = 1.0f + x * 16.0f;
     }
 
     void FormaSynth::setParameterTone (float x) 
