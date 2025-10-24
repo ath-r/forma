@@ -70,7 +70,7 @@ void ParameterSlider::paint (juce::Graphics& g)
     const float globalWidth = getTopLevelComponent()->getWidth();
     const float globalRatio = globalX / globalWidth;
     const float maxHorizontalOffset = 3.0f;
-    const float horizontalOffset = std::pow(globalRatio * 2.0f - 1.0f, 1.0f) * maxHorizontalOffset;
+    const float horizontalOffset = (globalRatio * 2.0f - 1.0f) * maxHorizontalOffset;
 
     juce::Rectangle<float> thumbBase(-32, -16 * positionCos + sinY, 64, 32 * positionCos);
     juce::Rectangle<float> thumbTop(-28 + horizontalOffset, -8 * positionCos, 56, 16 * positionCos);
@@ -80,7 +80,6 @@ void ParameterSlider::paint (juce::Graphics& g)
     thumbBase.reduce(thumbBase.getWidth() * reduction, thumbBase.getHeight() * reduction);
     thumbTop.reduce(thumbTop.getWidth() * reduction, thumbTop.getHeight() * reduction);
 
-    g.setOrigin(centreX, thumbY);
     left.clear();
     left.startNewSubPath(thumbBase.getTopLeft());
     left.lineTo(thumbBase.getBottomLeft());
@@ -120,8 +119,13 @@ void ParameterSlider::paint (juce::Graphics& g)
     line.lineTo(thumbBase.getX(), sinY +2.25);
     line.closeSubPath();
 
-    thumbBase.expand(3, 3);
+    g.setOrigin(centreX, thumbY);
+
+    auto lineArea = thumbBase.expanded(3, 3);
     g.setColour(juce::Colours::black);
+    g.fillRect(lineArea);
+
+    g.setColour(juce::Colours::grey);
     g.fillRect(thumbBase);
 
     g.setColour(juce::Colours::grey);
