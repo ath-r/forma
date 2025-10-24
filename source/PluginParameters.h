@@ -135,9 +135,9 @@ namespace Ath::Forma
     static const Control::Parameter PercussionPoly
     {
         .type = Control::Parameter::Type::Bool,
-        .name = "POLY",
+        .name = "Percussion Polyphony",
         .id = "poly",
-        .offText = "MONO",
+        .offText = "PARA",
         .onText = "POLY",
         .def = 0.0f
     };
@@ -145,7 +145,7 @@ namespace Ath::Forma
     static const Control::Parameter PercussionCresc
     {
         .type = Control::Parameter::Type::Bool,
-        .name = "CRESC",
+        .name = "Percussion Mode",
         .id = "cresc",
         .offText = "PERC",
         .onText = "CRESC",
