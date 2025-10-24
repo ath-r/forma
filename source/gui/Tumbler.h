@@ -84,6 +84,7 @@ namespace Ath::Gui
             g.setOrigin(centreX, centreY);
 
             g.setColour(juce::Colours::black);
+            g.fillRect(lineArea);
             g.fillPath(line);
 
             g.setColour(juce::Colours::darkgrey);

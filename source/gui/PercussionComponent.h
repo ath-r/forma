@@ -67,12 +67,7 @@ namespace Ath::Forma
             perc2.setBounds (area.removeFromLeft (sliderWidth));
             perc1.setBounds (area.removeFromLeft (sliderWidth));
             time.setBounds (area.removeFromLeft (sliderWidth));
-
-            juce::Rectangle<int> tumblerArea = {0,0,128,128};
-            tumblerArea.setCentre(centreX, centreY);
-
-            tumblerPoly.setBounds({0,0,80,128});
-            tumblerPoly.setTopRightPosition(centreX + 10, centreY-64);
+            //tumblerPoly.setBounds(area.removeFromLeft (sliderWidth).withHeight(128));
         }
 
         private:
