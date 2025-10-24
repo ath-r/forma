@@ -183,16 +183,37 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
     {
         auto paramData = Ath::Forma::ParametersByID[i];
 
-        params.push_back (std::make_unique<juce::AudioParameterFloat> (
-                juce::ParameterID {paramData.id, 0},
-                paramData.name,
-                juce::NormalisableRange<float>(paramData.min, paramData.max),
-                paramData.def,
-                paramData.name,
-                juce::AudioProcessorParameter::genericParameter,
-                [paramData](float value, int){ return juce::String(paramData.getStringFromValue(value)); }
-                )
-            );
+        switch (paramData.type)
+        {
+            case Ath::Control::Parameter::Type::Float:
+            {
+                params.push_back (std::make_unique<juce::AudioParameterFloat> (
+                    juce::ParameterID {paramData.id, 0},
+                    paramData.name,
+                    juce::NormalisableRange<float>(paramData.min, paramData.max),
+                    paramData.def,
+                    paramData.name,
+                    juce::AudioProcessorParameter::genericParameter,
+                    [paramData](float value, int){ return juce::String(paramData.getStringFromValue(value)); }
+                    )
+                );
+                break;
+            }
+            case Ath::Control::Parameter::Type::Bool:
+            {
+                params.push_back(std::make_unique<juce::AudioParameterBool>(
+                        juce::ParameterID {paramData.id, 0},
+                        paramData.name,
+                        paramData.def >= 0.5,
+                        paramData.name,
+                        [paramData](bool value, int){ return juce::String(value ? paramData.onText : paramData.offText); }
+                    )
+                );
+
+                break;
+            }
+
+        }
     }
 
     return {params.begin(), params.end()};

@@ -40,12 +40,6 @@ namespace Ath::Forma
             addAndMakeVisible(poly);
             addAndMakeVisible(perc);
 
-            poly.topLabel.setText("POLY", juce::dontSendNotification);
-            poly.bottomLabel.setText("MONO", juce::dontSendNotification);
-
-            perc.topLabel.setText("CRESC.", juce::dontSendNotification);
-            perc.bottomLabel.setText("PERC.", juce::dontSendNotification);
-
             perc16.slider.setColor(ParameterSlider::ColorScheme::Blue);
             perc8.slider.setColor(ParameterSlider::ColorScheme::Blue);
             perc5.slider.setColor(ParameterSlider::ColorScheme::Blue);

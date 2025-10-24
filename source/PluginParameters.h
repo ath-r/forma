@@ -134,20 +134,22 @@ namespace Ath::Forma
 
     static const Control::Parameter PercussionPoly
     {
+        .type = Control::Parameter::Type::Bool,
         .name = "POLY",
         .id = "poly",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .offText = "MONO",
+        .onText = "POLY",
+        .def = 0.0f
     };
 
     static const Control::Parameter PercussionCresc
     {
+        .type = Control::Parameter::Type::Bool,
         .name = "CRESC",
         .id = "cresc",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .offText = "PERC",
+        .onText = "CRESC",
+        .def = 0.0f
     };
 
     static const Control::Parameter keyboardBleed

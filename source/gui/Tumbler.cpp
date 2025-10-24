@@ -14,12 +14,12 @@ namespace Ath::Gui
         addAndMakeVisible(topLabel);
         topLabel.setEditable(false);
         topLabel.setJustificationType(juce::Justification::centredBottom);
+        topLabel.setText(parameter->getText(1, 10), juce::dontSendNotification);
 
         addAndMakeVisible(bottomLabel);
         bottomLabel.setEditable(false);
         bottomLabel.setJustificationType(juce::Justification::centredBottom);
-
-        bottomLabel.setText(parameter->getName(5), juce::dontSendNotification);
+        bottomLabel.setText(parameter->getText(0, 10), juce::dontSendNotification);
     }
 
     Tumbler::~Tumbler() 
@@ -32,7 +32,7 @@ namespace Ath::Gui
         auto buttonArea = getLocalBounds();
         buttonArea.reduce (3 + 4 * 2, 3);
 
-        if (buttonArea.contains (event.getMouseDownPosition()))
+        if (switchArea.contains (event.getMouseDownPosition().toFloat()))
         {
             switchedOn = !switchedOn;
             repaint();
@@ -46,7 +46,7 @@ namespace Ath::Gui
 
     void Tumbler::parameterChanged (const juce::String& parameterID, float newValue) 
     {
-        switchedOn = newValue > 0.5f;
+        switchedOn = newValue >= 0.5f;
 
         if (juce::MessageManager::getInstance()->isThisTheMessageThread())
         {
