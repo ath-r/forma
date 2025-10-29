@@ -131,7 +131,7 @@ namespace Ath::Forma
 
     void FormaSynth::processBlock (float* buffer, int numberOfSamples)
     {
-        if (true)
+        if (voiceCount > 0)
         {
             gate = 1.0f;
             gateSmoother.setTime(0.001f);
@@ -139,7 +139,7 @@ namespace Ath::Forma
         else
         {
             gate = 0.0f;
-            gateSmoother.setTime(1.0f);
+            gateSmoother.setTime(5.0f);
         }
 
         //sync oscillators to global time:
@@ -216,7 +216,9 @@ namespace Ath::Forma
             }            
 
             //filter nonlinearity:
-            auto filterAmpIn = (sum + bleed * keyboardBleedGain) * 0.015625f;
+            static Simd::float8 postNonlinearityGain = 128.0f;
+            static Simd::float8 preNonlinearityGain = 1.0f / 128.0f;
+            auto filterAmpIn = (sum + bleed * keyboardBleedGain) * preNonlinearityGain;
 
             //hard clipper (usually won't be reached):
             //auto sumClipped = filterClipper.process(x  * 0.33333f) * 3.0f;
@@ -226,7 +228,7 @@ namespace Ath::Forma
     //so it doesn't clip even with all keys pressed
     //since the transfer curve is very nonlinear, intermodulation harmonics will be present
     //even with a low input signal amplitude
-            auto filterAmpOut = filterNonlinearity.process(filterAmpIn) * 64.0f;
+            auto filterAmpOut = filterNonlinearity.process(filterAmpIn) * postNonlinearityGain;
 
             //white noise, 50hz hum and its harmonics:
             auto outHum = hum.process() * noiseFloorGain;
@@ -242,12 +244,15 @@ namespace Ath::Forma
         {
             auto toneOut = filterTone.process(buffer[i]);
 
+
             //output nonlinearity
-            auto ampIn = toneOut * (0.015625f / 6.0f);
-            auto ampOut = outputNonlinearity.process(ampIn) * (64.0f * 6.0f);
+            static float postNonlinearityGain = 128.0f;
+            static float preNonlinearityGain = 1.0f / 128.0f;
+            auto ampIn = toneOut * (preNonlinearityGain / 6.0f);
+            auto ampOut = outputNonlinearity.process(ampIn) * (postNonlinearityGain * 6.0f);
 
             //lastly, attenuate output signal by 18dB and a factor of 6 (because there are 6 stops)
-            buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f;
+            buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f * gateSmoother.process(gate);
         }
     }
 
@@ -279,6 +284,7 @@ namespace Ath::Forma
             for (auto& contact : needleContacts)
             {
                 contact.handleNoteOff(Midi::MessageNoteOff());
+                voiceCount = 0;
             }
             return; 
         }
@@ -293,15 +299,25 @@ namespace Ath::Forma
             if ((noteNumber >= lowestNote) && (noteNumber < highestNote))
             {
                 int note = noteNumber - lowestNote;
+                auto& needle = needleContacts[note];
 
                 // fire midi events here
                 if (message.isNoteOn())
                 {
-                    needleContacts[note].handleNoteOn(static_cast<Midi::MessageNoteOn>(message));
+                    if (!needle.isActive())
+                    {
+                        needle.handleNoteOn(static_cast<Midi::MessageNoteOn>(message));
+                        voiceCount += 1;
+                    }
                 }
+
                 else if (message.isNoteOff())
                 {
-                    needleContacts[note].handleNoteOff(static_cast<Midi::MessageNoteOff>(message));
+                    if (needle.isActive())
+                    {
+                        needle.handleNoteOff(static_cast<Midi::MessageNoteOff>(message));
+                        voiceCount -= 1;
+                    }
                 }
             }
 

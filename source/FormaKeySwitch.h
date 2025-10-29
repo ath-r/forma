@@ -26,7 +26,7 @@ namespace Ath::Forma
         Simd::float8 delta = 0.0f;
         Simd::float8 value = 0.0f;
 
-        Simd::int8 gate = 0.0f;
+        bool active = 0.0f;
         Simd::float8 inputSign1 = 0.0f;
 
         Filter::LowPass1<Simd::float8> filter;

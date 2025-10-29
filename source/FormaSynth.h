@@ -83,6 +83,7 @@ private:
 
         std::array<Simd::float8, OSC_OUTPUTS_NUMBER> oscillatorOutputs;
         
+        int voiceCount = 0;
         std::array<FormaNeedleContacts, KEY_NUMBER> needleContacts; 
         std::array<Simd::float8, KEY_NUMBER> needleContactInputs;
         std::array<Simd::float8, KEY_NUMBER> needleContactOutputs;

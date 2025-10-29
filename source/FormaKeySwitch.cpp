@@ -31,7 +31,7 @@ namespace Ath::Forma
         };
     };
 
-    bool FormaNeedleContacts::isActive() { return true; }
+    bool FormaNeedleContacts::isActive() { return active; }
 
     void FormaNeedleContacts::handleNoteOn (Midi::MessageNoteOn message)
     {
@@ -40,28 +40,23 @@ namespace Ath::Forma
 
         filter.setCutoffFrequency(10000.0f);
         delta = Simd::float8(c.T) / time;
+
+        active = true;
     }
 
     void FormaNeedleContacts::handleNoteOff (Midi::MessageNoteOff message) 
     {
         filter.setCutoffFrequency(100.0f);
         delta = Simd::float8(-c.T) / time;
+
+        active = false;
     }
 
     Simd::float8 FormaNeedleContacts::processSample(Simd::float8 x)
     {
         value += delta;
         value = Simd::clamp(value, 0.0f, 1.0f);
-
-        auto inputSign = Simd::sign(x);
-        auto zeroCrossing = inputSign != inputSign1;
-
         auto logic = value > actionThreshold;
-        auto shouldChange = logic != gate;
-
-        gate = gate ^ (shouldChange & zeroCrossing);
-
-        inputSign1 = inputSign;
 
         return x * filter.process(Simd::float8(1.0f) & logic);
     }
