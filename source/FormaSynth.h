@@ -102,6 +102,9 @@ private:
         alignas(32) std::array<float, 8> parameterFluteStopsInputs;
         Simd::float8 parameterFluteStops = 0.0f;
 
+        alignas(32) std::array<float, 8> parameterPercStopsInputs;
+        Simd::float8 parameterPercStops = 0.0f;
+
         Simd::float8 keyboardBleedGain = Math::dB(-70);
         Simd::float8 terzBleedGain = Math::dB(-10);
         Simd::float8 noiseFloorGain = Math::dB(-40);
@@ -114,35 +117,17 @@ private:
         std::array<ParameterValueData, PARAM_COUNT> parameters;
 
 public:
-    FormaSynth();
+        FormaSynth();
 
-    void setContext (Dsp::Context context);
+        void setContext (Dsp::Context context);
 
-    void processBlock (float* buffer, int numberOfSamples) override;
+        void processBlock (float* buffer, int numberOfSamples) override;
 
-    void handleMidiEvent (Control::Midi::Message message) override;
+        void handleMidiEvent (Control::Midi::Message message) override;
 
-    void setParameterFlute16 (float x);
+        void setParameter (int parameterIndex, float x, bool touch = false);
 
-    void setParameterFlute8 (float x);
-
-    void setParameterFlute4 (float x);
-
-    void setParameterFlute2 (float x);
-
-    void setParameterFlute5 (float x);
-
-    void setParameterFlute1 (float x);
-
-    void setParameterTone (float x);
-
-    void setParameterKeyboardBleed (float x);
-
-    void setParameterTerzBleed (float x);
-
-    void setParameterNoiseFloor (float x);
-
-    ParameterValueData getParameter(size_t id) { return parameters[id].untouch(); }
-    
+        ParameterValueData getParameter(size_t parameterIndex) { return parameters[parameterIndex].untouch(); }
+        
     };
 }

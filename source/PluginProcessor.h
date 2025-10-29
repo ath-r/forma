@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PluginParameters.h"
-#include "ParameterObserver.h"
 
 #include "PluginPerformance.h"
 #include "juce_audio_basics/juce_audio_basics.h"
@@ -15,7 +14,7 @@
 #include "ipps.h"
 #endif
 
-class PluginProcessor : public juce::AudioProcessor
+class PluginProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener
 {
 public:
     PluginProcessor();
@@ -23,6 +22,8 @@ public:
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
+
+    void parameterChanged (const juce::String& parameterId, float newValue) override;
 
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 
@@ -59,7 +60,6 @@ private:
     Ath::Forma::FormaSynth formaSynth;
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    std::array<ParameterObserver, Ath::Forma::PARAM_COUNT> parameterObservers;
 
     void setParameter(Ath::Control::Parameter p, Ath::Forma::FormaSynth::ParameterValueData parameterValueData)
     {

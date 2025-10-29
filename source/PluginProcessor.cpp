@@ -1,5 +1,4 @@
 #include "PluginProcessor.h"
-#include "ParameterObserver.h"
 #include "PluginEditor.h"
 
 #include "PluginParameters.h"
@@ -33,42 +32,18 @@ PluginProcessor::PluginProcessor()
     pluginInstanceSettings("pluginInstanceSettings")
 {
     using namespace Ath::Forma;
-
-    for (int i = 0; i < PARAM_COUNT; ++i)
-    {
-        auto& paramData = ParametersByID[i];
-        auto& id = paramData.id;
-        auto& observer = parameterObservers[i];
-
-        treeState.addParameterListener(id, &observer);
-        observer.parameter = treeState.getParameter(id);
-    }
-
-    parameterObservers[ParameterIDs::F16].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute16);
-    parameterObservers[ParameterIDs::F8].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute8);
-    parameterObservers[ParameterIDs::F4].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute4);
-    parameterObservers[ParameterIDs::F2].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute2);
-
-    parameterObservers[ParameterIDs::F5].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute5);
-    parameterObservers[ParameterIDs::F1].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterFlute1);
-    parameterObservers[ParameterIDs::TONE].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterTone);
-
-    parameterObservers[ParameterIDs::BLEED_KEYBOARD].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterKeyboardBleed);
-    parameterObservers[ParameterIDs::BLEED_TERZ].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterTerzBleed);
-    parameterObservers[ParameterIDs::NOISE_FLOOR].eventOut.addMemberCallback(formaSynth, &FormaSynth::setParameterNoiseFloor);
+    for (int i = 0; i < PARAM_COUNT; ++i) treeState.addParameterListener(ParametersByID[i].id, this);
 }
 
 PluginProcessor::~PluginProcessor()
 {
     using namespace Ath::Forma;
-    for (int i = 0; i < PARAM_COUNT; ++i)
-    {
-        auto& paramData = ParametersByID[i];
-        auto& id = paramData.id;
-        auto& observer = parameterObservers[i];
+    for (int i = 0; i < PARAM_COUNT; ++i) treeState.removeParameterListener(ParametersByID[i].id, this);
+}
 
-        treeState.removeParameterListener(id, &observer);
-    }
+void PluginProcessor::parameterChanged (const juce::String& parameterId, float newValue) 
+{
+    formaSynth.setParameter(treeState.getParameter(parameterId)->getParameterIndex(), newValue);
 }
 
 //==============================================================================
@@ -79,8 +54,12 @@ void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     performance.SampleRate.write(sampleRate);
     performance.SamplesPerBlock.write(samplesPerBlock);
 
-    for (auto& observer : parameterObservers) observer.forceCheck();
-
+    using namespace Ath::Forma;
+    for (int i = 0; i < PARAM_COUNT; i++)
+    {
+        auto parameter = treeState.getParameter(ParametersByID[i].id);
+        parameter->sendValueChangedMessageToListeners(parameter->getValue());
+    }
 }
 
 void PluginProcessor::releaseResources()
@@ -98,8 +77,6 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     const auto totalNumInputChannels  = getTotalNumInputChannels();
     const auto totalNumOutputChannels = getTotalNumOutputChannels();
     const auto numSamples = buffer.getNumSamples();
-
-    for (auto& observer : parameterObservers) observer.forceCheck();
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
     {
@@ -327,3 +304,4 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
     return true;
   #endif
 }
+

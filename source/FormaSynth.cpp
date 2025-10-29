@@ -142,6 +142,9 @@ namespace Ath::Forma
             gateSmoother.setTime(5.0f);
         }
 
+        parameterFluteStops = parameterFluteStopsInputs.data();
+        parameterPercStops = parameterPercStopsInputs.data();
+
         //sync oscillators to global time:
         //for (auto& osc : oscillators) osc.setTime(phaseCounter.getTime());
 
@@ -244,7 +247,6 @@ namespace Ath::Forma
         {
             auto toneOut = filterTone.process(buffer[i]);
 
-
             //output nonlinearity
             static float postNonlinearityGain = 128.0f;
             static float preNonlinearityGain = 1.0f / 128.0f;
@@ -253,6 +255,37 @@ namespace Ath::Forma
 
             //lastly, attenuate output signal by 18dB and a factor of 6 (because there are 6 stops)
             buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f * gateSmoother.process(gate);
+        }
+    }
+
+    void FormaSynth::setParameter (int parameterIndex, float x, bool touch) 
+    {
+        if (touch) parameters[parameterIndex].touch(x);
+        else parameters[parameterIndex].touchSilently(x);
+
+        switch(parameterIndex)
+        {
+            case F16: parameterFluteStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case F8: parameterFluteStopsInputs[1] = std::lerp (Math::DB_MINUS48, 1.0f, x); break;
+            case F4: parameterFluteStopsInputs[2] = std::lerp (Math::DB_MINUS42, 1.0f, x); break;
+            case F2: parameterFluteStopsInputs[3] = std::lerp (Math::DB_MINUS48, Math::DB_MINUS3, x); break;
+            case F5: parameterFluteStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case F1: parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS48, Math::DB_MINUS3, x); break;
+
+            case TONE: filterTone.setCutoffFrequency(Math::logerp2(500.0f, 15000.0f, x)); break;
+
+            case P16: parameterPercStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case P8: parameterPercStopsInputs[1] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case P4: parameterPercStopsInputs[2] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case P2: parameterPercStopsInputs[3] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case P5: parameterPercStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+
+            case TIME: break;
+
+            case BLEED_KEYBOARD: keyboardBleedGain = Math::decibelsToAmplitude(x); break;
+            case BLEED_TERZ: terzBleedGain = Math::decibelsToAmplitude(x); break;
+            case NOISE_FLOOR: noiseFloorGain = Math::decibelsToAmplitude(x); break;
         }
     }
 
@@ -265,14 +298,14 @@ namespace Ath::Forma
             
             switch (cc.cc)
             {
-                case 0x0c: setParameterFlute16(value); break;
-                case 0x0d: setParameterFlute8(value); break;
-                case 0x0e: setParameterFlute5(value); break;
-                case 0x0f: setParameterFlute4(value); break;
-                case 0x10: setParameterFlute2(value); break;
-                case 0x11: setParameterFlute1(value); break;
+                case 0x0c: setParameter(F16, value, true); break;
+                case 0x0d: setParameter(F8, value, true); break;
+                case 0x0e: setParameter(F5, value, true); break;
+                case 0x0f: setParameter(F4, value, true); break;
+                case 0x10: setParameter(F2, value, true); break;
+                case 0x11: setParameter(F1, value, true); break;
                 case 0x0b:
-                case 0x14: setParameterTone(value); break;
+                case 0x14: setParameter(TONE, value, true); break;
                 default: break;
             }
 
@@ -324,70 +357,5 @@ namespace Ath::Forma
             return;
         }
     }
-
-    void FormaSynth::setParameterFlute16 (float x) 
-    { 
-        parameters[F16].touch(x);
-        parameterFluteStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x);
-        parameterFluteStops = parameterFluteStopsInputs.data();
-    }
-
-    void FormaSynth::setParameterFlute8 (float x) 
-    { 
-        parameters[F8].touch(x);
-        parameterFluteStopsInputs[1] = std::lerp (Math::DB_MINUS48, 1.0f, x);
-        parameterFluteStops = parameterFluteStopsInputs.data();
-    }
-
-    void FormaSynth::setParameterFlute4 (float x) 
-    { 
-        parameters[F4].touch(x);
-        parameterFluteStopsInputs[2] = std::lerp (Math::DB_MINUS42, 1.0f, x);
-        parameterFluteStops = parameterFluteStopsInputs.data(); 
-    }
     
-    void FormaSynth::setParameterFlute2 (float x) 
-    { 
-        parameters[F2].touch(x);
-        parameterFluteStopsInputs[3] = std::lerp (Math::DB_MINUS48, 1.0f, x) * Math::DB_MINUS3;
-        parameterFluteStops = parameterFluteStopsInputs.data(); 
-    }
-
-    void FormaSynth::setParameterFlute5 (float x) 
-    { 
-        parameters[F5].touch(x);
-        parameterFluteStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x);
-        parameterFluteStops = parameterFluteStopsInputs.data();
-    }
-
-    void FormaSynth::setParameterFlute1 (float x) 
-    {
-        parameters[F1].touch(x);
-        parameterFluteStopsInputs[5] = std::lerp (Math::DB_MINUS48, 1.0f, x) * Math::DB_MINUS3;
-        parameterFluteStops = parameterFluteStopsInputs.data();
-    }
-
-    void FormaSynth::setParameterTone (float x) 
-    {
-        parameters[TONE].touch(x);
-        filterTone.setCutoffFrequency(Math::logerp2(500.0f, 15000.0f, x));
-    }
-
-    void FormaSynth::setParameterKeyboardBleed (float x) 
-    {
-        parameters[BLEED_KEYBOARD].touchSilently(x);
-        keyboardBleedGain = Math::decibelsToAmplitude(x);
-    }
-
-    void FormaSynth::setParameterTerzBleed (float x) 
-    {
-        parameters[BLEED_TERZ].touchSilently(x);
-        terzBleedGain = Math::decibelsToAmplitude(x);
-    }
-
-    void FormaSynth::setParameterNoiseFloor (float x) 
-    {
-        parameters[NOISE_FLOOR].touchSilently(x);
-        noiseFloorGain = Math::decibelsToAmplitude(x);
-    }
 }
