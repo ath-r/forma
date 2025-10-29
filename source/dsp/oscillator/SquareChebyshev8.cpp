@@ -88,7 +88,8 @@ namespace Ath::Dsp::Oscillator
             i_f += 2.0f;
         }
 
-        return sum;
-        
+        y = sum;
+        return y;     
+
     }
 }

@@ -154,11 +154,14 @@ namespace Ath::Forma
             //...
             //oscillatorOutputs[12] = {C2, C3, C4, C5, C6, C7, C8, C9}
             //...
-            buffer[i] = 0.0f;
+
+            for (auto& osc : oscillators) osc.processSample();
+            for (auto& osc : oscillators2) osc.processSample();
+
             for (int n = 0; n < OSC_NUMBER; n++)
             {
-                auto sample = oscillators[n].processSample();
-                auto sample2 = oscillators2[n].processSample();
+                auto sample = oscillators[n].last();
+                auto sample2 = oscillators2[n].last();
                 oscillatorOutputs[n] = sample;
                 oscillatorOutputs[n + 48] = sample2;
 

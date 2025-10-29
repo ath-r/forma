@@ -36,7 +36,8 @@ namespace Ath::Dsp::Oscillator
         auto centeredPhase = phase - 0.5f;
         auto triangularPhase = (float8(0.5f) - Simd::abs(centeredPhase)) * 2.0f - 0.5f;
 
-        return sincIntegral(triangularPhase * n);
+        y = sincIntegral(triangularPhase * n);
+        return y;
     }
 
     float8 SquareSincIntegral8::sincIntegral (float8 x)

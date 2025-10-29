@@ -18,7 +18,12 @@ namespace Ath::Dsp::Oscillator
         float8 frequency = 0.0f;
         float8 delta = 0.0f;
 
+        float8 y = 0.0f;
+
     public:
+
+        inline float8 last() { return y; }
+        
         void setContext (const Context context);
 
         void setFrequency (const float8 newFrequency);
