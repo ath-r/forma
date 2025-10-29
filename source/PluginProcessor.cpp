@@ -16,6 +16,9 @@
 
 #include "control/Midi.h"
 
+#include <chrono>
+#include <ratio>
+
 //==============================================================================
 PluginProcessor::PluginProcessor()
      : AudioProcessor (BusesProperties()
@@ -73,6 +76,9 @@ void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     formaSynth.setContext(sampleRate);
 
+    performance.SampleRate.write(sampleRate);
+    performance.SamplesPerBlock.write(samplesPerBlock);
+
     for (auto& observer : parameterObservers) observer.forceCheck();
 
 }
@@ -120,7 +126,14 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
     midiMessages.clear();
 
+    auto t1 = std::chrono::high_resolution_clock::now();
     formaSynth.process(ch0, numSamples, midiEvents.data(), midiEventCount);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto ns = std::chrono::duration<float, std::nano>(t2 - t1);
+
+    float integratedTime = performance.ExecutionTimeNs.value * 0.99f + ns.count() * 0.01f;
+    performance.ExecutionTimeNs.write(integratedTime);
+
     buffer.copyFrom(1, 0, buffer.getReadPointer(0), numSamples);
 
     using namespace Ath::Forma;

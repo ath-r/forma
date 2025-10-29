@@ -3,6 +3,7 @@
 #include "PluginEditor.h"
 #include "PluginParameters.h"
 #include "gui/MainComponent.h"
+#include "gui/PerformanceMeterComponent.h"
 #include "juce_core/juce_core.h"
 #include "juce_graphics/juce_graphics.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -15,7 +16,8 @@ using namespace Ath::Gui;
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p), 
     processorRef (p), 
-    mainComponent(p.treeState)
+    mainComponent(p.treeState),
+    performanceMeter(p.performance)
 {
     Ath::Gui::LookAndFeel::setDefaultLookAndFeel(&lookAndFeel);
 
@@ -26,6 +28,8 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     setResizable(true, true);
 
     addAndMakeVisible(mainComponent);
+    addAndMakeVisible(performanceMeter);
+
     constrainer.setFixedAspectRatio(initialWidth / initialHeight);
     constrainer.setMinimumHeight(200);
     setConstrainer(&constrainer);
@@ -35,6 +39,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     else setSize (initialWidth, initialHeight);
 
     mainComponent.setBounds(0, 0, initialWidth, initialHeight);
+    performanceMeter.setBounds(0, 0, initialWidth, 20);
 }
 
 PluginEditor::~PluginEditor()
@@ -50,7 +55,10 @@ void PluginEditor::resized()
     float scale = getHeight() / initialHeight;
     processorRef.pluginInstanceSettings.setAttribute("scale", scale);
     
-    mainComponent.setTransform(juce::AffineTransform::scale(scale));
+    auto transform = juce::AffineTransform::scale(scale);
+
+    mainComponent.setTransform(transform);
+    performanceMeter.setTransform(transform);
 }
 
 bool PluginEditor::keyPressed (const juce::KeyPress& key) 

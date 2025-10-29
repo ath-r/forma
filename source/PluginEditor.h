@@ -4,6 +4,7 @@
 
 #include "gui/LookAndFeel.h"
 #include "gui/MainComponent.h"
+#include "gui/PerformanceMeterComponent.h"
 
 #include "PluginProcessor.h"
 
@@ -31,6 +32,7 @@ private:
     PluginProcessor& processorRef;
 
     Ath::Forma::MainComponent mainComponent;
+    Ath::Forma::PerformanceMeterComponent performanceMeter;
 
     Ath::Gui::LookAndFeel lookAndFeel;
     juce::ComponentBoundsConstrainer constrainer;

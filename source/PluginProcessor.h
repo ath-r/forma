@@ -3,10 +3,10 @@
 #include "PluginParameters.h"
 #include "ParameterObserver.h"
 
+#include "PluginPerformance.h"
 #include "juce_audio_basics/juce_audio_basics.h"
 #include <array>
 #include <juce_audio_processors/juce_audio_processors.h>
-#include <memory>
 
 #include "FormaSynth.h"
 #include "juce_core/juce_core.h"
@@ -49,6 +49,8 @@ public:
 
     juce::AudioProcessorValueTreeState treeState;
     juce::XmlElement pluginInstanceSettings;
+
+    Ath::Forma::PerformanceData performance;
 
 private:
 

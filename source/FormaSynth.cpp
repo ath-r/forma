@@ -3,7 +3,6 @@
 #include "control/Midi.h"
 #include "math/Complex.h"
 #include "math/Conversion.h"
-#include "math/Random.h"
 #include "math/Simd.h"
 
 namespace Ath::Forma
@@ -141,9 +140,6 @@ namespace Ath::Forma
         {
             gate = 0.0f;
             gateSmoother.setTime(1.0f);
-
-            //reset global time when all voices are inactive:
-            phaseCounter.reset();
         }
 
         //sync oscillators to global time:
@@ -151,11 +147,6 @@ namespace Ath::Forma
 
         for (int i = 0; i < numberOfSamples; i++)
         {
-            //process phase counter:
-            phaseCounter.processSample(); 
-
-            //process parameter smoothers:
-
             //process oscillators:
 
             //this generates all octaves for each key
@@ -249,7 +240,7 @@ namespace Ath::Forma
             auto toneOut = filterTone.process(buffer[i]);
 
             //output nonlinearity
-            auto ampIn = toneOut  * (0.015625f / 6.0f);
+            auto ampIn = toneOut * (0.015625f / 6.0f);
             auto ampOut = outputNonlinearity.process(ampIn) * (64.0f * 6.0f);
 
             //lastly, attenuate output signal by 18dB and a factor of 6 (because there are 6 stops)

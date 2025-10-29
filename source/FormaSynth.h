@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <array>
 #include <cstddef>
 
@@ -17,7 +16,6 @@
 #include "math/Conversion.h"
 
 #include "dsp/Context.h"
-#include "dsp/PhaseCounter.h"
 #include "dsp/oscillator/SquareSincIntegral8.h"
 #include "dsp/oscillator/SquareChebyshev8.h"
 #include "dsp/cv/LinearSmoother.h"
@@ -58,8 +56,6 @@ public:
             }
         };
 private:
-        Dsp::PhaseCounter phaseCounter;
-
         static constexpr int KEY_NUMBER = 61;
         static constexpr int OSC_NUMBER = 12;
         static constexpr int OSC_OUTPUTS_NUMBER = KEY_NUMBER + 12;
@@ -115,8 +111,6 @@ private:
         Dsp::Cv::LinearSmoother<float> gateSmoother;
 
         std::array<ParameterValueData, PARAM_COUNT> parameters;
-
-
 
 public:
     FormaSynth();
