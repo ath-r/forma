@@ -32,7 +32,9 @@ namespace Ath::Forma
     {
         Measurement SampleRate;
         Measurement SamplesPerBlock;
-        Measurement ExecutionTimeNs;
+        Measurement ExecutionTimeImmediate;
+        Measurement ExecutionTime100;
+        Measurement ExecutionTime1000;
         Measurement MaxExecutionTimeNs;
         Measurement MinExecutionTimeNs;
     };

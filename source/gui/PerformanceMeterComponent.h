@@ -21,7 +21,7 @@ namespace Ath::Forma
         PerformanceMeterComponent(PerformanceData& p)
         : pdata(p)
         {
-            setFramesPerSecond(10);
+            setFramesPerSecond(1);
         }
 
         void update() override 
@@ -31,14 +31,17 @@ namespace Ath::Forma
             str += " samples / ";
             str += juce::String(pdata.SampleRate.read());
             str += " hz;\n";
-            str += juce::String(pdata.ExecutionTimeNs.read(), 2, true);
+            str += juce::String(pdata.ExecutionTime100.read(), 2, true);
             str += " nS over 100 measurements\n";
-            str += "max ";
-            str += juce::String(pdata.MaxExecutionTimeNs.read(), 2, true);
-            str += " nS over 1000 measurements\n";
-            str += "min ";
-            str += juce::String(pdata.MinExecutionTimeNs.read(), 2, true);
+            str += juce::String(pdata.ExecutionTime1000.read(), 2, true);
             str += " nS over 1000 measurements";
+            str += "\nmax ";
+            str += juce::String(pdata.MaxExecutionTimeNs.read(), 2, true);
+            str += " nS";
+            str += "\nmin ";
+            str += juce::String(pdata.MinExecutionTimeNs.read(), 2, true);
+            str += " nS";
+            str += "\nclick to reset readings";
             repaint();
         }
 
@@ -46,7 +49,9 @@ namespace Ath::Forma
         {
             if (event.mods.isLeftButtonDown())
             {
-                auto time = pdata.ExecutionTimeNs.read();
+                auto time = pdata.ExecutionTimeImmediate.read();
+                pdata.ExecutionTime100.write(time);
+                pdata.ExecutionTime1000.write(time);
                 pdata.MaxExecutionTimeNs.write(time);
                 pdata.MinExecutionTimeNs.write(time);
             }
@@ -55,6 +60,8 @@ namespace Ath::Forma
             {
                 visible = !visible;
             }
+
+            update();
         }
 
         void resized() override
@@ -66,7 +73,7 @@ namespace Ath::Forma
             if (visible)
             {
                 g.setColour(juce::Colours::lightgrey);
-                g.setFont(g.getCurrentFont().withHeight(getHeight() / 4));
+                g.setFont(g.getCurrentFont().withHeight(getHeight() / 6));
                 g.drawFittedText(str, getLocalBounds(), juce::Justification::topLeft, 2);
             }
         }

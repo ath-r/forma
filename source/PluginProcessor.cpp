@@ -108,16 +108,16 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto t2 = std::chrono::high_resolution_clock::now();
     auto ns = std::chrono::duration<float, std::nano>(t2 - t1).count();
 
-    float integratedTime = performance.ExecutionTimeNs.value * 0.99f + ns* 0.01f;
-    performance.ExecutionTimeNs.write(integratedTime);
+    performance.ExecutionTimeImmediate.write(ns);
+
+    float integratedTime100 = performance.ExecutionTime100.value * 0.99f + ns * 0.01f;
+    performance.ExecutionTime100.write(integratedTime100);
+
+    float integratedTime1000 = performance.ExecutionTime1000.value * 0.999f + ns * 0.001f;
+    performance.ExecutionTime1000.write(integratedTime1000);
 
     if (ns > performance.MaxExecutionTimeNs.value) performance.MaxExecutionTimeNs.write(ns);
-    float integratedMaxTime = performance.MaxExecutionTimeNs.value * 0.999f + ns * 0.001f;
-    performance.MaxExecutionTimeNs.write(integratedMaxTime);
-
     if (ns < performance.MinExecutionTimeNs.value) performance.MinExecutionTimeNs.write(ns);
-    float integratedMinTime = performance.MinExecutionTimeNs.value * 0.999f + ns * 0.001f;
-    performance.MinExecutionTimeNs.write(integratedMinTime);
 
     buffer.copyFrom(1, 0, buffer.getReadPointer(0), numSamples);
 
