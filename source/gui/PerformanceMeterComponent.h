@@ -15,38 +15,60 @@ namespace Ath::Forma
     {
     public:
         PerformanceData& pdata;
-        juce::Label label;
+        juce::String str;
+        bool visible = true;
 
         PerformanceMeterComponent(PerformanceData& p)
         : pdata(p)
         {
-            setSynchroniseToVBlank(true);
-            addAndMakeVisible(label);
+            setFramesPerSecond(10);
         }
 
         void update() override 
         {
-            juce::String str;
-
+            str.clear();
             str += juce::String(pdata.SamplesPerBlock.read());
             str += " samples / ";
             str += juce::String(pdata.SampleRate.read());
-            str += " hz; ";
+            str += " hz;\n";
             str += juce::String(pdata.ExecutionTimeNs.read(), 2, true);
-            str += " ns";
-
-            label.setText(str, juce::dontSendNotification);
+            str += " nS over 100 measurements\n";
+            str += "max ";
+            str += juce::String(pdata.MaxExecutionTimeNs.read(), 2, true);
+            str += " nS over 1000 measurements\n";
+            str += "min ";
+            str += juce::String(pdata.MinExecutionTimeNs.read(), 2, true);
+            str += " nS over 1000 measurements";
             repaint();
+        }
+
+        void mouseDown(const juce::MouseEvent& event) override
+        {
+            if (event.mods.isLeftButtonDown())
+            {
+                auto time = pdata.ExecutionTimeNs.read();
+                pdata.MaxExecutionTimeNs.write(time);
+                pdata.MinExecutionTimeNs.write(time);
+            }
+
+            if (event.mods.isRightButtonDown())
+            {
+                visible = !visible;
+            }
         }
 
         void resized() override
         {
-            label.setBounds(getLocalBounds());
         }
 
         void paint(juce::Graphics& g) override
         {
-
+            if (visible)
+            {
+                g.setColour(juce::Colours::lightgrey);
+                g.setFont(g.getCurrentFont().withHeight(getHeight() / 4));
+                g.drawFittedText(str, getLocalBounds(), juce::Justification::topLeft, 2);
+            }
         }
     };
 }

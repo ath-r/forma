@@ -39,7 +39,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     else setSize (initialWidth, initialHeight);
 
     mainComponent.setBounds(0, 0, initialWidth, initialHeight);
-    performanceMeter.setBounds(0, 0, initialWidth, 20);
+    performanceMeter.setBounds(20, 20, 1000, 100);
 }
 
 PluginEditor::~PluginEditor()
@@ -54,11 +54,9 @@ void PluginEditor::resized()
 {
     float scale = getHeight() / initialHeight;
     processorRef.pluginInstanceSettings.setAttribute("scale", scale);
-    
-    auto transform = juce::AffineTransform::scale(scale);
 
-    mainComponent.setTransform(transform);
-    performanceMeter.setTransform(transform);
+    mainComponent.setTransform(juce::AffineTransform::scale(scale));
+    performanceMeter.setTransform(juce::AffineTransform::scale(scale * 0.5f));
 }
 
 bool PluginEditor::keyPressed (const juce::KeyPress& key) 
