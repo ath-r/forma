@@ -233,14 +233,15 @@ namespace Ath::Forma
     //even with a low input signal amplitude
             auto filterAmpOut = filterNonlinearity.process(filterAmpIn) * postNonlinearityGain;
 
-            //white noise, 50hz hum and its harmonics:
-            auto outHum = hum.process() * noiseFloorGain;
+            //bleeds:
             auto outBleed = bleedTerz * terzBleedGain + bleed * keyboardBleedGain;
 
             //tone knob filter:
-            auto toneIn = filterAmpOut * parameterFluteStops + outHum + outBleed;
+            auto toneIn = filterAmpOut * parameterFluteStops + outBleed;
             buffer[i] = toneIn.sum();
         }
+
+        for (int i = 0; i < numberOfSamples; i++) buffer[i] += hum.process() * noiseFloorGain;
 
         // second loop for effects that come after flattening the SIMD into float
         for (int i = 0; i < numberOfSamples; i++)

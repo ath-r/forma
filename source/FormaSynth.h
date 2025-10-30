@@ -107,7 +107,7 @@ private:
 
         Simd::float8 keyboardBleedGain = Math::dB(-70);
         Simd::float8 terzBleedGain = Math::dB(-10);
-        Simd::float8 noiseFloorGain = Math::dB(-40);
+        float noiseFloorGain = Math::dB(-40);
 
         Simd::float8 parameterDriveGain = 1.0f;
 

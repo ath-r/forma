@@ -3,7 +3,6 @@
 #include "dsp/Context.h"
 #include "dsp/filter/FilterMath.h"
 
-#include "math/Simd.h"
 #include "math/Random.h"
 
 namespace Ath::Forma
@@ -12,7 +11,7 @@ namespace Ath::Forma
     {
         Dsp::Context c = Dsp::Context(48000.0f);
 
-        Dsp::Filter::LowPass1<Simd::float8> filter;
+        Dsp::Filter::LowPass1<float> filter;
         Math::Random::Mersenne rng;
 
         float phase = 0.0f;
@@ -21,6 +20,6 @@ namespace Ath::Forma
     public:
         void setContext (Dsp::Context context);
 
-        Simd::float8 process();
+        float process();
     };
 }
