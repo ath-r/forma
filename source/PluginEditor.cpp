@@ -56,7 +56,7 @@ void PluginEditor::resized()
     processorRef.pluginInstanceSettings.setAttribute("scale", scale);
 
     mainComponent.setTransform(juce::AffineTransform::scale(scale));
-    performanceMeter.setTransform(juce::AffineTransform::scale(scale * 0.5f));
+    performanceMeter.setTransform(juce::AffineTransform::scale(scale * 2 / 3));
 }
 
 bool PluginEditor::keyPressed (const juce::KeyPress& key) 
