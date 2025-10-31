@@ -4,6 +4,7 @@
 #include "math/Complex.h"
 #include "math/Conversion.h"
 #include "math/Simd.h"
+#include <cmath>
 
 namespace Ath::Forma
 {
@@ -104,7 +105,7 @@ namespace Ath::Forma
             prefilterGains[i] = Simd::rmag(transfer.re, transfer.im);
         }
         
-
+        paraphonicPercussionGenerator.setTime(getParameter(TIME).value);
         gateSmoother.setTime(0.001f);
     }
 
@@ -126,6 +127,7 @@ namespace Ath::Forma
         hum.setContext(context);
         filterTone.setContext(context);
 
+        paraphonicPercussionGenerator.setContext(context);
         gateSmoother.setContext(context);
     }
 
@@ -232,12 +234,14 @@ namespace Ath::Forma
     //since the transfer curve is very nonlinear, intermodulation harmonics will be present
     //even with a low input signal amplitude
             auto filterAmpOut = filterNonlinearity.process(filterAmpIn) * postNonlinearityGain;
+            auto fluteOut = filterAmpOut * parameterFluteStops;
+            auto percOut = filterAmpOut * parameterPercStops * float(paraphonicPercussionGenerator.process(gate));
 
             //bleeds:
             auto outBleed = bleedTerz * terzBleedGain + bleed * keyboardBleedGain;
 
             //tone knob filter:
-            auto toneIn = filterAmpOut * parameterFluteStops + outBleed;
+            auto toneIn = fluteOut + percOut + outBleed;
             buffer[i] = toneIn.sum();
         }
 
@@ -282,7 +286,7 @@ namespace Ath::Forma
             case P5: parameterPercStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
 
-            case TIME: break;
+            case TIME: paraphonicPercussionGenerator.setTime(std::lerp(0.01f, 10.0f, x)); break;
 
             case BLEED_KEYBOARD: keyboardBleedGain = Math::decibelsToAmplitude(x); break;
             case BLEED_TERZ: terzBleedGain = Math::decibelsToAmplitude(x); break;

@@ -9,7 +9,6 @@
 #include "FormaFilterBank.h"
 #include "FormaTransistorNonlinearity.h"
 #include "FormaHum.h"
-#include "dsp/waveshaping/SoftClipper.h"
 #include "PluginParameters.h"
 
 #include "math/Simd.h"
@@ -19,6 +18,7 @@
 #include "dsp/oscillator/SquareSincIntegral8.h"
 #include "dsp/oscillator/SquareChebyshev8.h"
 #include "dsp/cv/LinearSmoother.h"
+#include "dsp/cv/PercussionGenerator.h"
 
 #include "control/Midi.h"
 
@@ -62,6 +62,16 @@ private:
 
         std::array<Dsp::Oscillator::SquareSincIntegral8, OSC_NUMBER> oscillators;
         std::array<Dsp::Oscillator::SquareChebyshev8, OSC_NUMBER> oscillators2;
+        std::array<FormaNeedleContacts, KEY_NUMBER> needleContacts;
+
+        std::array<FormaFilterBank, 6> filterBanks;
+        FormaTransistorNonlinearity8 filterNonlinearity;
+        Dsp::Filter::LowPass1<float> filterTone;
+
+        Dsp::Cv::PercussionGenerator<double> paraphonicPercussionGenerator;
+        FormaHum hum;
+        FormaTransistorNonlinearity outputNonlinearity;
+        Dsp::Cv::LinearSmoother<float> gateSmoother;
 
         // Tuning error (in cents) as described in MM5555/MM5556 Chromatic Frequency Generators datasheet
         // Error is normalized based on the average
@@ -84,20 +94,11 @@ private:
         std::array<Simd::float8, OSC_OUTPUTS_NUMBER> oscillatorOutputs;
         
         int voiceCount = 0;
-        std::array<FormaNeedleContacts, KEY_NUMBER> needleContacts; 
         std::array<Simd::float8, KEY_NUMBER> needleContactInputs;
         std::array<Simd::float8, KEY_NUMBER> needleContactOutputs;
         std::array<Simd::float8, KEY_NUMBER> prefilterGains;
 
-        std::array<Simd::float8, 6> filterBankInputs;
-        std::array<FormaFilterBank, 6> filterBanks;
-
-        Dsp::Waveshaper::SoftClipperSimd<15, Simd::float8> filterClipper;
-        FormaTransistorNonlinearity8 filterNonlinearity;
-        Dsp::Filter::LowPass1<float> filterTone;
-        FormaTransistorNonlinearity outputNonlinearity;
-
-        FormaHum hum;
+        std::array<Simd::float8, 6> filterBankInputs;        
         
         alignas(32) std::array<float, 8> parameterFluteStopsInputs;
         Simd::float8 parameterFluteStops = 0.0f;
@@ -112,7 +113,6 @@ private:
         Simd::float8 parameterDriveGain = 1.0f;
 
         float gate = 0.0f;
-        Dsp::Cv::LinearSmoother<float> gateSmoother;
 
         std::array<ParameterValueData, PARAM_COUNT> parameters;
 
