@@ -147,8 +147,8 @@ namespace Ath::Forma
         parameterFluteStops = parameterFluteStopsInputs.data();
         parameterPercStops = parameterPercStopsInputs.data();
 
-        //sync oscillators to global time:
-        //for (auto& osc : oscillators) osc.setTime(phaseCounter.getTime());
+        Simd::float8 percMul = percussionModeCrescendo ? -1.0f : 1.0f;
+        Simd::float8 percAdd = percussionModeCrescendo ? 1.0f : 0.0f;
 
         for (int i = 0; i < numberOfSamples; i++)
         {
@@ -235,7 +235,7 @@ namespace Ath::Forma
     //even with a low input signal amplitude
             auto filterAmpOut = filterNonlinearity.process(filterAmpIn) * postNonlinearityGain;
             auto fluteOut = filterAmpOut * parameterFluteStops;
-            auto percOut = filterAmpOut * parameterPercStops * float(paraphonicPercussionGenerator.process(gate));
+            auto percOut = filterAmpOut * parameterPercStops * (percAdd + percMul * float(paraphonicPercussionGenerator.process(gate)));
 
             //bleeds:
             auto outBleed = bleedTerz * terzBleedGain + bleed * keyboardBleedGain;
@@ -287,6 +287,8 @@ namespace Ath::Forma
             case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
 
             case TIME: paraphonicPercussionGenerator.setTime(std::lerp(0.01f, 10.0f, x)); break;
+
+            case CRESC: percussionModeCrescendo = x > 0.5f; break;
 
             case BLEED_KEYBOARD: keyboardBleedGain = Math::decibelsToAmplitude(x); break;
             case BLEED_TERZ: terzBleedGain = Math::decibelsToAmplitude(x); break;

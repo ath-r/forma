@@ -145,7 +145,7 @@ namespace Ath::Forma
     static const Control::Parameter PercussionCresc
     {
         .type = Control::Parameter::Type::Bool,
-        .name = "Percussion Mode",
+        .name = "Percussion/Crescendo",
         .id = "cresc",
         .offText = "PERC",
         .onText = "CRESC",

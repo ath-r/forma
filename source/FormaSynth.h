@@ -113,6 +113,7 @@ private:
         Simd::float8 parameterDriveGain = 1.0f;
 
         float gate = 0.0f;
+        bool percussionModeCrescendo = false;
 
         std::array<ParameterValueData, PARAM_COUNT> parameters;
 
