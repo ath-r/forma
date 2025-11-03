@@ -66,7 +66,7 @@ private:
 
         std::array<FormaFilterBank, 6> filterBanks;
         FormaTransistorNonlinearity8 filterNonlinearity;
-        Dsp::Filter::LowPass1<float> filterTone;
+        Dsp::Filter::TPT::LowPass1<float> filterTone;
 
         Dsp::Cv::PercussionGenerator<Simd::float8> paraphonicPercussionGenerator;
         FormaHum hum;

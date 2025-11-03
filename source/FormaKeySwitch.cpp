@@ -2,8 +2,10 @@
 
 #include "FormaKeySwitch.h"
 #include "math/Clamp.h"
+#include "math/Conversion.h"
 #include "math/Easings.h"
 #include "math/Simd.h"
+#include "math/Random.h"
 #include <cmath>
 
 namespace Ath::Forma
@@ -29,6 +31,10 @@ namespace Ath::Forma
             2.0f,
             2.0f
         };
+
+        filterCutoff = Math::noteToFrequency(keyNumber + Math::C1_MIDI_NOTE_NUMBER);
+        filterCutoff *= {1.0f, 2.0f, 4.0f, 8.0f, 3.0f, 5.0f, 1.0f, 1.0f};
+        filterCutoff = Simd::min(filterCutoff, 1000.0f);
     };
 
     bool FormaNeedleContacts::isActive() { return active; }
@@ -38,7 +44,7 @@ namespace Ath::Forma
         const Simd::float8 x = Math::easeOutCubic(float(message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
 
-        filter.setCutoffFrequency(10000.0f);
+        filter.setCutoffFrequency(100.0f);
         delta = Simd::float8(c.T) / time;
 
         active = true;
@@ -47,17 +53,18 @@ namespace Ath::Forma
     void FormaNeedleContacts::handleNoteOff (Midi::MessageNoteOff message) 
     {
         filter.setCutoffFrequency(100.0f);
-        delta = Simd::float8(-c.T) / time;
+        delta = Simd::float8(-c.T) / 0.001f;
 
         active = false;
     }
 
-    Simd::float8 FormaNeedleContacts::processSample(Simd::float8 x)
+    Simd::float8 FormaNeedleContacts::processSample()
     {
         value += delta;
         value = Simd::clamp(value, 0.0f, 1.0f);
         auto logic = value > actionThreshold;
 
-        return x * filter.process(Simd::float8(1.0f) & logic);
+        y = filter.process(Simd::float8(1.0f) & logic);
+        return y;
     }
 }

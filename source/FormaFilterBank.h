@@ -6,7 +6,7 @@
 #include "math/Conversion.h"
 #include "math/Simd.h"
 #include "dsp/Context.h"
-#include "dsp/filter/FilterMath.h"
+#include "dsp/filter/TPT.h"
 
 namespace Ath::Forma 
 {
@@ -19,8 +19,8 @@ namespace Ath::Forma
         Dsp::Context c;
         Simd::float8 frequency = 30.0f;
 
-        std::array<Dsp::Filter::LowPass1<Simd::float8>, STAGE_NUM> filters;
-        Dsp::Filter::HighPass1<Simd::float8> highpass;
+        std::array<Dsp::Filter::TPT::LowPass1<Simd::float8>, STAGE_NUM> filters;
+        Dsp::Filter::TPT::HighPass1<Simd::float8> highpass;
 
         public:
         Simd::float8 hmul = { 1.0, 2.0, 4.0, 8.0, 3.0, 10.0, 1.0, 1.0 };

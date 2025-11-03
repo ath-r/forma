@@ -15,7 +15,8 @@ namespace Ath::Math
 
     float semitonesToFrequencyRatio (float semitones);
 
-    constexpr double ipow(double a, int n) 
+    template <typename T>
+    constexpr double ipow(T a, int n) 
     {
         if (n == 0) return 1.0;
         if (n < 0) return 1.0 / ipow(a, -n);

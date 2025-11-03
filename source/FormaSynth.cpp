@@ -159,6 +159,7 @@ namespace Ath::Forma
 
             for (auto& osc : oscillators) osc.processSample();
             for (auto& osc : oscillators2) osc.processSample();
+            for (auto& needle : needleContacts) needle.processSample();
 
             for (int n = 0; n < OSC_NUMBER; n++)
             {
@@ -191,7 +192,7 @@ namespace Ath::Forma
                 auto terz = Simd::permute(oscillatorOutputs[n + 4], Simd::perm6) & maskTerz;
 
                 needleContactInputs[n] = prinzipal + nasat + terz;
-                needleContactOutputs[n] = needleContacts[n].processSample(needleContactInputs[n]);
+                needleContactOutputs[n] = needleContactInputs[n] * needleContacts[n].last();
 
                 auto bleedAttenuation = (float(n) / float(KEY_NUMBER));
                 bleedAttenuation = Math::ipow(bleedAttenuation, 4);

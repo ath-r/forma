@@ -1,12 +1,10 @@
 #pragma once
 
-#include "dsp/filter/FilterMath.h"
+#include "dsp/filter/Naive.h"
 #include "dsp/Context.h"
-#include "dsp/cv/LinearSmoother.h"
 
 #include "control/Midi.h"
 #include "math/Simd.h"
-#include "math/Random.h"
 
 namespace Ath::Forma
 {
@@ -22,14 +20,14 @@ namespace Ath::Forma
         const Simd::float8 minVelocityGateAttack = 0.00001f;
         const Simd::float8 maxVelocityGateAttack = 0.05f;
         
-        Simd::float8 time = 0.00001f;
+        Simd::float8 filterCutoff = 100.0f;
         Simd::float8 delta = 0.0f;
         Simd::float8 value = 0.0f;
+        Simd::float8 y = 0.0f;
 
-        bool active = 0.0f;
-        Simd::float8 inputSign1 = 0.0f;
+        bool active = false;
 
-        Filter::LowPass1<Simd::float8> filter;
+        Filter::Naive::LowPass1<Simd::float8> filter;
 
     public:
         void setContext (Context context);
@@ -42,6 +40,8 @@ namespace Ath::Forma
 
         void handleNoteOff (Midi::MessageNoteOff message);
 
-        Simd::float8 processSample(Simd::float8 x);
+        Simd::float8 processSample();
+
+        inline Simd::float8 last() { return y; }
     };
 }
