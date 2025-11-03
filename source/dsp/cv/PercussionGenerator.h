@@ -2,6 +2,7 @@
 
 #include "../Context.h"
 #include "../../math/Conversion.h"
+#include "../../control/Midi.h"
 #include <algorithm>
 
 namespace Ath::Dsp::Cv
@@ -10,11 +11,16 @@ namespace Ath::Dsp::Cv
     class PercussionGenerator
     {
         Context c;
-        T time = 1.0;
+        double time = 1.0;
 
-        T lastInput = 0.0;
         T a = 0.9;
         T y = 0.0;
+
+        T a2 = 0.9;
+        T y2 = 0.0;
+
+        T add = 0.0f;
+        T mul = 1.0f;
 public:
         void setContext(Context context)
         {
@@ -22,22 +28,40 @@ public:
             setTime(time);
         }
 
-        void setTime(T t)
+        void setTime(double t)
         {
             time = std::clamp(t, 0.001, 10.0);
             auto decayInSamples = t * c.SR;
             a = std::pow(0.01, 1.0 / decayInSamples);
         }
 
-        T process(T gateIn)
+        void setCrescendo(bool cresc)
         {
-            T gateTruncated = (gateIn > 0.5f) ? 1.0f : 0.0f;
+            // cv in perc mode: y
+            // cv in cresc mode: 1 - y
+            add = cresc ? 1.0 : 0.0;
+            mul = cresc ? -1.0 : 1.0; 
+        }
 
-            if (gateTruncated != lastInput) y = gateTruncated;
-            lastInput = gateTruncated;
+        void handleNoteOn(Control::Midi::MessageNoteOn message)
+        {
+            y = 1.0;
+            y2 = 1.0;
+            a2 = 1.0;
+            setTime(time);
+        }
 
+        void handleNoteOff(Control::Midi::MessageNoteOff message)
+        {
+            auto decayInSamples = 0.005 * c.SR;
+            a2 = std::pow(0.01, 1.0 / decayInSamples);
+        }
+
+        inline T process()
+        {
             y *= a;
-            return y;
+            y2 *= a2;
+            return (y * mul + add) * y2;
         }
     };
 }

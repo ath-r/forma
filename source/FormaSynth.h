@@ -68,7 +68,7 @@ private:
         FormaTransistorNonlinearity8 filterNonlinearity;
         Dsp::Filter::LowPass1<float> filterTone;
 
-        Dsp::Cv::PercussionGenerator<double> paraphonicPercussionGenerator;
+        Dsp::Cv::PercussionGenerator<Simd::float8> paraphonicPercussionGenerator;
         FormaHum hum;
         FormaTransistorNonlinearity outputNonlinearity;
         Dsp::Cv::LinearSmoother<float> gateSmoother;
@@ -113,7 +113,6 @@ private:
         Simd::float8 parameterDriveGain = 1.0f;
 
         float gate = 0.0f;
-        bool percussionModeCrescendo = false;
 
         std::array<ParameterValueData, PARAM_COUNT> parameters;
 

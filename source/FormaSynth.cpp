@@ -147,9 +147,6 @@ namespace Ath::Forma
         parameterFluteStops = parameterFluteStopsInputs.data();
         parameterPercStops = parameterPercStopsInputs.data();
 
-        Simd::float8 percMul = percussionModeCrescendo ? -1.0f : 1.0f;
-        Simd::float8 percAdd = percussionModeCrescendo ? 1.0f : 0.0f;
-
         for (int i = 0; i < numberOfSamples; i++)
         {
             //process oscillators:
@@ -235,7 +232,7 @@ namespace Ath::Forma
     //even with a low input signal amplitude
             auto filterAmpOut = filterNonlinearity.process(filterAmpIn) * postNonlinearityGain;
             auto fluteOut = filterAmpOut * parameterFluteStops;
-            auto percOut = filterAmpOut * parameterPercStops * (percAdd + percMul * float(paraphonicPercussionGenerator.process(gate)));
+            auto percOut = filterAmpOut * parameterPercStops * paraphonicPercussionGenerator.process();
 
             //bleeds:
             auto outBleed = bleedTerz * terzBleedGain + bleed * keyboardBleedGain;
@@ -286,9 +283,9 @@ namespace Ath::Forma
             case P5: parameterPercStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
 
-            case TIME: paraphonicPercussionGenerator.setTime(std::lerp(0.01f, 10.0f, x)); break;
+            case TIME: paraphonicPercussionGenerator.setTime(std::lerp(0.01f, 10.0f, x * x * x)); break;
 
-            case CRESC: percussionModeCrescendo = x > 0.5f; break;
+            case CRESC: paraphonicPercussionGenerator.setCrescendo(x > 0.5f); break;
 
             case BLEED_KEYBOARD: keyboardBleedGain = Math::decibelsToAmplitude(x); break;
             case BLEED_TERZ: terzBleedGain = Math::decibelsToAmplitude(x); break;
@@ -324,6 +321,7 @@ namespace Ath::Forma
             for (auto& contact : needleContacts)
             {
                 contact.handleNoteOff(Midi::MessageNoteOff());
+                paraphonicPercussionGenerator.handleNoteOff(Midi::MessageNoteOff());
                 voiceCount = 0;
             }
             return; 
@@ -346,7 +344,10 @@ namespace Ath::Forma
                 {
                     if (!needle.isActive())
                     {
-                        needle.handleNoteOn(static_cast<Midi::MessageNoteOn>(message));
+                        auto m = static_cast<Midi::MessageNoteOn>(message);
+                        needle.handleNoteOn(m);
+
+                        if (voiceCount == 0) paraphonicPercussionGenerator.handleNoteOn(m);
                         voiceCount += 1;
                     }
                 }
@@ -355,8 +356,11 @@ namespace Ath::Forma
                 {
                     if (needle.isActive())
                     {
-                        needle.handleNoteOff(static_cast<Midi::MessageNoteOff>(message));
+                        auto m = static_cast<Midi::MessageNoteOff>(message);
+                        needle.handleNoteOff(m);
+
                         voiceCount -= 1;
+                        if (voiceCount == 0) paraphonicPercussionGenerator.handleNoteOff(m);
                     }
                 }
             }
