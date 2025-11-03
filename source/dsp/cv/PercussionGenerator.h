@@ -21,6 +21,8 @@ namespace Ath::Dsp::Cv
 
         T add = 0.0f;
         T mul = 1.0f;
+
+        T out = 0.0f;
 public:
         void setContext(Context context)
         {
@@ -57,11 +59,17 @@ public:
             a2 = std::pow(0.01, 1.0 / decayInSamples);
         }
 
-        inline T process()
+        inline T processSample()
         {
             y *= a;
             y2 *= a2;
-            return (y * mul + add) * y2;
+            out = (y * mul + add) * y2;
+            return out;
+        }
+
+        inline T last()
+        {
+            return out;
         }
     };
 }
