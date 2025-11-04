@@ -26,7 +26,6 @@ namespace Ath::Forma
         perc2 (ParametersByID[P2].id, vts),
         perc1 (ParametersByID[P1].id, vts),
         time (ParametersByID[TIME].id, vts),
-        poly(ParametersByID[POLY].id, vts),
         perc(ParametersByID[CRESC].id, vts)
         {
             addAndMakeVisible(frame);
@@ -37,7 +36,6 @@ namespace Ath::Forma
             addAndMakeVisible (perc2);
             addAndMakeVisible (perc1);
             addAndMakeVisible (time);
-            addAndMakeVisible(poly);
             addAndMakeVisible(perc);
 
             perc16.slider.setColor(ParameterSlider::ColorScheme::Blue);
@@ -70,7 +68,6 @@ namespace Ath::Forma
             perc2.setBounds (area.removeFromLeft (sliderWidth));
             perc1.setBounds (area.removeFromLeft (sliderWidth));
             time.setBounds (area.removeFromLeft (sliderWidth));
-            poly.setBounds(area.removeFromLeft (sliderWidth));
             perc.setBounds(area.removeFromLeft (sliderWidth));
         }
 
@@ -79,6 +76,6 @@ namespace Ath::Forma
 
         FrameComponent frame;
         Gui::SliderWithLabel perc16, perc8, perc5, perc4, perc2, perc1, time;
-        Gui::Tumbler poly, perc;
+        Gui::Tumbler perc;
     };
 }

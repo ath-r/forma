@@ -132,22 +132,22 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
-    static const Control::Parameter PercussionPoly
+    static const Control::Parameter PercussionTremolo
     {
         .type = Control::Parameter::Type::Bool,
-        .name = "Percussion Polyphony",
-        .id = "poly",
-        .offText = "PARA",
-        .onText = "POLY",
+        .name = "Percussion Envelope Mode",
+        .id = "tremolo",
+        .offText = "SINGLE",
+        .onText = "TREMOLO",
         .def = 0.0f
     };
 
     static const Control::Parameter PercussionCresc
     {
         .type = Control::Parameter::Type::Bool,
-        .name = "Percussion/Crescendo",
+        .name = "Decay/Crescendo",
         .id = "cresc",
-        .offText = "PERC",
+        .offText = "DECAY",
         .onText = "CRESC",
         .def = 0.0f
     };
@@ -198,7 +198,6 @@ namespace Ath::Forma
         P2,
         P1,
         TIME,
-        POLY,
         CRESC,
         BLEED_KEYBOARD,
         BLEED_TERZ,
@@ -222,7 +221,6 @@ namespace Ath::Forma
         [P2] = Percussion2,
         [P1] = Percussion1,
         [TIME] = PercussionTime,
-        [POLY] = PercussionPoly,
         [CRESC] = PercussionCresc,
         [BLEED_KEYBOARD] = keyboardBleed,
         [BLEED_TERZ] = terzBleed,

@@ -16,6 +16,7 @@ namespace Ath::Dsp::Cv
         T a = 0.9;
         T y = 0.0;
 
+        T a2_preset_value = 0.9;
         T a2 = 0.9;
         T y2 = 0.0;
 
@@ -23,16 +24,22 @@ namespace Ath::Dsp::Cv
         T mul = 1.0f;
 
         T out = 0.0f;
+
+        bool gate = false;
+        bool tremolo = false;
 public:
         void setContext(Context context)
         {
             c = context;
             setTime(time);
+
+            auto decayInSamples = 0.005 * c.SR;
+            a2_preset_value = std::pow(0.01, 1.0 / decayInSamples);
         }
 
         void setTime(double t)
         {
-            time = std::clamp(t, 0.001, 10.0);
+            time = std::clamp(t, 0.01, 10.0);
             auto decayInSamples = t * c.SR;
             a = std::pow(0.01, 1.0 / decayInSamples);
         }
@@ -45,22 +52,35 @@ public:
             mul = cresc ? -1.0 : 1.0; 
         }
 
+        void setTremolo(bool trem)
+        {
+            tremolo = trem;
+        }
+
         void handleNoteOn(Control::Midi::MessageNoteOn message)
         {
             y = 1.0;
             y2 = 1.0;
             a2 = 1.0;
-            setTime(time);
+
+            gate = true;
         }
 
         void handleNoteOff(Control::Midi::MessageNoteOff message)
         {
-            auto decayInSamples = 0.005 * c.SR;
-            a2 = std::pow(0.01, 1.0 / decayInSamples);
+            a2 = a2_preset_value;
+
+            gate = false;
         }
 
         inline T processSample()
         {
+            if (tremolo)
+            {
+                if (gate && y < 0.01) handleNoteOff(Control::Midi::MessageNoteOff());
+                if (!gate && y2 < 0.01) handleNoteOn(Control::Midi::MessageNoteOn());
+            }
+
             y *= a;
             y2 *= a2;
             out = (y * mul + add) * y2;

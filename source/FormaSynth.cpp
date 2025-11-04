@@ -235,8 +235,8 @@ namespace Ath::Forma
             auto filterAmpOut = filterNonlinearity.process(filterAmpIn) * postNonlinearityGain;
             auto fluteOut = filterAmpOut * parameterFluteStops;
 
-            auto percIn = (filterAmpOut * parameterPercStops * percussionGenerator.last() * preNonlinearityGain).sum();
-            auto percOut = percusionNonlinearity.process(percIn) * 128.0f;
+            auto percIn = (filterAmpOut * parameterPercStops * preNonlinearityGain).sum();
+            auto percOut = percusionNonlinearity.process(percIn) * 128.0f * percussionGenerator.last();
 
             //bleeds:
             auto outBleed = bleedTerz * terzBleedGain + bleed * keyboardBleedGain;
@@ -288,14 +288,13 @@ namespace Ath::Forma
             case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
 
             case TIME: percussionGenerator.setTime(std::lerp(0.01f, 10.0f, x * x * x)); break;
-
             case CRESC: percussionGenerator.setCrescendo(x > 0.5f); break;
 
             case BLEED_KEYBOARD: keyboardBleedGain = Math::decibelsToAmplitude(x); break;
             case BLEED_TERZ: terzBleedGain = Math::decibelsToAmplitude(x); break;
             case NOISE_FLOOR: noiseFloorGain = Math::decibelsToAmplitude(x); break;
         }
-    }
+    }   
 
     void FormaSynth::handleMidiEvent (Control::Midi::Message message)
     {

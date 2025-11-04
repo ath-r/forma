@@ -68,7 +68,7 @@ private:
         FormaTransistorNonlinearity8 filterNonlinearity;
         Dsp::Filter::TPT::LowPass1<float> filterTone;
 
-        Dsp::Cv::PercussionGenerator<Simd::float8> percussionGenerator;
+        Dsp::Cv::PercussionGenerator<double> percussionGenerator;
         FormaTransistorNonlinearity percusionNonlinearity;
         FormaHum hum;
         FormaTransistorNonlinearity outputNonlinearity;
