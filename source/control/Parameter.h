@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <format>
 
 namespace Ath::Control
@@ -23,6 +24,8 @@ namespace Ath::Control
 
         std::string offText;
         std::string onText;
+
+        std::vector<std::string> choices;
 
         float def;
         float min;

@@ -106,6 +106,7 @@ private:
 
         alignas(32) std::array<float, 8> parameterPercStopsInputs;
         Simd::float8 parameterPercStops = 0.0f;
+        bool percEnabled = false;
 
         Simd::float8 keyboardBleedGain = Math::dB(-70);
         Simd::float8 terzBleedGain = Math::dB(-10);

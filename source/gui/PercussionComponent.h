@@ -9,6 +9,7 @@
 
 #include "../PluginParameters.h"
 #include "FrameComponent.h"
+#include "ChoiceComponent.h"
 #include "SliderWithLabel.h"
 #include "Tumbler.h"
 
@@ -25,10 +26,12 @@ namespace Ath::Forma
         perc4 (ParametersByID[P4].id, vts),
         perc2 (ParametersByID[P2].id, vts),
         perc1 (ParametersByID[P1].id, vts),
-        time (ParametersByID[TIME].id, vts),
-        perc(ParametersByID[CRESC].id, vts)
+        time (ParametersByID[PERC_TIME].id, vts),
+        percOn(ParametersByID[PERC_ON].id, vts),
+        cresc(ParametersByID[PERC_CRESC].id, vts)
         {
             addAndMakeVisible(frame);
+            addAndMakeVisible(percOn);
             addAndMakeVisible (perc16);
             addAndMakeVisible (perc8);
             addAndMakeVisible (perc5);
@@ -36,7 +39,7 @@ namespace Ath::Forma
             addAndMakeVisible (perc2);
             addAndMakeVisible (perc1);
             addAndMakeVisible (time);
-            addAndMakeVisible(perc);
+            addAndMakeVisible (cresc);
 
             perc16.slider.setColor(ParameterSlider::ColorScheme::Blue);
             perc8.slider.setColor(ParameterSlider::ColorScheme::Blue);
@@ -61,6 +64,7 @@ namespace Ath::Forma
 
             auto sliderWidth = area.getWidth() / 9;
 
+            percOn.setBounds(area.removeFromLeft (sliderWidth));
             perc16.setBounds (area.removeFromLeft (sliderWidth));
             perc8.setBounds (area.removeFromLeft (sliderWidth));
             perc5.setBounds (area.removeFromLeft (sliderWidth));
@@ -68,7 +72,7 @@ namespace Ath::Forma
             perc2.setBounds (area.removeFromLeft (sliderWidth));
             perc1.setBounds (area.removeFromLeft (sliderWidth));
             time.setBounds (area.removeFromLeft (sliderWidth));
-            perc.setBounds(area.removeFromLeft (sliderWidth));
+            cresc.setBounds(area.removeFromLeft (sliderWidth));
         }
 
         private:
@@ -76,6 +80,6 @@ namespace Ath::Forma
 
         FrameComponent frame;
         Gui::SliderWithLabel perc16, perc8, perc5, perc4, perc2, perc1, time;
-        Gui::Tumbler perc;
+        Gui::Tumbler percOn, cresc;
     };
 }

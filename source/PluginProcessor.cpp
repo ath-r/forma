@@ -210,6 +210,23 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
 
                 break;
             }
+            case Ath::Control::Parameter::Type::Choice:
+            {
+                juce::StringArray strings;
+                for (auto& string : paramData.choices) strings.add(string);
+
+                params.push_back(std::make_unique<juce::AudioParameterChoice>(
+                        juce::ParameterID {paramData.id, 0},
+                        paramData.name,
+                        strings,
+                        paramData.def,
+                        paramData.name,
+                        [paramData](int index, int){ return juce::String(paramData.choices[index]); }
+                    )
+                );
+
+                break;
+            }
 
         }
     }

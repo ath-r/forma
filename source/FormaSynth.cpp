@@ -105,7 +105,7 @@ namespace Ath::Forma
             prefilterGains[i] = Simd::rmag(transfer.re, transfer.im);
         }
         
-        percussionGenerator.setTime(getParameter(TIME).value);
+        percussionGenerator.setTime(getParameter(PERC_TIME).value);
         gateSmoother.setTime(0.001f);
     }
 
@@ -136,7 +136,7 @@ namespace Ath::Forma
         if (voiceCount > 0)
         {
             gate = 1.0f;
-            gateSmoother.setTime(0.001f);
+            gateSmoother.setTime(0.0001f);
         }
         else
         {
@@ -145,7 +145,9 @@ namespace Ath::Forma
         }
 
         parameterFluteStops = parameterFluteStopsInputs.data();
-        parameterPercStops = parameterPercStopsInputs.data();
+
+        if (percEnabled) parameterPercStops = parameterPercStopsInputs.data();
+        else parameterPercStops = Math::dB(-50);
 
         for (int i = 0; i < numberOfSamples; i++)
         {
@@ -269,6 +271,9 @@ namespace Ath::Forma
         if (touch) parameters[parameterIndex].touch(x);
         else parameters[parameterIndex].touchSilently(x);
 
+        const bool booleanValue = x >= 0.5f;
+        bool updatePercussionPreset = false;
+
         switch(parameterIndex)
         {
             case F16: parameterFluteStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
@@ -280,19 +285,41 @@ namespace Ath::Forma
 
             case TONE: filterTone.setCutoffFrequency(Math::logerp2(500.0f, 15000.0f, x)); break;
 
+            case PERC_ON: percEnabled = booleanValue; break;
             case P16: parameterPercStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P8: parameterPercStopsInputs[1] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P4: parameterPercStopsInputs[2] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P2: parameterPercStopsInputs[3] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P5: parameterPercStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            
+            case PERC_TIME: percussionGenerator.setTime(std::lerp(0.5f, 10.0f, x * x)); break;
+            case PERC_CRESC: percussionGenerator.setCrescendo(x > 0.5f); break;
 
-            case TIME: percussionGenerator.setTime(std::lerp(0.01f, 10.0f, x * x * x)); break;
-            case CRESC: percussionGenerator.setCrescendo(x > 0.5f); break;
+            case PERC_SOFT:
+            case PERC_SPEED:
+            case PERC_HARMONIC: updatePercussionPreset = true; break;
 
             case BLEED_KEYBOARD: keyboardBleedGain = Math::decibelsToAmplitude(x); break;
             case BLEED_TERZ: terzBleedGain = Math::decibelsToAmplitude(x); break;
             case NOISE_FLOOR: noiseFloorGain = Math::decibelsToAmplitude(x); break;
+        }
+
+        if (updatePercussionPreset)
+        {
+            const bool softMode = getParameter(PERC_SOFT).value >= 0.5f;
+            const bool speedMode = getParameter(PERC_SPEED).value >= 0.5f;
+            const bool harmonicMode = getParameter(PERC_HARMONIC).value >= 0.5f;
+
+            setParameter(PERC_TIME, speedMode ? 0.0f : 0.3f, true);
+            setParameter(P16, 0.0f, true);
+            setParameter(P8, !harmonicMode, true);
+            setParameter(P5, harmonicMode, true);
+            setParameter(P4, !harmonicMode && softMode, true);
+            setParameter(P2, !harmonicMode && softMode, true);
+            setParameter(P1, harmonicMode && softMode, true);
+
+            setParameter(PERC_CRESC, 0.0f, true);
         }
     }   
 
@@ -313,6 +340,10 @@ namespace Ath::Forma
                 case 0x11: setParameter(F1, value, true); break;
                 case 0x0b:
                 case 0x14: setParameter(TONE, value, true); break;
+                case 0x42: setParameter(PERC_ON, value, true); break;
+                case 0x46: setParameter(PERC_SOFT, value, true); break;
+                case 0x47: setParameter(PERC_SPEED, value, true); break;
+                case 0x48: setParameter(PERC_HARMONIC, value, true); break;
                 default: break;
             }
 

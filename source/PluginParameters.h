@@ -69,6 +69,16 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
+    static const Control::Parameter PercussionOn
+    {
+        .type = Control::Parameter::Type::Bool,
+        .name = "Percussion On/Off",
+        .id = "percEnabled",
+        .offText = "OFF",
+        .onText = "ON",
+        .def = 0.0f
+    };
+
     static const Control::Parameter Percussion16
     {
         .name = "P16′",
@@ -132,23 +142,43 @@ namespace Ath::Forma
         .max = 1.0f
     };
 
-    static const Control::Parameter PercussionTremolo
-    {
-        .type = Control::Parameter::Type::Bool,
-        .name = "Percussion Envelope Mode",
-        .id = "tremolo",
-        .offText = "SINGLE",
-        .onText = "TREMOLO",
-        .def = 0.0f
-    };
-
     static const Control::Parameter PercussionCresc
     {
         .type = Control::Parameter::Type::Bool,
         .name = "Decay/Crescendo",
-        .id = "cresc",
+        .id = "percCresc",
         .offText = "DECAY",
         .onText = "CRESC",
+        .def = 0.0f
+    };
+
+    static const Control::Parameter PercussionSoft
+    {
+        .type = Control::Parameter::Type::Bool,
+        .name = "Percussion Soft",
+        .id = "percSoft",
+        .offText = "SOFT",
+        .onText = "BRIGHT",
+        .def = 0.0f
+    };
+
+    static const Control::Parameter PercussionSpeed
+    {
+        .type = Control::Parameter::Type::Bool,
+        .name = "Percussion Speed",
+        .id = "percSpeed",
+        .offText = "SLOW",
+        .onText = "FAST",
+        .def = 0.0f
+    };
+
+    static const Control::Parameter PercussionHarmonic
+    {
+        .type = Control::Parameter::Type::Bool,
+        .name = "Percussion Harmonic",
+        .id = "percHarmonic",
+        .offText = "2ND",
+        .onText = "3RD",
         .def = 0.0f
     };
 
@@ -191,14 +221,18 @@ namespace Ath::Forma
         F2,
         F1,
         TONE,
+        PERC_ON,
         P16,
         P8,
         P5,
         P4,
         P2,
         P1,
-        TIME,
-        CRESC,
+        PERC_TIME,
+        PERC_CRESC,
+        PERC_SOFT,
+        PERC_SPEED,
+        PERC_HARMONIC,
         BLEED_KEYBOARD,
         BLEED_TERZ,
         NOISE_FLOOR,
@@ -214,18 +248,20 @@ namespace Ath::Forma
         [F2] = Flute2,
         [F1] = Flute1,
         [TONE] = Tone,
+        [PERC_ON] = PercussionOn,
         [P16] = Percussion16,
         [P8] = Percussion8,
         [P5] = Percussion5,
         [P4] = Percussion4,
         [P2] = Percussion2,
         [P1] = Percussion1,
-        [TIME] = PercussionTime,
-        [CRESC] = PercussionCresc,
+        [PERC_TIME] = PercussionTime,
+        [PERC_CRESC] = PercussionCresc,
+        [PERC_SOFT] = PercussionSoft,
+        [PERC_SPEED] = PercussionSpeed,
+        [PERC_HARMONIC] = PercussionHarmonic,
         [BLEED_KEYBOARD] = keyboardBleed,
         [BLEED_TERZ] = terzBleed,
         [NOISE_FLOOR] = noiseFloor
     };
-
-
 }

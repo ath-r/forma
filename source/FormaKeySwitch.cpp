@@ -44,7 +44,7 @@ namespace Ath::Forma
         const Simd::float8 x = Math::easeOutCubic(float(message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
 
-        filter.setCutoffFrequency(100.0f);
+        filter.setCutoffFrequency(10000.0f);
         delta = Simd::float8(c.T) / time;
 
         active = true;
@@ -52,7 +52,7 @@ namespace Ath::Forma
 
     void FormaNeedleContacts::handleNoteOff (Midi::MessageNoteOff message) 
     {
-        filter.setCutoffFrequency(100.0f);
+        filter.setCutoffFrequency(500.0f);
         delta = Simd::float8(-c.T) / 0.001f;
 
         active = false;
@@ -65,6 +65,6 @@ namespace Ath::Forma
         auto logic = value > actionThreshold;
 
         y = filter.process(Simd::float8(1.0f) & logic);
-        return y;
+        return Simd::float8(1.0f) & logic;
     }
 }
