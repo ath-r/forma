@@ -40,7 +40,7 @@ public:
         void setTime(double t)
         {
             time = std::clamp(t, 0.01, 10.0);
-            auto decayInSamples = t * c.SR;
+            auto decayInSamples = time * c.SR;
             a = std::pow(0.01, 1.0 / decayInSamples);
         }
 
