@@ -52,7 +52,7 @@ namespace Ath::Forma
 
     void FormaNeedleContacts::handleNoteOff (Midi::MessageNoteOff message) 
     {
-        filter.setCutoffFrequency(500.0f);
+        filter.setCutoffFrequency(1000.0f);
         delta = Simd::float8(-c.T) / 0.001f;
 
         active = false;
@@ -65,6 +65,6 @@ namespace Ath::Forma
         auto logic = value > actionThreshold;
 
         y = filter.process(Simd::float8(1.0f) & logic);
-        return Simd::float8(1.0f) & logic;
+        return y;
     }
 }

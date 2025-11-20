@@ -76,7 +76,7 @@ namespace Ath::Forma
             {
                 y = filters[i].process(y);
             }
-            return y + x * Math::DB_MINUS48;
+            return y + x * Math::dB(-60);
         }
     };
 }
