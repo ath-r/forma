@@ -289,11 +289,11 @@ namespace Ath::Forma
             case P16: parameterPercStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P8: parameterPercStopsInputs[1] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P4: parameterPercStopsInputs[2] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
-            case P2: parameterPercStopsInputs[3] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case P2: parameterPercStopsInputs[3] = std::lerp (Math::DB_MINUS54, Math::DB_MINUS3, x); break;
             case P5: parameterPercStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
-            case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
+            case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, Math::DB_MINUS3, x); break;
             
-            case PERC_TIME: percussionGenerator.setTime(std::lerp(0.5f, 10.0f, x * x)); break;
+            case PERC_TIME: percussionGenerator.setTime(std::lerp(0.25f, 10.0f, x * x)); break;
             case PERC_CRESC: percussionGenerator.setCrescendo(x > 0.5f); break;
 
             case PERC_SOFT:
