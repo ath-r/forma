@@ -37,7 +37,9 @@ namespace Ath::Forma
         filterCutoff = Simd::min(filterCutoff, 1000.0f);
     };
 
-    bool FormaNeedleContacts::isActive() { return active; }
+    bool FormaNeedleContacts::isGateOn() { return gate; }
+
+    bool FormaNeedleContacts::isActive() { return value.sum() > 0.0f; }
 
     void FormaNeedleContacts::handleNoteOn (Midi::MessageNoteOn message)
     {
@@ -47,7 +49,7 @@ namespace Ath::Forma
         filter.setCutoffFrequency(10000.0f);
         delta = Simd::float8(c.T) / time;
 
-        active = true;
+        gate = true;
     }
 
     void FormaNeedleContacts::handleNoteOff (Midi::MessageNoteOff message) 
@@ -55,7 +57,7 @@ namespace Ath::Forma
         filter.setCutoffFrequency(1000.0f);
         delta = Simd::float8(-c.T) / 0.001f;
 
-        active = false;
+        gate = false;
     }
 
     Simd::float8 FormaNeedleContacts::processSample()

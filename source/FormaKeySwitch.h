@@ -25,7 +25,7 @@ namespace Ath::Forma
         Simd::float8 value = 0.0f;
         Simd::float8 y = 0.0f;
 
-        bool active = false;
+        bool gate = false;
 
         Filter::Naive::LowPass1<Simd::float8> filter;
 
@@ -33,6 +33,8 @@ namespace Ath::Forma
         void setContext (Context context);
 
         void init (int keyNumber);
+
+        bool isGateOn();
 
         bool isActive();
 

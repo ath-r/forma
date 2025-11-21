@@ -39,7 +39,7 @@ namespace Ath::Dsp::Filter::TPT
         T z1 = 0.0f;
         T y = 0.0f;
 
-        T frequency;
+        T frequency = 100.f;
 
     public:
         void reset()

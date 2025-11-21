@@ -376,19 +376,20 @@ namespace Ath::Forma
                 // fire midi events here
                 if (message.isNoteOn())
                 {
-                    if (!needle.isActive())
-                    {
-                        auto m = static_cast<Midi::MessageNoteOn>(message);
-                        needle.handleNoteOn(m);
+                    auto m = static_cast<Midi::MessageNoteOn>(message);
 
-                        if (voiceCount == 0) percussionGenerator.handleNoteOn(m);
+                    if (!needle.isActive() && (voiceCount == 0)) percussionGenerator.handleNoteOn(m);
+
+                    if (!needle.isGateOn())
+                    {
+                        needle.handleNoteOn(m);
                         voiceCount += 1;
                     }
                 }
 
                 else if (message.isNoteOff())
                 {
-                    if (needle.isActive())
+                    if (needle.isGateOn())
                     {
                         auto m = static_cast<Midi::MessageNoteOff>(message);
                         needle.handleNoteOff(m);

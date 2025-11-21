@@ -19,7 +19,7 @@ namespace Ath::Dsp::Filter::Naive
         T g = 0.0f;
         T y = 0.0f;
 
-        T frequency;
+        T frequency = 100.0f;
 
     public:
         void reset()
