@@ -102,7 +102,7 @@ namespace Ath::Forma
 
                 transfer += t;
             }
-            prefilterGains[i] = Simd::rmag(transfer.re, transfer.im);
+            prefilterGains[i] = Simd::rmag(transfer.re, transfer.im) * std::lerp(1.0f, Math::dB(-6), float(i) / 61.0f);
         }
         
         percussionGenerator.setTime(getParameter(PERC_TIME).value);
