@@ -256,8 +256,8 @@ namespace Ath::Forma
             auto toneOut = filterTone.process(buffer[i]);
 
             //output nonlinearity
-            static float postNonlinearityGain = 128.0f;
-            static float preNonlinearityGain = 1.0f / 128.0f;
+            static float postNonlinearityGain = 256.0f;
+            static float preNonlinearityGain = 1.0f / 256.0f;
             auto ampIn = toneOut * (preNonlinearityGain / 6.0f);
             auto ampOut = outputNonlinearity.process(ampIn) * (postNonlinearityGain * 6.0f);
 
@@ -293,7 +293,7 @@ namespace Ath::Forma
             case P5: parameterPercStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, Math::DB_MINUS3, x); break;
             
-            case PERC_TIME: percussionGenerator.setTime(std::lerp(0.25f, 10.0f, x * x)); break;
+            case PERC_TIME: percussionGenerator.setTime(std::lerp(0.1f, 10.0f, x * x)); break;
             case PERC_CRESC: percussionGenerator.setCrescendo(x > 0.5f); break;
 
             case PERC_SOFT:
@@ -311,7 +311,7 @@ namespace Ath::Forma
             const bool speedMode = getParameter(PERC_SPEED).value >= 0.5f;
             const bool harmonicMode = getParameter(PERC_HARMONIC).value >= 0.5f;
 
-            setParameter(PERC_TIME, speedMode ? 0.0f : 0.3f, true);
+            setParameter(PERC_TIME, speedMode ? 0.1f : 0.2f, true);
             setParameter(P16, 0.0f, true);
             setParameter(P8, !harmonicMode, true);
             setParameter(P5, harmonicMode, true);

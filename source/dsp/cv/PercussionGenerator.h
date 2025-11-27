@@ -32,14 +32,14 @@ public:
             setTime(time);
 
             filter.setContext(c);
-            filter.setCutoffFrequency(10000);
+            filter.setCutoffFrequency(1000);
         }
 
         void setTime(double t)
         {
             time = std::clamp(t, 0.01, 10.0);
             auto decayInSamples = time * c.SR;
-            a = std::pow(0.01, 1.0 / decayInSamples);
+            a = std::pow(0.1, 1.0 / decayInSamples);
         }
 
         void setCrescendo(bool cresc)
