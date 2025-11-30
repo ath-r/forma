@@ -16,7 +16,6 @@
 
 **FORMA** is a digital emulation of the **Formation 1** transistor combo organ manufactured in the GDR during the 1980s. This virtual instrument imitates the original's signal flow, timbre, articulation, nonlinearities, signal bleeds and noise floor.
 ![](media/interface.png)
-Featuring six ranks from organ's **Flute II** section: 16′, 8′, 5⅓′, 4′, 2′, 1⅗′ and Tone control.
 
 The plug-in currently supports VST3 and CLAP formats for Windows and Linux hosts. 
 Only x86 processors with AVX2 instruction set are supported.
@@ -50,7 +49,12 @@ Keyboard action of the original organ has a particular behaviour that directly a
 /todo
 
 ### Bleeds and noise floor
-/todo
+This plugin imitates several kinds of bleeds and noises that original organ produces:
+
+  * Background noise and 50 hz hum and its harmonics (-40 dB)
+  * Unfiltered square tones that leak into the output past the keyswitches (-70 dB)
+  * Leakage of ranks with faders turned down (around -50 dB) 
+  * Significant leakage of the 1⅗′ rank into the output (up to -30 dB)
 
 # Building from source
 
