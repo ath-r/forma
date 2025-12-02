@@ -265,7 +265,7 @@ namespace Ath::Forma
             buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f * gateSmoother.process(gate);
         }
 
-        parameters[PERC_CV].touch(percussionGenerator.last());
+        parameters[PERC_CV].touch(percussionGenerator.last() * percussionGenerator.getGate());
     }
 
     void FormaSynth::setParameter (int parameterIndex, float x, bool touch) 

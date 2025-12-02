@@ -81,6 +81,11 @@ public:
             return out;
         }
 
+        inline T getGate()
+        {
+            return gate ? 1.0f : 0.0f;
+        }
+
         inline T last()
         {
             return out;
