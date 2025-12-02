@@ -10,63 +10,49 @@ namespace Ath::Forma
     {
         .name = "16′",
         .id = "f16",
-        .def = 1.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .def = 1.0f
     };
 
     static const Control::Parameter Flute8
     {
         .name = "8′",
         .id = "f8",
-        .def = 1.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .def = 1.0f
     };
 
     static const Control::Parameter Flute5
     {
         .name = "5⅓′",
         .id = "f5",
-        .def = 1.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .def = 1.0f
     };
 
     static const Control::Parameter Flute4
     {
         .name = "4′",
         .id = "f4",
-        .def = 1.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .def = 1.0f
     };
 
     static const Control::Parameter Flute2
     {
         .name = "2′",
         .id = "f2",
-        .def = 1.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .def = 1.0f
     };
 
     static const Control::Parameter Flute1
     {
         .name = "1⅗′",
         .id = "f1",
-        .def = 1.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .def = 1.0f
     };
 
     static const Control::Parameter Tone
     {
         .name = "TONE",
         .id = "tone",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .def = 0.0f
     };
 
     static const Control::Parameter PercussionOn
@@ -75,71 +61,58 @@ namespace Ath::Forma
         .name = "Percussion On/Off",
         .id = "percEnabled",
         .offText = "OFF",
-        .onText = "ON",
-        .def = 0.0f
+        .onText = "ON"
+    };
+
+    static const Control::Parameter PercussionCV
+    {
+        .type = Control::Parameter::Type::Float,
+        .category = Control::Parameter::Category::OtherMeter,
+        .name = "Percussion CV",
+        .id = "percCv"
     };
 
     static const Control::Parameter Percussion16
     {
         .name = "P16′",
-        .id = "p16",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .id = "p16"
     };
 
     static const Control::Parameter Percussion8
     {
         .name = "P8′",
-        .id = "p8",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .id = "p8"
     };
 
     static const Control::Parameter Percussion5
     {
         .name = "P5⅓′",
-        .id = "p5",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .id = "p5"
     };
 
     static const Control::Parameter Percussion4
     {
         .name = "P4′",
-        .id = "p4",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .id = "p4"
     };
 
     static const Control::Parameter Percussion2
     {
         .name = "P2′",
-        .id = "p2",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .id = "p2"
     };
 
     static const Control::Parameter Percussion1
     {
         .name = "P1⅗′",
-        .id = "p1",
-        .def = 0.0f,
-        .min = 0.0f,
-        .max = 1.0f
+        .id = "p1"
     };
 
     static const Control::Parameter PercussionTime
     {
         .name = "TIME",
         .id = "time",
-        .def = 0.1f,
-        .min = 0.0f,
-        .max = 1.0f
+        .def = 0.1f
     };
 
     static const Control::Parameter PercussionCresc
@@ -149,7 +122,6 @@ namespace Ath::Forma
         .id = "percCresc",
         .offText = "DECAY",
         .onText = "CRESC",
-        .def = 0.0f
     };
 
     static const Control::Parameter PercussionSoft
@@ -158,8 +130,7 @@ namespace Ath::Forma
         .name = "Percussion Soft",
         .id = "percSoft",
         .offText = "SOFT",
-        .onText = "BRIGHT",
-        .def = 0.0f
+        .onText = "BRIGHT"
     };
 
     static const Control::Parameter PercussionSpeed
@@ -168,8 +139,7 @@ namespace Ath::Forma
         .name = "Percussion Speed",
         .id = "percSpeed",
         .offText = "SLOW",
-        .onText = "FAST",
-        .def = 0.0f
+        .onText = "FAST"
     };
 
     static const Control::Parameter PercussionHarmonic
@@ -178,8 +148,7 @@ namespace Ath::Forma
         .name = "Percussion Harmonic",
         .id = "percHarmonic",
         .offText = "2ND",
-        .onText = "3RD",
-        .def = 0.0f
+        .onText = "3RD"
     };
 
     static const Control::Parameter keyboardBleed
@@ -222,6 +191,7 @@ namespace Ath::Forma
         F1,
         TONE,
         PERC_ON,
+        PERC_CV,
         P16,
         P8,
         P5,
@@ -249,6 +219,7 @@ namespace Ath::Forma
         [F1] = Flute1,
         [TONE] = Tone,
         [PERC_ON] = PercussionOn,
+        [PERC_CV] = PercussionCV,
         [P16] = Percussion16,
         [P8] = Percussion8,
         [P5] = Percussion5,

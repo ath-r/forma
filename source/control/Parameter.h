@@ -15,9 +15,23 @@ namespace Ath::Control
             Choice
         };
 
+        enum class Category
+        {
+            Generic,
+            InputGain,
+            OutputGain,
+            InputMeter,
+            OutputMeter,
+            CompressorLimiterGainReductionMeter,
+            ExpanderGateGainReductionMeter,
+            AnalysisMeter, 	
+            OtherMeter
+        };
+
         int hints;
 
         Type type = Type::Float;
+        Category category = Category::Generic;
         std::string name;
         std::string id;
         std::string unit;
@@ -27,9 +41,9 @@ namespace Ath::Control
 
         std::vector<std::string> choices;
 
-        float def;
-        float min;
-        float max;
+        float def = 0.0f;
+        float min = 0.0f;
+        float max = 1.0f;
 
         static std::string getStringFromValue (float value);
     };

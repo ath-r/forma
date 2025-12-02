@@ -264,6 +264,8 @@ namespace Ath::Forma
             //lastly, attenuate output signal by 18dB and a factor of 6 (because there are 6 stops)
             buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f * gateSmoother.process(gate);
         }
+
+        parameters[PERC_CV].touch(percussionGenerator.last());
     }
 
     void FormaSynth::setParameter (int parameterIndex, float x, bool touch) 
@@ -378,7 +380,7 @@ namespace Ath::Forma
                 {
                     auto m = static_cast<Midi::MessageNoteOn>(message);
 
-                    if (!needle.isActive() && (voiceCount == 0)) percussionGenerator.handleNoteOn(m);
+                    if (percEnabled && !needle.isActive() && (voiceCount == 0)) percussionGenerator.handleNoteOn(m);
 
                     if (!needle.isGateOn())
                     {

@@ -9,6 +9,7 @@
 
 #include "../PluginParameters.h"
 #include "FrameComponent.h"
+#include "LedComponent.h"
 #include "ChoiceComponent.h"
 #include "SliderWithLabel.h"
 #include "Tumbler.h"
@@ -28,7 +29,8 @@ namespace Ath::Forma
         perc1 (ParametersByID[P1].id, vts),
         time (ParametersByID[PERC_TIME].id, vts),
         percOn(ParametersByID[PERC_ON].id, vts),
-        cresc(ParametersByID[PERC_CRESC].id, vts)
+        cresc(ParametersByID[PERC_CRESC].id, vts),
+        led(ParametersByID[PERC_CV].id, vts)
         {
             addAndMakeVisible(frame);
             addAndMakeVisible(percOn);
@@ -40,6 +42,7 @@ namespace Ath::Forma
             addAndMakeVisible (perc1);
             addAndMakeVisible (time);
             addAndMakeVisible (cresc);
+            addAndMakeVisible(led);
 
             perc16.slider.setColor(ParameterSlider::ColorScheme::Blue);
             perc8.slider.setColor(ParameterSlider::ColorScheme::Blue);
@@ -73,12 +76,17 @@ namespace Ath::Forma
             perc1.setBounds (area.removeFromLeft (sliderWidth));
             time.setBounds (area.removeFromLeft (sliderWidth));
             cresc.setBounds(area.removeFromLeft (sliderWidth));
+
+            juce::Point<int> ledPosition = {percOn.getBoundsInParent().getCentreX(), percOn.getBoundsInParent().getBottom()};
+            auto ledArea = juce::Rectangle<int>(24, 24).withCentre(ledPosition.translated(0, 10));
+            led.setBounds(ledArea);
         }
 
         private:
         juce::AudioProcessorValueTreeState& vts;
 
         FrameComponent frame;
+        Gui::LedComponent led;
         Gui::SliderWithLabel perc16, perc8, perc5, perc4, perc2, perc1, time;
         Gui::Tumbler percOn, cresc;
     };

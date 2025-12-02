@@ -179,7 +179,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
 
     for (int i = 0; i < Ath::Forma::PARAM_COUNT; ++i)
     {
-        auto paramData = Ath::Forma::ParametersByID[i];
+        auto paramData = Ath::Forma::ParametersByID[i];        
 
         switch (paramData.type)
         {
@@ -191,7 +191,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
                     juce::NormalisableRange<float>(paramData.min, paramData.max),
                     paramData.def,
                     paramData.name,
-                    juce::AudioProcessorParameter::genericParameter,
+                    static_cast<juce::AudioProcessorParameter::Category>(paramData.category),
                     [paramData](float value, int){ return juce::String(paramData.getStringFromValue(value)); }
                     )
                 );
