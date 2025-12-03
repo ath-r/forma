@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ParameterListeningComponent.h"
 #include "Slider.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_core/juce_core.h"
@@ -9,14 +10,11 @@
 
 #include "../PluginParameters.h"
 #include "FrameComponent.h"
-#include "LedComponent.h"
-#include "ChoiceComponent.h"
 #include "SliderWithLabel.h"
-#include "Tumbler.h"
 
 namespace Ath::Forma 
 {
-    class PercussionComponent : public juce::Component
+    class PercussionComponent : public Gui::ParameterListeningComponent
     {
         public:
         PercussionComponent (juce::AudioProcessorValueTreeState& vtsRef)
@@ -26,23 +24,15 @@ namespace Ath::Forma
         perc5 (ParametersByID[P5].id, vts),
         perc4 (ParametersByID[P4].id, vts),
         perc2 (ParametersByID[P2].id, vts),
-        perc1 (ParametersByID[P1].id, vts),
-        time (ParametersByID[PERC_TIME].id, vts),
-        percOn(ParametersByID[PERC_ON].id, vts),
-        cresc(ParametersByID[PERC_CRESC].id, vts),
-        led(ParametersByID[PERC_CV].id, vts)
+        perc1 (ParametersByID[P1].id, vts)
         {
             addAndMakeVisible(frame);
-            addAndMakeVisible(percOn);
             addAndMakeVisible (perc16);
             addAndMakeVisible (perc8);
             addAndMakeVisible (perc5);
             addAndMakeVisible (perc4);
             addAndMakeVisible (perc2);
             addAndMakeVisible (perc1);
-            addAndMakeVisible (time);
-            addAndMakeVisible (cresc);
-            addAndMakeVisible(led);
 
             perc16.slider.setColor(ParameterSlider::ColorScheme::Blue);
             perc8.slider.setColor(ParameterSlider::ColorScheme::Blue);
@@ -52,6 +42,25 @@ namespace Ath::Forma
             perc1.slider.setColor(ParameterSlider::ColorScheme::Blue);
 
             frame.label.setText("PERCUSSION", juce::NotificationType::sendNotification);
+
+            vts.addParameterListener(ParametersByID[VCA_SOURCE].id, this);
+            value = vts.getParameter(ParametersByID[VCA_SOURCE].id)->getValue();
+            handleAsyncUpdate();
+        }
+
+        ~PercussionComponent()
+        {
+            vts.removeParameterListener(ParametersByID[VCA_SOURCE].id, this);
+        }
+
+        void handleAsyncUpdate() override
+        {
+            float alpha = value > 0.5f ? 1.0f : 0.25f;
+
+            for (auto child : getChildren())
+            {
+                child->setAlpha(alpha);
+            }
         }
 
         void resized() override
@@ -65,29 +74,20 @@ namespace Ath::Forma
             area.reduce(20, 20);
             area.removeFromBottom(20);
 
-            auto sliderWidth = area.getWidth() / 9;
+            auto sliderWidth = area.getWidth() / 6;
 
-            percOn.setBounds(area.removeFromLeft (sliderWidth));
             perc16.setBounds (area.removeFromLeft (sliderWidth));
             perc8.setBounds (area.removeFromLeft (sliderWidth));
             perc5.setBounds (area.removeFromLeft (sliderWidth));
             perc4.setBounds (area.removeFromLeft (sliderWidth));
             perc2.setBounds (area.removeFromLeft (sliderWidth));
             perc1.setBounds (area.removeFromLeft (sliderWidth));
-            time.setBounds (area.removeFromLeft (sliderWidth));
-            cresc.setBounds(area.removeFromLeft (sliderWidth));
-
-            juce::Point<int> ledPosition = {percOn.getBoundsInParent().getCentreX(), percOn.getBoundsInParent().getBottom()};
-            auto ledArea = juce::Rectangle<int>(24, 24).withCentre(ledPosition.translated(0, 10));
-            led.setBounds(ledArea);
         }
 
         private:
         juce::AudioProcessorValueTreeState& vts;
 
         FrameComponent frame;
-        Gui::LedComponent led;
-        Gui::SliderWithLabel perc16, perc8, perc5, perc4, perc2, perc1, time;
-        Gui::Tumbler percOn, cresc;
+        Gui::SliderWithLabel perc16, perc8, perc5, perc4, perc2, perc1;
     };
 }

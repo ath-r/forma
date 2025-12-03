@@ -7,10 +7,12 @@ namespace Ath::Forma
     MainComponent::MainComponent (juce::AudioProcessorValueTreeState& vtsRef)
         : vts (vtsRef),
         flutes(vts),
-        percussion(vts)
+        vca(vts),
+        percussion(vts)        
     {
         addAndMakeVisible(logo);
         addAndMakeVisible(flutes);
+        addAndMakeVisible(vca);
         addAndMakeVisible(percussion);
     }
 
@@ -26,7 +28,8 @@ namespace Ath::Forma
 
         logo.setBounds(area.removeFromTop (area.getHeight() * 0.333f));
 
-        flutes.setBounds(area.removeFromLeft(area.getWidth() * (7.0f / 16.0f)));
+        flutes.setBounds(area.removeFromLeft(getWidth() * (7.0f / 17.0f)));
+        vca.setBounds(area.removeFromLeft(getWidth() * (4.0f / 17.0f)));
         percussion.setBounds(area);
     }
 }

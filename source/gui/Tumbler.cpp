@@ -20,7 +20,6 @@ namespace Ath::Gui
         bottomLabel.setEditable(false);
         bottomLabel.setJustificationType(juce::Justification::centredBottom);
         bottomLabel.setText(parameter->getText(0, 10), juce::dontSendNotification);
-
         switchedOn = vts.getParameter(paramId)->getValue();
     }
 

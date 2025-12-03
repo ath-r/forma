@@ -105,7 +105,7 @@ namespace Ath::Forma
             prefilterGains[i] = Simd::rmag(transfer.re, transfer.im) * std::lerp(1.0f, Math::dB(-6), float(i) / 61.0f);
         }
         
-        percussionGenerator.setTime(getParameter(PERC_TIME).value);
+        percussionGenerator.setTime(getParameter(VCA_TIME).value);
         gateSmoother.setTime(0.001f);
     }
 
@@ -146,8 +146,17 @@ namespace Ath::Forma
 
         parameterFluteStops = parameterFluteStopsInputs.data();
 
-        if (percEnabled) parameterPercStops = parameterPercStopsInputs.data();
+        if (vcaEnabled)
+        {
+            if (vcaSourcePercussion) parameterPercStops = parameterPercStopsInputs.data();
+            else 
+            {
+                parameterPercStops = parameterFluteStops;
+                parameterFluteStops = Math::dB(-50);
+            }
+        }
         else parameterPercStops = Math::dB(-50);
+
 
         for (int i = 0; i < numberOfSamples; i++)
         {
@@ -287,7 +296,8 @@ namespace Ath::Forma
 
             case TONE: filterTone.setCutoffFrequency(Math::logerp2(500.0f, 15000.0f, x)); break;
 
-            case PERC_ON: percEnabled = booleanValue; break;
+            case VCA_ON: vcaEnabled = booleanValue; break;
+            case VCA_SOURCE: vcaSourcePercussion = booleanValue; break;
             case P16: parameterPercStopsInputs[0] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P8: parameterPercStopsInputs[1] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P4: parameterPercStopsInputs[2] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
@@ -295,8 +305,8 @@ namespace Ath::Forma
             case P5: parameterPercStopsInputs[4] = std::lerp (Math::DB_MINUS54, 1.0f, x); break;
             case P1: parameterPercStopsInputs[5] = std::lerp (Math::DB_MINUS54, Math::DB_MINUS3, x); break;
             
-            case PERC_TIME: percussionGenerator.setTime(std::lerp(0.1f, 10.0f, x * x)); break;
-            case PERC_CRESC: percussionGenerator.setCrescendo(x > 0.5f); break;
+            case VCA_TIME: percussionGenerator.setTime(std::lerp(0.1f, 10.0f, x * x)); break;
+            case VCA_CRESC: percussionGenerator.setCrescendo(x > 0.5f); break;
 
             case PERC_SOFT:
             case PERC_SPEED:
@@ -313,7 +323,7 @@ namespace Ath::Forma
             const bool speedMode = getParameter(PERC_SPEED).value >= 0.5f;
             const bool harmonicMode = getParameter(PERC_HARMONIC).value >= 0.5f;
 
-            setParameter(PERC_TIME, speedMode ? 0.1f : 0.2f, true);
+            setParameter(VCA_TIME, speedMode ? 0.1f : 0.2f, true);
             setParameter(P16, 0.0f, true);
             setParameter(P8, !harmonicMode, true);
             setParameter(P5, harmonicMode, true);
@@ -321,7 +331,7 @@ namespace Ath::Forma
             setParameter(P2, !harmonicMode && softMode, true);
             setParameter(P1, harmonicMode && softMode, true);
 
-            setParameter(PERC_CRESC, 0.0f, true);
+            setParameter(VCA_CRESC, 0.0f, true);
         }
     }   
 
@@ -342,7 +352,7 @@ namespace Ath::Forma
                 case 0x11: setParameter(F1, value, true); break;
                 case 0x0b:
                 case 0x14: setParameter(TONE, value, true); break;
-                case 0x42: setParameter(PERC_ON, value, true); break;
+                case 0x42: setParameter(VCA_ON, value, true); break;
                 case 0x46: setParameter(PERC_SOFT, value, true); break;
                 case 0x47: setParameter(PERC_SPEED, value, true); break;
                 case 0x48: setParameter(PERC_HARMONIC, value, true); break;
@@ -380,7 +390,7 @@ namespace Ath::Forma
                 {
                     auto m = static_cast<Midi::MessageNoteOn>(message);
 
-                    if (percEnabled && !needle.isActive() && (voiceCount == 0)) percussionGenerator.handleNoteOn(m);
+                    if (vcaEnabled && !needle.isActive() && (voiceCount == 0)) percussionGenerator.handleNoteOn(m);
 
                     if (!needle.isGateOn())
                     {

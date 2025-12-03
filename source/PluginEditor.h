@@ -26,7 +26,7 @@ public:
 
 private:
 
-    float initialWidth = 1400.0f;
+    float initialWidth = 1500.0f;
     float initialHeight = 400.0f; 
 
     PluginProcessor& processorRef;

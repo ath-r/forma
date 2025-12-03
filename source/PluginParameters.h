@@ -55,21 +55,39 @@ namespace Ath::Forma
         .def = 0.0f
     };
 
-    static const Control::Parameter PercussionOn
+    static const Control::Parameter VcaOn
     {
         .type = Control::Parameter::Type::Bool,
-        .name = "Percussion On/Off",
-        .id = "percEnabled",
+        .name = "VCA On/Off",
+        .id = "vcaEnabled",
         .offText = "OFF",
         .onText = "ON"
     };
 
-    static const Control::Parameter PercussionCV
+    static const Control::Parameter VcaSource
     {
-        .type = Control::Parameter::Type::Float,
-        .category = Control::Parameter::Category::OtherMeter,
-        .name = "Percussion CV",
-        .id = "percCv"
+        .type = Control::Parameter::Type::Bool,
+        .name = "VCA Source",
+        .id = "vcaSource",
+        .offText = "SUM IN",
+        .onText = "PRC IN",
+        .def = 1
+    };
+
+    static const Control::Parameter VcaTime
+    {
+        .name = "TIME",
+        .id = "time",
+        .def = 0.1f
+    };
+
+    static const Control::Parameter VcaMode
+    {
+        .type = Control::Parameter::Type::Bool,
+        .name = "Decay/Crescendo",
+        .id = "vcaCresc",
+        .offText = "DECAY",
+        .onText = "CRESC",
     };
 
     static const Control::Parameter Percussion16
@@ -106,22 +124,6 @@ namespace Ath::Forma
     {
         .name = "P1⅗′",
         .id = "p1"
-    };
-
-    static const Control::Parameter PercussionTime
-    {
-        .name = "TIME",
-        .id = "time",
-        .def = 0.1f
-    };
-
-    static const Control::Parameter PercussionCresc
-    {
-        .type = Control::Parameter::Type::Bool,
-        .name = "Decay/Crescendo",
-        .id = "percCresc",
-        .offText = "DECAY",
-        .onText = "CRESC",
     };
 
     static const Control::Parameter PercussionSoft
@@ -181,6 +183,14 @@ namespace Ath::Forma
         .max = -30.0f
     };
 
+    static const Control::Parameter PercussionCV
+    {
+        .type = Control::Parameter::Type::Float,
+        .category = Control::Parameter::Category::OtherMeter,
+        .name = "VCA CV",
+        .id = "vcaCv"
+    };
+
     enum ParameterIDs
     {
         F16,
@@ -190,22 +200,23 @@ namespace Ath::Forma
         F2,
         F1,
         TONE,
-        PERC_ON,
-        PERC_CV,
+        VCA_ON,
+        VCA_SOURCE,
+        VCA_TIME,
+        VCA_CRESC,
         P16,
         P8,
         P5,
         P4,
         P2,
         P1,
-        PERC_TIME,
-        PERC_CRESC,
         PERC_SOFT,
         PERC_SPEED,
         PERC_HARMONIC,
         BLEED_KEYBOARD,
         BLEED_TERZ,
         NOISE_FLOOR,
+        PERC_CV,
         PARAM_COUNT
     };
 
@@ -218,21 +229,22 @@ namespace Ath::Forma
         [F2] = Flute2,
         [F1] = Flute1,
         [TONE] = Tone,
-        [PERC_ON] = PercussionOn,
-        [PERC_CV] = PercussionCV,
+        [VCA_ON] = VcaOn,
+        [VCA_SOURCE] = VcaSource,
+        [VCA_TIME] = VcaTime,
+        [VCA_CRESC] = VcaMode,
         [P16] = Percussion16,
         [P8] = Percussion8,
         [P5] = Percussion5,
         [P4] = Percussion4,
         [P2] = Percussion2,
         [P1] = Percussion1,
-        [PERC_TIME] = PercussionTime,
-        [PERC_CRESC] = PercussionCresc,
         [PERC_SOFT] = PercussionSoft,
         [PERC_SPEED] = PercussionSpeed,
         [PERC_HARMONIC] = PercussionHarmonic,
         [BLEED_KEYBOARD] = keyboardBleed,
         [BLEED_TERZ] = terzBleed,
-        [NOISE_FLOOR] = noiseFloor
+        [NOISE_FLOOR] = noiseFloor,
+        [PERC_CV] = PercussionCV
     };
 }
