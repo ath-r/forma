@@ -21,6 +21,87 @@ def group_pairs(roots):
                     break
     return pairs
 
+def tf2sos(tf):
+     #separate numerator and denominator polynomials
+          num, den = sp.fraction(H)
+          pnum = sp.Poly(num, s)
+          pden = sp.Poly(den, s)
+
+          poles = sp.nroots(den)
+          zeros = sp.nroots(num)
+
+          pole_pairs = group_pairs(poles)
+          zero_pairs = group_pairs(zeros)
+
+          n = max(len(pole_pairs), len(zero_pairs))
+          sos1 = []          
+
+          #restore overall gain from leading coefficients
+          k = pnum.LC() / pden.LC()
+          k_root = float(k ** (1 / n)) #this will be the gain for every sos section, which will improve precision over single huge gain
+
+          for i in range(n):
+               ppair = pole_pairs[i] if i < len(pole_pairs) else []
+               zpair = zero_pairs[i] if i < len(zero_pairs) else []
+               
+               #denominators
+               if len(ppair) == 2:
+                    p1, p2 = ppair
+                    a2, a1, a0 = 1, -(p1+p2), p1*p2
+               elif len(ppair) == 1:
+                    p = ppair[0]
+                    a2, a1, a0 = 0, 1, -p
+               else:
+                    a2, a1, a0 = 0, 0, 1
+
+               #numerators
+               if len(zpair) == 2:
+                    z1, z2 = zpair
+                    b2, b1, b0 = 1, -(z1+z2), z1*z2
+               elif len(zpair) == 1:
+                    z = zpair[0]
+                    b2, b1, b0 = 0, 1, -z
+               else:
+                    b2, b1, b0 = 0, 0, 1
+
+               #multiply numerator by nth root of overall gain
+               b0 *= k_root
+               b1 *= k_root
+               b2 *= k_root
+
+               sos1.append(np.array([b0, b1, b2, a0, a1, a2]).astype(float)/float(a0))
+
+          sos2 = []
+          fos2 = []
+          for sos in sos1:
+               b0, b1, b2, a0, a1, a2 = sos
+
+               if a2 == 0 and b2 == 0:
+                    fos2.append(sos)
+
+               if a2 == 0 and b2 != 0:
+                    sos2.append(sos)
+
+          for section1, section2 in zip(fos2[0::2], fos2[1::2]):
+               b01, b11, b21, a01, a11, a21 = section1
+               b02, b12, b22, a02, a12, a22 = section2
+
+               b0 = b01 * b02
+               b1 = b11 * b02 + b01 * b12
+               b2 = b11 * b12
+
+               a0 = a01 * a02
+               a1 = a11 * a02 + a01 * a12
+               a2 = a11 * a12
+
+               sos2.append(np.array([b0, b1, b2, a0, a1, a2])/a0)
+          
+          if len(fos2) % 2 != 0:
+               sos2.append(fos2[-1])
+
+          return sos2
+     
+
 netlist = '''
 C1 /A9 /B9
 C2 /B1 /D1
@@ -96,8 +177,6 @@ from sympy.polys.polyroots import root_factors
 s, z, T = sp.symbols('s z T')
 
 import numpy as np
-import scipy
-from scipy.signal import tf2sos, freqz_sos
 import matplotlib.pyplot as plt
 
 NUMBER_OF_RANKS = 6
@@ -129,75 +208,9 @@ for i in range(NUMBER_OF_RANKS):
           H = H.xreplace({list(H.free_symbols)[0]: s})
           #print(_log_string + 'analog transfer function ready')
 
-          #separate numerator and denominator polynomials
-          num, den = sp.fraction(H)
-          pnum = sp.Poly(num, s)
-          pden = sp.Poly(den, s)
-
-          poles = sp.nroots(den)
-          zeros = sp.nroots(num)
-
-          pole_pairs = group_pairs(poles)
-          zero_pairs = group_pairs(zeros)
-
-          n = max(len(pole_pairs), len(zero_pairs))
-          second_order_sections = []
-          analog_sos_coeffs = []
-          digital_sos_coeffs = []
-
-          #restore overall gain from leading coefficients
-          k = pnum.LC() / pden.LC()
-          k_root = float(k ** (1 / n)) #this will be the gain for every sos section, which will improve precision over single huge gain
-
-          for i in range(n):
-               ppair = pole_pairs[i] if i < len(pole_pairs) else []
-               zpair = zero_pairs[i] if i < len(zero_pairs) else []
-               
-               #denominators
-               if len(ppair) == 2:
-                    p1, p2 = ppair
-                    a2, a1, a0 = 1, -(p1+p2), p1*p2
-               elif len(ppair) == 1:
-                    p = ppair[0]
-                    a2, a1, a0 = 0, 1, -p
-               else:
-                    a2, a1, a0 = 0, 0, 1
-
-               #numerators
-               if len(zpair) == 2:
-                    z1, z2 = zpair
-                    b2, b1, b0 = 1, -(z1+z2), z1*z2
-               elif len(zpair) == 1:
-                    z = zpair[0]
-                    b2, b1, b0 = 0, 1, -z
-               else:
-                    b2, b1, b0 = 0, 0, 1
-
-               #normalize everything by a0
-               b0 = (b0 / a0).evalf()
-               b1 /= a0
-               b2 /= a0
-
-               a1 /= a0
-               a2 /= a0
-               a0 = 1
-
-               #multiply numerator by nth root of overall gain
-               b0 *= k_root
-               b1 *= k_root
-               b2 *= k_root
-
-               second_order_sections.append(sp.simplify((b2*s**2 + b1*s + b0)/(a2*s**2 + a1*s + a0)))
-               analog_sos_coeffs.append(np.array([b0, b1, b2, a0, a1, a2]).astype(np.float32))
-
-               print(analog_sos_coeffs[i])
-
-
-          #sanity check
-          #prod = sp.prod(second_order_sections)
-          #print(prod.subs(s, 1).evalf())
-          #print(H.subs(s, 1).evalf())
-
+          analog_sos_coeffs = tf2sos(H)
+          for sos in analog_sos_coeffs: print(sos)
+          
           #calculate bilinear transform for testing
 
           SAMPLE_RATE = 48000
@@ -207,6 +220,7 @@ for i in range(NUMBER_OF_RANKS):
           K = 2 / T
           K2 = K * K
 
+          digital_sos_coeffs = []
           #bilinear transform of soses
           for coeffs in analog_sos_coeffs:
                b0, b1, b2, a0, a1, a2 = coeffs
@@ -219,7 +233,7 @@ for i in range(NUMBER_OF_RANKS):
                A1 = -2*a2*K2 + 2*a0
                A2 = a2*K2 - a1*K + a0
 
-               digital = np.array([B0, B1, B2, A0, A1, A2], dtype=np.float32)
+               digital = np.array([B0, B1, B2, A0, A1, A2], dtype=float)
                digital /= digital[3]   #normalize by A0
 
                digital_sos_coeffs.append(digital)
