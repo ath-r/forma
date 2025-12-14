@@ -59,6 +59,7 @@ R18 /D5 /D6
 R19 /D6 /D7
 R20 /D7 /D8
 R21 /D8 /D9
+Rload /A9 0 10e3
 P2 /A9 0
 '''
 #resistor values for each rank
@@ -126,7 +127,7 @@ for i in range(NUMBER_OF_RANKS):
           #compute the analog transfer function H(s)
           H = _cct2.P1.transfer('P2').expr.evalf()
           H = H.xreplace({list(H.free_symbols)[0]: s})
-          print(_log_string + 'analog transfer function ready')
+          #print(_log_string + 'analog transfer function ready')
 
           #separate numerator and denominator polynomials
           num, den = sp.fraction(H)
@@ -188,6 +189,8 @@ for i in range(NUMBER_OF_RANKS):
 
                second_order_sections.append(sp.simplify((b2*s**2 + b1*s + b0)/(a2*s**2 + a1*s + a0)))
                analog_sos_coeffs.append(np.array([b0, b1, b2, a0, a1, a2]).astype(np.float32))
+
+               print(analog_sos_coeffs[i])
 
 
           #sanity check
