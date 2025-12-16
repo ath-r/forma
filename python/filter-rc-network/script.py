@@ -209,7 +209,7 @@ for i in range(NUMBER_OF_RANKS):
           #print(_log_string + 'analog transfer function ready')
 
           analog_sos_coeffs = tf2sos(H)
-          for sos in analog_sos_coeffs: print(sos)
+          #for sos in analog_sos_coeffs: print(sos)
           
           #calculate bilinear transform for testing
 
@@ -263,3 +263,14 @@ for i in range(NUMBER_OF_RANKS):
           plt.plot(np.log10(np.abs(digital_sos_transfer)) * 20)
           plt.savefig('python/filter-rc-network/' + _rank + _input[1:] + '.png')
           plt.clf()
+
+          output_string = '['
+          #output analog coefficients
+          for coeffs in analog_sos_coeffs:
+               output_string += np.array2string(coeffs, precision=10, max_line_width=120, separator=', ')[1:-1]
+               output_string += ',\n'
+          
+          output_string = output_string[:-2]
+          output_string += ']'
+
+          print(output_string)
