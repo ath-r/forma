@@ -55,18 +55,6 @@ namespace Ath::Forma
         }
 
         // initialize filterbanks
-        float freq = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER);
-        filterBanks[0].setFrequency(freq);
-        filterBanks[1].vmul = {1.0f, 2.0f, 2.828f, 4.0f, 5.656f, 8.0};
-        filterBanks[1].setFrequency(freq *= 1.4142f);
-        filterBanks[2].vmul = {1.0f, 1.4142f, 2.0f, 2.828f, 4.0f, 5.656f};
-        filterBanks[2].setFrequency(freq *= 2.0f);
-        filterBanks[3].vmul = filterBanks[2].vmul;
-        filterBanks[3].setFrequency(freq *= 2.0f);
-        filterBanks[4].vmul = filterBanks[2].vmul;
-        filterBanks[4].setFrequency(freq *= 2.0f);
-        filterBanks[5].vmul = filterBanks[2].vmul;
-        filterBanks[5].setFrequency(freq *= 2.0f);
 
         // initialize voicing to even out filter attenuation
         for (int i = 0; i < KEY_NUMBER; i++)
@@ -85,7 +73,6 @@ namespace Ath::Forma
             else if (i < 54) filterBankIndex = 4;
             else filterBankIndex = 5;
 
-            auto& filterBank = filterBanks[filterBankIndex];
             Math::complex<Simd::float8> transfer = { 0.0f, 0.0f };
             
             // This algorithm samples the transfer function of a given filterbank 
@@ -96,13 +83,13 @@ namespace Ath::Forma
             for (int n = 1; n < OVERTONES_TO_SAMPLE; n += 2)
             {
                 //TODO: normal division/multiplication by scalar for complex numbers
-                auto t = filterBank.getTransfer(freqs * float(n));
+                Math::complex<Simd::float8> t = {1.0f, 0.0f }; // PLACEHOLDER
                 t.re /= float(n);
                 t.im /= float(n);
 
                 transfer += t;
             }
-            prefilterGains[i] = Simd::rmag(transfer.re, transfer.im) * std::lerp(1.0f, Math::dB(-6), float(i) / 61.0f);
+            prefilterGains[i] = 1.0f; // PLACEHOLDER
         }
         
         percussionGenerator.setTime(getParameter(VCA_TIME).value);
@@ -122,10 +109,10 @@ namespace Ath::Forma
             needleContacts[i].setContext(context);
         }
 
-        for (auto& filterBank : filterBanks) filterBank.setContext(context);
-
         hum.setContext(context);
         filterTone.setContext(context);
+
+        filterBank.setContext(context);
 
         percussionGenerator.setContext(context);
         gateSmoother.setContext(context);
@@ -227,7 +214,7 @@ namespace Ath::Forma
             Simd::float8 sum = 0.0f;
             for (int n = 0; n < 6; n++)
             {
-                sum += filterBanks[n].process(filterBankInputs[n]);
+                sum += filterBank.cascades[n].process(filterBankInputs[n]);
             }            
 
             //filter nonlinearity:
@@ -254,7 +241,7 @@ namespace Ath::Forma
 
             //tone knob filter:
             auto toneIn = fluteOut + outBleed;
-            buffer[i] = toneIn.sum() + percOut;
+            buffer[i] = (sum * parameterFluteStops).sum();
         }
 
         for (int i = 0; i < numberOfSamples; i++) buffer[i] += hum.process() * noiseFloorGain;
@@ -271,7 +258,7 @@ namespace Ath::Forma
             auto ampOut = outputNonlinearity.process(ampIn) * (postNonlinearityGain * 6.0f);
 
             //lastly, attenuate output signal by 18dB and a factor of 6 (because there are 6 stops)
-            buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f * gateSmoother.process(gate);
+            //buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f * gateSmoother.process(gate);
         }
 
         parameters[PERC_CV].touch(percussionGenerator.last() * percussionGenerator.getGate());

@@ -1,82 +1,58 @@
 #pragma once
 
-#include <algorithm>
 #include <array>
 #include "math/Complex.h"
-#include "math/Conversion.h"
 #include "math/Simd.h"
 #include "dsp/Context.h"
-#include "dsp/filter/TPT.h"
+#include "dsp/filter/Biquad.h"
+
+#include "FormaBiquadCoefficients.h"
 
 namespace Ath::Forma 
 {
     class FormaFilterBank
     {
-        static constexpr int STAGE_NUM = 6;
-
-        int stages = 6;
-
+        static constexpr int INPUT_NUM = 6;
+        static constexpr int CASCADE_SIZE = 15;
         Dsp::Context c;
-        Simd::float8 frequency = 30.0f;
 
-        std::array<Dsp::Filter::TPT::LowPass1<Simd::float8>, STAGE_NUM> filters;
-        Dsp::Filter::TPT::HighPass1<Simd::float8> highpass;
-
-        public:
-        Simd::float8 hmul = { 1.0, 2.0, 4.0, 8.0, 3.0, 10.0, 1.0, 1.0 };
-        std::array<Simd::float8, STAGE_NUM> vmul = { 1.0f, 2.828f, 4.0f, 5.656f, 8.0, 11.313f};
-        
+    public:
+        std::array<Dsp::Filter::BiquadCascade<Simd::float8, CASCADE_SIZE>, INPUT_NUM> cascades;
+    
         void setContext(Dsp::Context context)
         {
             c = context;
 
-            for (auto& filter : filters) filter.setContext(c);
-            highpass.setContext(c);
-
-            setFrequency(frequency);
-        }
-
-        void setStageNumber(int n)
-        {
-            stages = std::clamp(n, 0, STAGE_NUM);
-        }
-
-        void setFrequency(Simd::float8 freq)
-        {
-            frequency = freq;
-
-            for (int i = 0; i < STAGE_NUM; i++)
+            for (int i = 0; i < INPUT_NUM; i++) // inputs
             {
-                auto& filter = filters[i];
+                for (int j = 0; j < CASCADE_SIZE; j++) // inner
+                {
+                    auto c16 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i][j], c.SR);
+                    auto c8 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM][j], c.SR);
+                    auto c4 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM * 2][j], c.SR);
+                    auto c2 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM * 3][j], c.SR);
+                    auto c5 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM * 4][j], c.SR);
+                    auto c1 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM * 5][j], c.SR);
 
-                filter.setCutoffFrequency(frequency * hmul * vmul[i]);
+                    Simd::float8 b0 = {float(c16.b0), float(c8.b0), float(c4.b0), float(c2.b0), float(c5.b0), float(c1.b0), 1.0f, 1.0f};
+                    Simd::float8 b1 = {float(c16.b1), float(c8.b1), float(c4.b1), float(c2.b1), float(c5.b1), float(c1.b1), 0.0f, 0.0f};
+                    Simd::float8 b2 = {float(c16.b2), float(c8.b2), float(c4.b2), float(c2.b2), float(c5.b2), float(c1.b2), 0.0f, 0.0f};
+                    Simd::float8 a0 = {float(c16.a0), float(c8.a0), float(c4.a0), float(c2.a0), float(c5.a0), float(c1.a0), 1.0f, 1.0f};
+                    Simd::float8 a1 = {float(c16.a1), float(c8.a1), float(c4.a1), float(c2.a1), float(c5.a1), float(c1.a1), 0.0f, 0.0f};
+                    Simd::float8 a2 = {float(c16.a2), float(c8.a2), float(c4.a2), float(c2.a2), float(c5.a2), float(c1.a2), 0.0f, 0.0f};
+
+                    cascades[i].biquads[j].setCoefficients({b0, b1, b2, a0, a1, a2} );
+
+                    cascades[i].biquads[j].reset();
+                }
             }
-            highpass.setCutoffFrequency(freq * hmul);
         }
 
         Math::complex<Simd::float8> getTransfer(Simd::float8 frequency)
         {
-            Math::complex<Simd::float8> transfer = { 1.0f, 0.0f };
-
-            transfer *= highpass.getTransfer(frequency);
-            for (int i = 0; i < stages; i++)
-            {
-                transfer *= filters[i].getTransfer(frequency);
-            }
+            Math::complex<Simd::float8> transfer = { 1.0f, 0.0f }; // PLACEHOLDER
 
             return transfer;
-        }
-
-        Simd::float8 process(Simd::float8 x)
-        {
-            x = highpass.process(x);
-            auto y = x;
-
-            for (int i = 0; i < stages; i++)
-            {
-                y = filters[i].process(y);
-            }
-            return y + x * Math::dB(-60);
         }
     };
 }
