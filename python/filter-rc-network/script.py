@@ -1,115 +1,83 @@
-def group_pairs(roots):
-    #sort roots by real part, then imaginary part
-    roots = sorted(roots, key=lambda r: (complex(r.evalf()).real, complex(r.evalf()).imag))
-    pairs = []
-    used = set() #indices of roots already paired
-    for i, r in enumerate(roots):
-        if i in used:
-            continue
-        
-        #treat (numerically) real roots as first-order factors
-        if abs(sp.im(r)) < 1e-12:
-            pairs.append([r])  # real root
-            used.add(i)
-        else:
-            #match with conjugate partner
-            for j in range(i+1, len(roots)):
-                if j in used: continue
-                if abs(r.conjugate() - roots[j]) < 1e-12:
-                    pairs.append([r, roots[j]])
-                    used.add(i); used.add(j)
-                    break
-    return pairs
-
-def pole_radius(section):
-    b0, b1, b2, a0, a1, a2 = section
-    if abs(a2) < 1e-18:
-        return abs(-a0 / a1)   # single pole
-    poles = np.roots([a2, a1, a0])
-    return max(abs(poles))
+def nearest_in_list(lst, value):
+    return min(lst, key=lambda x: abs(abs(x) - abs(value)))
 
 def tf2sos(tf):
      #separate numerator and denominator polynomials
-          num, den = sp.fraction(H)
-          pnum = sp.Poly(num, s)
-          pden = sp.Poly(den, s)
+     num, den = sp.fraction(H)
+     pnum = sp.Poly(num, s)
+     pden = sp.Poly(den, s)
 
-          poles = sp.nroots(den)
-          zeros = sp.nroots(num)
+     poles = sp.nroots(den)
+     zeros = sp.nroots(num)
 
-          pole_pairs = group_pairs(poles)
-          zero_pairs = group_pairs(zeros)
+     real_zeros = []
+     complex_zeros = []
 
-          n = max(len(pole_pairs), len(zero_pairs))
-          sos1 = []          
+     for zero in zeros:
+          if zero.is_real: real_zeros.append(float(zero))
+          else: complex_zeros.append(complex(zero))
 
-          #restore overall gain from leading coefficients
-          k = pnum.LC() / pden.LC()
-          k_root = float(k ** (1 / n)) #this will be the gain for every sos section, which will improve precision over single huge gain
+     real_zeros.sort()
+     poles.sort()
 
-          for i in range(n):
-               ppair = pole_pairs[i] if i < len(pole_pairs) else []
-               zpair = zero_pairs[i] if i < len(zero_pairs) else []
-               
-               #denominators
-               if len(ppair) == 2:
-                    p1, p2 = ppair
-                    a2, a1, a0 = 1, -(p1+p2), p1*p2
-               elif len(ppair) == 1:
-                    p = ppair[0]
-                    a2, a1, a0 = 0, 1, -p
-               else:
-                    a2, a1, a0 = 0, 0, 1
+     biquads = []
 
-               #numerators
-               if len(zpair) == 2:
-                    z1, z2 = zpair
-                    b2, b1, b0 = 1, -(z1+z2), z1*z2
-               elif len(zpair) == 1:
-                    z = zpair[0]
-                    b2, b1, b0 = 0, 1, -z
-               else:
-                    b2, b1, b0 = 0, 0, 1
+     for z1, z2 in zip(complex_zeros[::2], complex_zeros[1::2]):
+          zero_frequency = np.abs(z1)
 
-               #multiply numerator by nth root of overall gain
-               #b0 *= k_root
-               #b1 *= k_root
-               #b2 *= k_root
+          p1 = nearest_in_list(poles, zero_frequency)
+          poles.remove(p1)
 
-               sos1.append(np.array([b0, b1, b2, a0, a1, a2]).astype(float)/float(a0))
+          p2 = nearest_in_list(poles, z2)
+          poles.remove(p2)
 
-          sos2 = []
-          fos2 = []
-          for sos in sos1:
-               b0, b1, b2, a0, a1, a2 = sos
+          biquads.append(np.array([(z1 * z2).real, (-z1 - z2).real, 1, p1 * p2, -p1 - p2, 1], dtype = float))
 
-               if a2 == 0 and b2 == 0:
-                    fos2.append(sos)
+     for z1, z2 in zip(real_zeros[::2], real_zeros[1::2]):
+          real_zeros.remove(z1)
+          real_zeros.remove(z2)
 
-               if a2 == 0 and b2 != 0:
-                    sos2.append(sos)
+          mean = (z1 + z2) / 2
 
-          for section1, section2 in zip(fos2[0::2], fos2[1::2]):
-               b01, b11, b21, a01, a11, a21 = section1
-               b02, b12, b22, a02, a12, a22 = section2
+          p1 = nearest_in_list(poles, mean)
+          poles.remove(p1)
+          p2 = nearest_in_list(poles, mean)
+          poles.remove(p2)
 
-               b0 = b01 * b02
-               b1 = b11 * b02 + b01 * b12
-               b2 = b11 * b12
+          biquads.append(np.array([z1 * z2, -z1 - z2, 1, p1 * p2, -p1 - p2, 1], dtype = float))
 
-               a0 = a01 * a02
-               a1 = a11 * a02 + a01 * a12
-               a2 = a11 * a12
+     for z in real_zeros: # basically takes the last remaining zero if there's one left
+          real_zeros.remove(z)
 
-               sos2.append(np.array([b0, b1, b2, a0, a1, a2])/a0)
-          
-          if len(fos2) % 2 != 0:
-               sos2.append(fos2[-1])
+          p1 = nearest_in_list(poles, z)
+          poles.remove(p1)
+          p2 = nearest_in_list(poles, z)
+          poles.remove(p2)
 
-          #sos1.sort(key=pole_radius)
+          biquads.append(np.array([-z, 1.0, 0.0, p1 * p2, -p1 - p2, 1], dtype = float))
 
-          return sos1
-     
+     for p1, p2 in zip(poles[::2], poles[1::2]):
+          poles.remove(p1)
+          poles.remove(p2)
+
+          biquads.append(np.array([1.0, 0.0, 0.0, p1 * p2, -p1 - p2, 1], dtype = float))
+
+     for p in poles: # takes the last remaining pole if there's one left
+          poles.remove(p)
+
+          biquads.append(np.array([1.0, 0.0, 0.0, -p, 1.0, 0.0], dtype = float))
+
+     k = pnum.LC() / pden.LC() # gain
+     k_root = float(k ** (1 / len(biquads))) # gain distributed for each biquad
+
+     for coeffs in biquads:
+          coeffs[:3] *= k_root
+          coeffs /= coeffs[3]
+
+     print('zeros left:', real_zeros)
+     print('poles left:', poles)
+     print(biquads)
+     return biquads
 
 netlist = '''
 C1 /A9 /B9
@@ -220,35 +188,7 @@ for i in range(NUMBER_OF_RANKS):
           #print(_log_string + 'analog transfer function ready')
 
           analog_sos_coeffs = tf2sos(H)
-          #for sos in analog_sos_coeffs: print(sos)
           
-          #calculate bilinear transform for testing
-
-          SAMPLE_RATE = 48000
-          T = 1 / SAMPLE_RATE
-          T2 = T * T
-
-          K = 2 / T
-          K2 = K * K
-
-          digital_sos_coeffs = []
-          #bilinear transform of soses
-          for coeffs in analog_sos_coeffs:
-               b0, b1, b2, a0, a1, a2 = coeffs
-
-               B0 = b2*K2 + b1*K + b0
-               B1 = -2*b2*K2 + 2*b0
-               B2 = b2*K2 - b1*K + b0
-
-               A0 = a2*K2 + a1*K + a0
-               A1 = -2*a2*K2 + 2*a0
-               A2 = a2*K2 - a1*K + a0
-
-               digital = np.array([B0, B1, B2, A0, A1, A2], dtype=float)
-               digital /= digital[3]   #normalize by A0
-
-               digital_sos_coeffs.append(digital)
-
           #frequencies for frequency responses
           _s = np.linspace(1,20e3,20000) * 2j * np.pi
           _s2 = _s**2
@@ -260,18 +200,12 @@ for i in range(NUMBER_OF_RANKS):
           for coeffs in analog_sos_coeffs:
                analog_sos_transfer *= (coeffs[0] + coeffs[1] * _s + coeffs[2] * _s2) / (coeffs[3] + coeffs[4] * _s + coeffs[5] * _s2)
 
-          #transfer function of digital sos cascade
-          digital_sos_transfer = 1
-          for coeffs in digital_sos_coeffs:
-               digital_sos_transfer *= (coeffs[0] + coeffs[1] * _z + coeffs[2] * _z2) / (coeffs[3] + coeffs[4] * _z + coeffs[5] * _z2)
-
           analog_transfer_lambda = sp.lambdify(s, H, 'numpy')
           analog_transfer = analog_transfer_lambda(_s)
 
           plt.xscale('log')
           plt.plot(np.log10(np.abs(analog_transfer)) * 20)
           plt.plot(np.log10(np.abs(analog_sos_transfer)) * 20)
-          plt.plot(np.log10(np.abs(digital_sos_transfer)) * 20)
           plt.savefig('python/filter-rc-network/' + _rank + _input[1:] + '.png')
           plt.clf()
 
@@ -299,7 +233,7 @@ file_string = f"""#pragma once
 namespace Ath::Forma
 {{
 
-static  Dsp::Filter::AnalogBiquadCoefficients<double> BIQUAD_COEFFS[36][15] = 
+static  Dsp::Filter::Biquad::AnalogBiquadCoefficients<double> BIQUAD_COEFFS[36][8] = 
 {{
 {data_string}
 }};

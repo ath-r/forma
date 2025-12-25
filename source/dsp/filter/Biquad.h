@@ -1,10 +1,14 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <type_traits>
 
-namespace Ath::Dsp::Filter
+#include "../../math/Complex.h"
+#include "FilterMath.h"
+
+namespace Ath::Dsp::Filter::Biquad
 {
     enum class BiquadTopology
     {
@@ -37,7 +41,18 @@ namespace Ath::Dsp::Filter
     };
 
     template <typename T>
-    static DigitalBiquadCoefficients<T> BilinearTransform(AnalogBiquadCoefficients<T> in, double sr)
+    static Math::complex<T> transfer(DigitalBiquadCoefficients<T> coeffs, Math::complex<T> s, T sr)
+    {
+        auto k = sr * 2.0f;
+
+        auto z1 = (k - s) / (k + s);
+        auto z2 = z1 * z1;
+
+        return (coeffs.b0 + coeffs.b1 * z1 + coeffs.b2 * z2) / (coeffs.a0 + coeffs.a1 * z1 + coeffs.a2 * z2);
+    }
+
+    template <typename T>
+    static DigitalBiquadCoefficients<T> bilinear(AnalogBiquadCoefficients<T> in, double sr)
     {
         const auto k = sr * 2.0;
         const auto k2 = k * k;
@@ -90,9 +105,9 @@ namespace Ath::Dsp::Filter
         DF2state v1;
         DF2state v2;
 
-        DigitalBiquadCoefficients<T> coeffs;
-
     public:
+
+        DigitalBiquadCoefficients<T> coeffs;
 
         Biquad()
         {
@@ -187,7 +202,7 @@ namespace Ath::Dsp::Filter
         }
     };
 
-    template <typename T, int N, BiquadTopology Topology = BiquadTopology::DirectForm1>
+    template <typename T, int N, BiquadTopology Topology = BiquadTopology::TransposedDirectForm2>
     class BiquadCascade
     {
         T y = 0.0;
@@ -204,7 +219,7 @@ namespace Ath::Dsp::Filter
                 y = biquad.process(y);
             }
 
-            return biquads[0].last();
+            return y;
         }
 
         T last()

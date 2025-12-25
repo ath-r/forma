@@ -56,6 +56,33 @@ namespace Ath::Forma
 
         // initialize filterbanks
 
+        
+        
+        percussionGenerator.setTime(getParameter(VCA_TIME).value);
+        gateSmoother.setTime(0.001f);
+    }
+
+    void FormaSynth::setContext (Dsp::Context context)
+    {
+        for (int i = 0; i < OSC_NUMBER; i++)
+        {
+            oscillators[i].setContext(context);
+            oscillators2[i].setContext(context);
+        }
+
+        for (int i = 0; i < KEY_NUMBER; i++)
+        {
+            needleContacts[i].setContext(context);
+        }
+
+        hum.setContext(context);
+        filterTone.setContext(context);
+
+        filterBank.setContext(context);
+
+        percussionGenerator.setContext(context);
+        gateSmoother.setContext(context);
+
         // initialize voicing to even out filter attenuation
         for (int i = 0; i < KEY_NUMBER; i++)
         {
@@ -83,39 +110,15 @@ namespace Ath::Forma
             for (int n = 1; n < OVERTONES_TO_SAMPLE; n += 2)
             {
                 //TODO: normal division/multiplication by scalar for complex numbers
-                Math::complex<Simd::float8> t = {1.0f, 0.0f }; // PLACEHOLDER
+
+                Math::complex<Simd::float8> t = filterBank.getTransfer(freqs * float(n), filterBankIndex);
                 t.re /= float(n);
                 t.im /= float(n);
 
                 transfer += t;
             }
-            prefilterGains[i] = 1.0f; // PLACEHOLDER
+            prefilterGains[i] = Simd::rmag(transfer.re, transfer.im) * std::lerp(1.0f, Math::dB(-3), float(i) / 61.0f);
         }
-        
-        percussionGenerator.setTime(getParameter(VCA_TIME).value);
-        gateSmoother.setTime(0.001f);
-    }
-
-    void FormaSynth::setContext (Dsp::Context context)
-    {
-        for (int i = 0; i < OSC_NUMBER; i++)
-        {
-            oscillators[i].setContext(context);
-            oscillators2[i].setContext(context);
-        }
-
-        for (int i = 0; i < KEY_NUMBER; i++)
-        {
-            needleContacts[i].setContext(context);
-        }
-
-        hum.setContext(context);
-        filterTone.setContext(context);
-
-        filterBank.setContext(context);
-
-        percussionGenerator.setContext(context);
-        gateSmoother.setContext(context);
     }
 
     void FormaSynth::processBlock (float* buffer, int numberOfSamples)
@@ -234,14 +237,14 @@ namespace Ath::Forma
             auto fluteOut = filterAmpOut * parameterFluteStops;
 
             auto percIn = (filterAmpOut * parameterPercStops * preNonlinearityGain).sum();
-            auto percOut = percusionNonlinearity.process(percIn) * 128.0f * percussionGenerator.last();
+            auto percOut = percusionNonlinearity.process(percIn) * 128.0f * float(percussionGenerator.last());
 
             //bleeds:
             auto outBleed = bleedTerz * terzBleedGain + bleed * keyboardBleedGain;
 
             //tone knob filter:
             auto toneIn = fluteOut + outBleed;
-            buffer[i] = (sum * parameterFluteStops).sum();
+            buffer[i] = toneIn.sum() + percOut;
         }
 
         for (int i = 0; i < numberOfSamples; i++) buffer[i] += hum.process() * noiseFloorGain;
@@ -258,7 +261,7 @@ namespace Ath::Forma
             auto ampOut = outputNonlinearity.process(ampIn) * (postNonlinearityGain * 6.0f);
 
             //lastly, attenuate output signal by 18dB and a factor of 6 (because there are 6 stops)
-            //buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f * gateSmoother.process(gate);
+            buffer[i] = float(ampOut) * Math::DB_MINUS18 / 6.0f * gateSmoother.process(gate);
         }
 
         parameters[PERC_CV].touch(percussionGenerator.last() * percussionGenerator.getGate());

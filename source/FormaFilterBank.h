@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include "dsp/filter/FilterMath.h"
 #include "math/Complex.h"
 #include "math/Simd.h"
 #include "dsp/Context.h"
@@ -13,11 +14,11 @@ namespace Ath::Forma
     class FormaFilterBank
     {
         static constexpr int INPUT_NUM = 6;
-        static constexpr int CASCADE_SIZE = 15;
+        static constexpr int CASCADE_SIZE = 8;
         Dsp::Context c;
 
     public:
-        std::array<Dsp::Filter::BiquadCascade<Simd::float8, CASCADE_SIZE>, INPUT_NUM> cascades;
+        std::array<Dsp::Filter::Biquad::BiquadCascade<Simd::float8, CASCADE_SIZE>, INPUT_NUM> cascades;
     
         void setContext(Dsp::Context context)
         {
@@ -25,14 +26,14 @@ namespace Ath::Forma
 
             for (int i = 0; i < INPUT_NUM; i++) // inputs
             {
-                for (int j = 0; j < CASCADE_SIZE; j++) // inner
+                for (int j = 0; j < CASCADE_SIZE; j++) // inners
                 {
-                    auto c16 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i][j], c.SR);
-                    auto c8 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM][j], c.SR);
-                    auto c4 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM * 2][j], c.SR);
-                    auto c2 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM * 3][j], c.SR);
-                    auto c5 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM * 4][j], c.SR);
-                    auto c1 = Dsp::Filter::BilinearTransform(BIQUAD_COEFFS[i + INPUT_NUM * 5][j], c.SR);
+                    auto c16 = Dsp::Filter::Biquad::bilinear(BIQUAD_COEFFS[i][j], c.SR);
+                    auto c8 = Dsp::Filter::Biquad::bilinear(BIQUAD_COEFFS[i + INPUT_NUM][j], c.SR);
+                    auto c4 = Dsp::Filter::Biquad::bilinear(BIQUAD_COEFFS[i + INPUT_NUM * 2][j], c.SR);
+                    auto c2 = Dsp::Filter::Biquad::bilinear(BIQUAD_COEFFS[i + INPUT_NUM * 3][j], c.SR);
+                    auto c5 = Dsp::Filter::Biquad::bilinear(BIQUAD_COEFFS[i + INPUT_NUM * 4][j], c.SR);
+                    auto c1 = Dsp::Filter::Biquad::bilinear(BIQUAD_COEFFS[i + INPUT_NUM * 5][j], c.SR);
 
                     Simd::float8 b0 = {float(c16.b0), float(c8.b0), float(c4.b0), float(c2.b0), float(c5.b0), float(c1.b0), 1.0f, 1.0f};
                     Simd::float8 b1 = {float(c16.b1), float(c8.b1), float(c4.b1), float(c2.b1), float(c5.b1), float(c1.b1), 0.0f, 0.0f};
@@ -48,9 +49,14 @@ namespace Ath::Forma
             }
         }
 
-        Math::complex<Simd::float8> getTransfer(Simd::float8 frequency)
+        Math::complex<Simd::float8> getTransfer(Simd::float8 frequency, int index)
         {
             Math::complex<Simd::float8> transfer = { 1.0f, 0.0f }; // PLACEHOLDER
+
+            for (auto& biquad : cascades[index].biquads)
+            {
+                transfer *= Dsp::Filter::Biquad::transfer(biquad.coeffs, Dsp::Filter::f2s(frequency), Simd::float8(c.SR));
+            }
 
             return transfer;
         }
