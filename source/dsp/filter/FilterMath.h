@@ -26,6 +26,20 @@ namespace Ath::Dsp::Filter
         return normFrequencyToG(freq);
     }
 
+    template <typename T>
+    static Math::complex<T> f2s(T frequency)
+    {
+        return { 0.0f, frequency * Math::ftau };
+    }
+
+    template <typename T>
+    static Math::complex<T> bilinear(Math::complex<T> s, T sr)
+    {
+        Math::complex<T> k = T(sr * 2.0);
+
+        return (k + s) / (k - s);
+    }
+
     template<typename T>
     static Math::complex<T> transferLP1(Math::complex<T> wc, Math::complex<T> s)
     {

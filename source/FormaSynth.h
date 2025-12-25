@@ -64,7 +64,7 @@ private:
         std::array<Dsp::Oscillator::SquareChebyshev8, OSC_NUMBER> oscillators2;
         std::array<FormaNeedleContacts, KEY_NUMBER> needleContacts;
 
-        std::array<FormaFilterBank, 6> filterBanks;
+        FormaFilterBank filterBank;
         FormaTransistorNonlinearity8 filterNonlinearity;
         Dsp::Filter::TPT::LowPass1<float> filterTone;
 

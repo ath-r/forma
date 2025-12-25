@@ -55,55 +55,8 @@ namespace Ath::Forma
         }
 
         // initialize filterbanks
-        float freq = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER);
-        filterBanks[0].setFrequency(freq);
-        filterBanks[1].vmul = {1.0f, 2.0f, 2.828f, 4.0f, 5.656f, 8.0};
-        filterBanks[1].setFrequency(freq *= 1.4142f);
-        filterBanks[2].vmul = {1.0f, 1.4142f, 2.0f, 2.828f, 4.0f, 5.656f};
-        filterBanks[2].setFrequency(freq *= 2.0f);
-        filterBanks[3].vmul = filterBanks[2].vmul;
-        filterBanks[3].setFrequency(freq *= 2.0f);
-        filterBanks[4].vmul = filterBanks[2].vmul;
-        filterBanks[4].setFrequency(freq *= 2.0f);
-        filterBanks[5].vmul = filterBanks[2].vmul;
-        filterBanks[5].setFrequency(freq *= 2.0f);
 
-        // initialize voicing to even out filter attenuation
-        for (int i = 0; i < KEY_NUMBER; i++)
-        {
-            const float basefreq = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER + i);
-            Simd::float8 freqs = { 1.0f, 2.0f, 4.0f, 8.0f, 3.0f, 10.0f, 1.0f, 1.0f };
-            freqs *= basefreq;
-
-            // I KNOW that this can be expressed with a very simple formula, but let's keep it like that
-            // since it's more readable and can be flexibly changed in case filter bank distribution changes
-            int filterBankIndex;
-            if (i < 6) filterBankIndex = 0;
-            else if (i < 18) filterBankIndex = 1;
-            else if (i < 30) filterBankIndex = 2; 
-            else if (i < 42) filterBankIndex = 3;
-            else if (i < 54) filterBankIndex = 4;
-            else filterBankIndex = 5;
-
-            auto& filterBank = filterBanks[filterBankIndex];
-            Math::complex<Simd::float8> transfer = { 0.0f, 0.0f };
-            
-            // This algorithm samples the transfer function of a given filterbank 
-            // for the first OVERTONES_TO_SAMPLE overtones of a given tone
-            // Sum of these TFs is then used to determine how much this tone needs to be amplified
-            // to compensate for filters' attenuation
-            constexpr int OVERTONES_TO_SAMPLE = 10;
-            for (int n = 1; n < OVERTONES_TO_SAMPLE; n += 2)
-            {
-                //TODO: normal division/multiplication by scalar for complex numbers
-                auto t = filterBank.getTransfer(freqs * float(n));
-                t.re /= float(n);
-                t.im /= float(n);
-
-                transfer += t;
-            }
-            prefilterGains[i] = Simd::rmag(transfer.re, transfer.im) * std::lerp(1.0f, Math::dB(-6), float(i) / 61.0f);
-        }
+        
         
         percussionGenerator.setTime(getParameter(VCA_TIME).value);
         gateSmoother.setTime(0.001f);
@@ -122,13 +75,50 @@ namespace Ath::Forma
             needleContacts[i].setContext(context);
         }
 
-        for (auto& filterBank : filterBanks) filterBank.setContext(context);
-
         hum.setContext(context);
         filterTone.setContext(context);
 
+        filterBank.setContext(context);
+
         percussionGenerator.setContext(context);
         gateSmoother.setContext(context);
+
+        // initialize voicing to even out filter attenuation
+        for (int i = 0; i < KEY_NUMBER; i++)
+        {
+            const float basefreq = Math::noteToFrequency(Math::C1_MIDI_NOTE_NUMBER + i);
+            Simd::float8 freqs = { 1.0f, 2.0f, 4.0f, 8.0f, 3.0f, 10.0f, 1.0f, 1.0f };
+            freqs *= basefreq;
+
+            // I KNOW that this can be expressed with a very simple formula, but let's keep it like that
+            // since it's more readable and can be flexibly changed in case filter bank distribution changes
+            int filterBankIndex;
+            if (i < 6) filterBankIndex = 0;
+            else if (i < 18) filterBankIndex = 1;
+            else if (i < 30) filterBankIndex = 2; 
+            else if (i < 42) filterBankIndex = 3;
+            else if (i < 54) filterBankIndex = 4;
+            else filterBankIndex = 5;
+
+            Math::complex<Simd::float8> transfer = { 0.0f, 0.0f };
+            
+            // This algorithm samples the transfer function of a given filterbank 
+            // for the first OVERTONES_TO_SAMPLE overtones of a given tone
+            // Sum of these TFs is then used to determine how much this tone needs to be amplified
+            // to compensate for filters' attenuation
+            constexpr int OVERTONES_TO_SAMPLE = 10;
+            for (int n = 1; n < OVERTONES_TO_SAMPLE; n += 2)
+            {
+                //TODO: normal division/multiplication by scalar for complex numbers
+
+                Math::complex<Simd::float8> t = filterBank.getTransfer(freqs * float(n), filterBankIndex);
+                t.re /= float(n);
+                t.im /= float(n);
+
+                transfer += t;
+            }
+            prefilterGains[i] = Simd::rmag(transfer.re, transfer.im) * std::lerp(1.0f, Math::dB(-3), float(i) / 61.0f);
+        }
     }
 
     void FormaSynth::processBlock (float* buffer, int numberOfSamples)
@@ -227,7 +217,7 @@ namespace Ath::Forma
             Simd::float8 sum = 0.0f;
             for (int n = 0; n < 6; n++)
             {
-                sum += filterBanks[n].process(filterBankInputs[n]);
+                sum += filterBank.cascades[n].process(filterBankInputs[n]);
             }            
 
             //filter nonlinearity:
@@ -247,7 +237,7 @@ namespace Ath::Forma
             auto fluteOut = filterAmpOut * parameterFluteStops;
 
             auto percIn = (filterAmpOut * parameterPercStops * preNonlinearityGain).sum();
-            auto percOut = percusionNonlinearity.process(percIn) * 128.0f * percussionGenerator.last();
+            auto percOut = percusionNonlinearity.process(percIn) * 128.0f * float(percussionGenerator.last());
 
             //bleeds:
             auto outBleed = bleedTerz * terzBleedGain + bleed * keyboardBleedGain;
