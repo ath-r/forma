@@ -19,16 +19,12 @@ namespace Ath::Forma
 
         const Simd::float8 minVelocityGateAttack = 0.00001f;
         const Simd::float8 maxVelocityGateAttack = 0.05f;
-        
-        Simd::float8 filterCutoff = 100.0f;
+        \
         Simd::float8 delta = 0.0f;
         Simd::float8 value = 0.0f;
         Simd::float8 y = 0.0f;
 
-        bool gate = false;
-
-        Filter::Naive::LowPass1<Simd::float8> filter;
-
+        bool gate = false;\
     public:
         void setContext (Context context);
 

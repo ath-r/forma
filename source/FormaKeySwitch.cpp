@@ -13,8 +13,6 @@ namespace Ath::Forma
     void FormaNeedleContacts::setContext (Context context)
     {
         c = context;
-        filter.setContext(context);
-        filter.setCutoffFrequency(50.0f);
     }
 
     void FormaNeedleContacts::init (int keyNumber) 
@@ -31,10 +29,6 @@ namespace Ath::Forma
             2.0f,
             2.0f
         };
-
-        filterCutoff = Math::noteToFrequency(keyNumber + Math::C1_MIDI_NOTE_NUMBER);
-        filterCutoff *= {1.0f, 2.0f, 4.0f, 8.0f, 3.0f, 5.0f, 1.0f, 1.0f};
-        filterCutoff = Simd::min(filterCutoff, 1000.0f);
     };
 
     bool FormaNeedleContacts::isGateOn() { return gate; }
@@ -46,7 +40,6 @@ namespace Ath::Forma
         const Simd::float8 x = Math::easeOutCubic(float(message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
 
-        filter.setCutoffFrequency(10000.0f);
         delta = Simd::float8(c.T) / time;
 
         gate = true;
@@ -54,7 +47,6 @@ namespace Ath::Forma
 
     void FormaNeedleContacts::handleNoteOff (Midi::MessageNoteOff message) 
     {
-        filter.setCutoffFrequency(100.0f);
         delta = Simd::float8(-c.T) / 0.001f;
 
         gate = false;
@@ -66,7 +58,7 @@ namespace Ath::Forma
         value = Simd::clamp(value, 0.0f, 1.0f);
         auto logic = value > actionThreshold;
 
-        y = filter.process(Simd::float8(1.0f) & logic);
+        y = Simd::float8(1.0f) & logic;
         return y;
     }
 }
