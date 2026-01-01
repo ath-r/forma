@@ -30,13 +30,13 @@ namespace Ath::Math
     }
 
     template <typename T>
-    static inline T truncate (T x)
+    static inline T trunc (T x)
     {
         return static_cast<int>(x);
     }
 
     template <typename T>
-    static inline T fastmod1f (T x)
+    static inline T frac (T x)
     {
         return x - static_cast<int>(x);
     };
@@ -178,7 +178,7 @@ namespace Ath::Math
     static inline T foldArgument(T x)
     {
         const T half = 0.5;
-        x = fastmod1f(x + half) - half;
+        x = frac(x + half) - half;
 
         return max(min(x, half - x), -half - x);
     }
