@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Context.h"
-#include "../../math/Clamp.h"
+#include "../../math/Math.h"
 
 namespace Ath::Dsp::Cv
 {

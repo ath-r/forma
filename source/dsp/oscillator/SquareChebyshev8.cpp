@@ -1,5 +1,5 @@
 #include "SquareChebyshev8.h"
-#include "../../math/Trigonometry.h"
+#include "../../math/Math.h"
 
 namespace Ath::Dsp::Oscillator
 {

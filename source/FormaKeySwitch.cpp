@@ -1,9 +1,7 @@
 #pragma once
 
 #include "FormaKeySwitch.h"
-#include "math/Clamp.h"
-#include "math/Conversion.h"
-#include "math/Easings.h"
+#include "math/Math.h"
 #include "math/Simd.h"
 #include "math/Random.h"
 #include <cmath>
@@ -37,7 +35,7 @@ namespace Ath::Forma
 
     void FormaNeedleContacts::handleNoteOn (Midi::MessageNoteOn message)
     {
-        const Simd::float8 x = Math::easeOutCubic(float(message.velocity) / 127.0f);
+        const Simd::float8 x = Math::cubeInv(float(message.velocity) / 127.0f);
         const Simd::float8 time = Simd::lerp(maxVelocityGateAttack, minVelocityGateAttack, x);
 
         delta = Simd::float8(c.T) / time;

@@ -6,7 +6,7 @@
 
 #include "Context.h"
 #include "../math/Complex.h"
-#include "../math/Trigonometry.h"
+#include "../math/Math.h"
 
 namespace Ath::Dsp::Filter
 {

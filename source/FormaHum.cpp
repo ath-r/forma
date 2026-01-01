@@ -1,7 +1,6 @@
 #include "FormaHum.h"
 
-#include "math/Conversion.h"
-#include "math/Trigonometry.h"
+#include "math/Math.h"
 
 #include <cmath>
 

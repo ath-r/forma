@@ -12,7 +12,7 @@
 #include "PluginParameters.h"
 
 #include "math/Simd.h"
-#include "math/Conversion.h"
+#include "math/Math.h"
 
 #include "dsp/Context.h"
 #include "dsp/oscillator/SquareSincIntegral8.h"
