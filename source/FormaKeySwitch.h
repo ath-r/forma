@@ -1,6 +1,5 @@
 #pragma once
 
-#include "dsp/filter/Naive.h"
 #include "dsp/Context.h"
 
 #include "control/Midi.h"
@@ -19,12 +18,12 @@ namespace Ath::Forma
 
         const Simd::float8 minVelocityGateAttack = 0.00001f;
         const Simd::float8 maxVelocityGateAttack = 0.05f;
-        \
+        
         Simd::float8 delta = 0.0f;
         Simd::float8 value = 0.0f;
         Simd::float8 y = 0.0f;
 
-        bool gate = false;\
+        bool gate = false;
     public:
         void setContext (Context context);
 

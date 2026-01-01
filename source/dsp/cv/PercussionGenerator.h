@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Context.h"
-#include "../filter/Naive.h"
+#include "../Filter.h"
 #include "../../control/Midi.h"
 #include <algorithm>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dsp/Context.h"
-#include "dsp/filter/TPT.h"
+#include "dsp/Filter.h"
 
 #include "math/Random.h"
 

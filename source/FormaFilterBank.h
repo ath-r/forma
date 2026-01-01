@@ -1,11 +1,10 @@
 #pragma once
 
 #include <array>
-#include "dsp/filter/FilterMath.h"
+#include "dsp/Filter.h"
 #include "math/Complex.h"
 #include "math/Simd.h"
 #include "dsp/Context.h"
-#include "dsp/filter/Biquad.h"
 
 #include "FormaBiquadCoefficients.h"
 
