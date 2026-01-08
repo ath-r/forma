@@ -15,7 +15,7 @@ namespace Ath::Forma
 
     void FormaNeedleContacts::init (int keyNumber) 
     {
-        Math::Random::Mersenne rng;
+        Math::Random::MersenneTwister rng;
         rng.setSeed(keyNumber);
         actionThreshold = {
             rng.getFloat(), 

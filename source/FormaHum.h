@@ -12,7 +12,7 @@ namespace Ath::Forma
         Dsp::Context c = Dsp::Context(48000.0f);
 
         Dsp::Filter::TPT::LowPass1<float> filter;
-        Math::Random::Mersenne rng;
+        Math::Random::MersenneTwister rng;
 
         float phase = 0.0f;
         float delta = 0.0f;
