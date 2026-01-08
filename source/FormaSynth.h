@@ -3,7 +3,7 @@
 #include <array>
 #include <cstddef>
 
-#include "processor/MidiAudioProcessor.h"
+#include "ath_dsp/processor/MidiAudioProcessor.h"
 
 #include "FormaKeySwitch.h"
 #include "FormaFilterBank.h"
@@ -11,16 +11,16 @@
 #include "FormaHum.h"
 #include "PluginParameters.h"
 
-#include "math/Simd.h"
-#include "math/Math.h"
+#include "ath_dsp/math/Simd.h"
+#include "ath_dsp/math/Math.h"
 
-#include "dsp/Context.h"
+#include "ath_dsp/dsp/Context.h"
 #include "dsp/oscillator/SquareSincIntegral8.h"
 #include "dsp/oscillator/SquareChebyshev8.h"
-#include "dsp/cv/LinearSmoother.h"
-#include "dsp/cv/PercussionGenerator.h"
+#include "ath_dsp/dsp/cv/LinearSmoother.h"
+#include "ath_dsp/dsp/cv/PercussionGenerator.h"
 
-#include "control/Midi.h"
+#include "ath_dsp/control/Midi.h"
 
 namespace Ath::Forma
 {

@@ -2,7 +2,7 @@
 
 #include "juce_audio_processors/juce_audio_processors.h"
 
-#include "control/Events.h"
+#include "ath_dsp/control/Events.h"
 
 class ParameterObserver : public juce::AudioProcessorValueTreeState::Listener
 {

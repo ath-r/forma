@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Context.h"
-#include "../../math/Simd.h"
+#include "ath_dsp/dsp/Context.h"
+#include "ath_dsp/math/Simd.h"
 
 namespace Ath::Dsp::Oscillator
 {

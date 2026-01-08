@@ -1,5 +1,5 @@
 #include "SquareChebyshev8.h"
-#include "../../math/Math.h"
+#include "ath_dsp/math/Math.h"
 
 namespace Ath::Dsp::Oscillator
 {
@@ -16,7 +16,7 @@ namespace Ath::Dsp::Oscillator
 
         delta = frequency * c.T;
 
-        n = Math::truncate (15000.0f / frequency[0]);
+        n = Math::trunc(15000.0f / frequency[0]);
         n = Math::max(n, 1.0f);
     }
 

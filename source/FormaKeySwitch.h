@@ -1,9 +1,9 @@
 #pragma once
 
-#include "dsp/Context.h"
+#include "ath_dsp/dsp/Context.h"
 
-#include "control/Midi.h"
-#include "math/Simd.h"
+#include "ath_dsp/control/Midi.h"
+#include "ath_dsp/math/Simd.h"
 
 namespace Ath::Forma
 {

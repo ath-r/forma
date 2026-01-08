@@ -1,9 +1,9 @@
 #include "FormaSynth.h"
 #include "PluginParameters.h"
-#include "control/Midi.h"
-#include "math/Complex.h"
-#include "math/Math.h"
-#include "math/Simd.h"
+#include "ath_dsp/control/Midi.h"
+#include "ath_dsp/math/Complex.h"
+#include "ath_dsp/math/Math.h"
+#include "ath_dsp/math/Simd.h"
 #include <cmath>
 
 namespace Ath::Forma

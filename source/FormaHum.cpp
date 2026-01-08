@@ -1,6 +1,6 @@
 #include "FormaHum.h"
 
-#include "math/Math.h"
+#include "ath_dsp/math/Math.h"
 
 #include <cmath>
 

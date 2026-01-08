@@ -1,5 +1,5 @@
 #include "SquareSincIntegral8.h"
-#include "../../math/Math.h"
+#include "ath_dsp/math/Math.h"
 #include "SquareChebyshev8.h"
 
 namespace Ath::Dsp::Oscillator

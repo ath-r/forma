@@ -1,9 +1,9 @@
 #pragma once
 
-#include "dsp/waveshaping/ADAA1.h"
-#include "dsp/waveshaping/ADAA1simd.h"
-#include "math/Polynomial.h"
-#include "math/Simd.h"
+#include "ath_dsp/dsp/waveshaping/ADAA1.h"
+#include "ath_dsp/dsp/waveshaping/ADAA1simd.h"
+#include "ath_dsp/math/Polynomial.h"
+#include "ath_dsp/math/Simd.h"
 
 namespace Ath::Forma
 {

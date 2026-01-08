@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 
-#include "control/Parameter.h"
+#include "ath_dsp/control/Parameter.h"
 
 namespace Ath::Forma
 {

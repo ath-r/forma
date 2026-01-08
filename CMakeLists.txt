@@ -41,6 +41,7 @@ set(FORMATS Standalone AU VST3 AUv3)
 
 # For simplicity, the name of the CMake project is also the name of the target
 project(${PROJECT_NAME} VERSION ${CURRENT_VERSION})
+add_subdirectory(modules/ath_dsp)
 
 # JUCE is setup as a submodule in the /JUCE folder
 # Locally, you must run `git submodule update --init --recursive` once
@@ -142,6 +143,7 @@ target_compile_definitions(SharedCode
 # This allows the JUCE plugin targets and the Tests target to link against it
 target_link_libraries(SharedCode
     INTERFACE
+    ath_dsp
     Assets
     melatonin_inspector
     juce_audio_utils

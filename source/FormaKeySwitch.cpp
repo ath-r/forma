@@ -1,9 +1,9 @@
 #pragma once
 
 #include "FormaKeySwitch.h"
-#include "math/Math.h"
-#include "math/Simd.h"
-#include "math/Random.h"
+#include "ath_dsp/math/Math.h"
+#include "ath_dsp/math/Simd.h"
+#include "ath_dsp/math/Random.h"
 #include <cmath>
 
 namespace Ath::Forma

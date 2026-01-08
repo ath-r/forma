@@ -1,9 +1,9 @@
 #pragma once
 
-#include "dsp/Context.h"
-#include "dsp/Filter.h"
+#include "ath_dsp/dsp/Context.h"
+#include "ath_dsp/dsp/Filter.h"
 
-#include "math/Random.h"
+#include "ath_dsp/math/Random.h"
 
 namespace Ath::Forma
 {
