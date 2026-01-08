@@ -14,3 +14,6 @@
 	path = modules/clap-juce-extensions
 	url = https://github.com/free-audio/clap-juce-extensions.git
 	branch = main
+[submodule "modules/ath_dsp"]
+	path = modules/ath_dsp
+	url = https://github.com/ath-r/ath_dsp.git
