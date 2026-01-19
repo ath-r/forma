@@ -72,7 +72,7 @@ private:
         FormaTransistorNonlinearity percusionNonlinearity;
         FormaHum hum;
         FormaTransistorNonlinearity outputNonlinearity;
-        Dsp::Cv::LinearSmoother<float> gateSmoother;
+        Dsp::Cv::ConstantRateLinearSmoother<float> gateSmoother;
 
         // Tuning error (in cents) as described in MM5555/MM5556 Chromatic Frequency Generators datasheet
         // Error is normalized based on the average
